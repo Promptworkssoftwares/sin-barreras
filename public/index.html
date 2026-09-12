@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1d20">
+  <meta name="description" content="Sin Barreras: traducción en tiempo real, aprendizaje práctico, AI Coach y cámara por $5.99 al mes.">
+  <title>Sin Barreras · Comunícate sin límites</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/landing.css?v=1.4.26">
+</head>
+<body>
+  <header class="landing-nav">
+    <a class="landing-brand" href="/"><img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"></a>
+    <nav>
+      <a href="#features">Funciones</a>
+      <a href="#pricing">Precio</a>
+      <button id="nav-login" class="nav-login" type="button">Iniciar sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="landing-hero">
+      <div class="hero-copy">
+        <span class="hero-kicker"><i></i> TRADUCE · APRENDE · AVANZA</span>
+        <h1>El idioma no debe<br><em>detenerte.</em></h1>
+        <p>Traduce conversaciones en tiempo real, aprende inglés para situaciones reales, practica con IA y entiende documentos desde la cámara.</p>
+        <div id="hero-actions" class="hero-actions">
+          <button id="hero-login" class="cta-primary" type="button">COMENZAR AHORA <span>→</span></button>
+          <span class="price-note"><strong>$5.99</strong><small>USD / mes · cancela cuando quieras</small></span>
+        </div>
+        <div class="trust-row"><span>✓ Cuenta personal</span><span>✓ Progreso privado</span><span>✓ Acceso completo</span></div>
+      </div>
+      <div class="hero-visual" aria-label="Vista previa de Sin Barreras">
+        <div class="phone-card">
+          <div class="phone-top"><span>SB</span><b>Conversación activa</b><i></i></div>
+          <div class="speech speech-a"><small>ESPAÑOL</small><strong>Necesito hablar con mi supervisor.</strong></div>
+          <div class="translate-pulse"><i></i><span>AI</span><i></i></div>
+          <div class="speech speech-b"><small>ENGLISH</small><strong>I need to speak with my supervisor.</strong><button type="button" aria-label="Escuchar">◖</button></div>
+          <div class="learning-chip"><span>＋</span><div><b>Aprender “supervisor”</b><small>Guárdala en tu vocabulario</small></div></div>
+        </div>
+        <div class="orbit orbit-one">AI COACH</div>
+        <div class="orbit orbit-two">CÁMARA</div>
+        <div class="orbit orbit-three">APRENDER</div>
+      </div>
+    </section>
+
+    <section class="feature-strip" id="features">
+      <article><span>01</span><div><strong>Hablar</strong><p>Interpretación bidireccional automática.</p></div></article>
+      <article><span>02</span><div><strong>Aprender</strong><p>Niveles largos y repetición inteligente.</p></div></article>
+      <article><span>03</span><div><strong>AI Coach</strong><p>Conversaciones y correcciones reales.</p></div></article>
+      <article><span>04</span><div><strong>Cámara</strong><p>Traduce y explica documentos.</p></div></article>
+    </section>
+
+    <section class="pricing-section" id="pricing">
+      <div class="pricing-copy"><span>UN SOLO PLAN</span><h2>Todo Sin Barreras.<br>Sin funciones escondidas.</h2><p>Una cuenta individual con traducción, aprendizaje, práctica, coach y cámara.</p></div>
+      <article class="price-card">
+        <div class="price-card-head"><span>PLAN SIN BARRERAS</span><b>POPULAR</b></div>
+        <div class="big-price"><sup>$</sup><strong>5.99</strong><small>/ mes</small></div>
+        <ul><li>Traducción de voz en dos direcciones</li><li>Learning Lab completo</li><li>AI Conversation Coach</li><li>Práctica y pronunciación</li><li>Traducción con cámara</li><li>Progreso sincronizado por cuenta</li></ul>
+        <button id="pricing-login" type="button">CREAR MI CUENTA <span>→</span></button>
+        <p>Pago seguro procesado por Stripe.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer><img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><span>Comunícate hoy. Aprende para mañana.</span></footer>
+
+  <dialog id="auth-dialog" class="auth-dialog">
+    <div class="auth-shell">
+      <button class="dialog-close" type="button" data-close="auth-dialog" aria-label="Cerrar">×</button>
+      <div class="auth-logo"><img src="/icons/icon-192.png" alt=""></div>
+      <span class="auth-kicker">TU CUENTA SIN BARRERAS</span>
+      <h2 id="auth-title">Entra a tu cuenta.</h2>
+      <p id="auth-copy">Usa tu cuenta de Sin Barreras. Google queda disponible como opción secundaria.</p>
+      <div id="auth-status" class="auth-status is-hidden"></div>
+
+      <div id="local-auth" class="local-auth">
+        <div class="auth-tabs" role="tablist" aria-label="Acceso a la cuenta">
+          <button id="login-tab" class="auth-tab is-active" type="button" data-auth-mode="login">Iniciar sesión</button>
+          <button id="register-tab" class="auth-tab" type="button" data-auth-mode="register">Crear cuenta</button>
+        </div>
+
+        <form id="login-form" class="account-form">
+          <label>Email<input id="login-email" name="email" type="email" autocomplete="username" required></label>
+          <label>Contraseña<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
+          <button class="cta-primary" type="submit">INICIAR SESIÓN <span>→</span></button>
+        </form>
+
+        <form id="register-form" class="account-form is-hidden">
+          <label>Nombre<input id="register-name" name="name" type="text" autocomplete="name" maxlength="120" required></label>
+          <label>Email<input id="register-email" name="email" type="email" autocomplete="email" required></label>
+          <label>Contraseña<input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required></label>
+          <small class="password-note">Mínimo 10 caracteres.</small>
+          <button class="cta-primary" type="submit">CREAR MI CUENTA <span>→</span></button>
+        </form>
+      </div>
+
+      <div id="social-auth-block" class="social-auth-block">
+        <div class="auth-divider"><span>o continúa con</span></div>
+        <div id="provider-actions" class="provider-actions">
+          <a id="google-login" class="provider-button google" href="/auth/google"><span class="google-mark">G</span><b>Google</b><i>→</i></a>
+          <a id="chatgpt-login" class="provider-button chatgpt is-hidden" href="/auth/chatgpt"><span class="chatgpt-mark">◎</span><b>ChatGPT</b><i>→</i></a>
+        </div>
+      </div>
+
+      <div id="member-actions" class="member-actions is-hidden">
+        <div class="member-card"><span id="member-avatar">SB</span><div><strong id="member-name">Usuario</strong><small id="member-email"></small></div></div>
+        <button id="open-app" class="cta-primary is-hidden" type="button">ABRIR SIN BARRERAS <span>→</span></button>
+        <button id="subscribe-button" class="cta-primary is-hidden" type="button">SUSCRIBIRME POR $5.99/MES <span>→</span></button>
+        <button id="landing-logout" class="text-action" type="button">Cerrar sesión</button>
+      </div>
+      <p class="auth-legal">El acceso requiere una suscripción activa de $5.99/mes o un acceso gratuito otorgado por el owner. La cuenta owner tiene acceso total sin suscripción.</p>
+    </div>
+  </dialog>
+
+  <script type="module" src="/js/landing.js?v=1.4.26"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "sin-barreras",
+  "version": "1.4.28",
+  "private": true,
+  "description": "SaaS de interpretación, aprendizaje adaptativo, AI Coach y traducción con cámara.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server/bootstrap.js",
+    "start": "node server/bootstrap.js",
+    "seed:owner": "node scripts/seed-owner.js",
+    "test": "node --test && node scripts/security-audit.js",
+    "check:env": "node scripts/check-env.js",
+    "mongo:test": "node scripts/check-mongodb.js",
+    "security:audit": "node scripts/security-audit.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.18.0",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-oauth2": "^1.8.0",
+    "stripe": "^18.5.0"
+  }
+}

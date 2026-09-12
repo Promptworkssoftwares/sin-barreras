@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132427">
+  <title>Sin Barreras · Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/css/admin.css?v=1.4.26">
+</head>
+<body>
+  <aside class="admin-sidebar">
+    <a href="/admin" class="admin-brand"><img class="admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras"></a>
+    <div class="admin-label">SAAS CONTROL CENTER</div>
+    <nav>
+      <button class="side-link is-active" data-section="overview"><span>⌂</span>Overview</button>
+      <button class="side-link" data-section="users"><span>◎</span>Usuarios</button>
+      <button class="side-link" data-section="grants"><span>◇</span>Acceso gratis</button>
+      <button class="side-link" data-section="subscriptions"><span>◫</span>Suscripciones</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="/app">← Volver a la app</a>
+      <button id="admin-logout" type="button">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-title-block">
+        <img class="admin-topbar-logo admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-topbar-logo admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras">
+        <div><span class="eyebrow">OWNER DASHBOARD</span><h1 id="page-title">Control del SaaS</h1></div>
+      </div>
+      <div class="admin-user"><span id="admin-avatar">SB</span><div><strong id="admin-name">Owner</strong><small id="admin-email"></small></div></div>
+    </header>
+
+    <section id="overview-section" class="admin-section">
+      <div id="stats-grid" class="stats-grid">
+        <article><span>USUARIOS</span><strong id="stat-users">—</strong><small>Cuentas registradas</small></article>
+        <article><span>PAGADOS</span><strong id="stat-paid">—</strong><small>Suscripciones activas</small></article>
+        <article><span>GRATIS</span><strong id="stat-free">—</strong><small>Accesos otorgados</small></article>
+        <article><span>MRR EST.</span><strong id="stat-mrr">—</strong><small>USD / mes</small></article>
+      </div>
+      <div class="overview-grid">
+        <article class="control-card">
+          <div class="card-head"><div><span>ACCESO DIRECTO</span><h2>Dar acceso gratis</h2></div><i>◇</i></div>
+          <p>Escribe un email ahora. Cuando esa persona se registre con el mismo email, entrará sin pagar.</p>
+          <form id="quick-grant-form" class="grant-form"><input id="quick-grant-email" type="email" placeholder="persona@email.com" required><input id="quick-grant-note" type="text" maxlength="240" placeholder="Nota opcional"><button type="submit">DAR ACCESO <span>→</span></button></form>
+        </article>
+        <article class="control-card compact-card">
+          <div class="card-head"><div><span>ESTADO</span><h2>Operación</h2></div><i>●</i></div>
+          <div class="status-list"><div><span>Plan actual</span><b>$5.99 / mes</b></div><div><span>Revocados</span><b id="stat-revoked">—</b></div><div><span>Emails gratis activos</span><b id="stat-grants">—</b></div></div>
+        </article>
+      </div>
+      <article class="table-card"><div class="table-card-head"><div><span>RECIENTES</span><h2>Últimos usuarios</h2></div><button type="button" data-go="users">VER TODOS</button></div><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Acceso</th><th>Estado</th><th>Registro</th></tr></thead><tbody id="recent-users"></tbody></table></div></article>
+    </section>
+
+    <section id="users-section" class="admin-section is-hidden">
+      <div class="section-toolbar"><div><span class="eyebrow">PERSONAS</span><h2>Usuarios</h2></div><div class="filters"><input id="user-search" type="search" placeholder="Buscar email o nombre"><select id="user-filter"><option value="all">Todos</option><option value="paid">Pagados</option><option value="free">Gratis</option><option value="pending">Sin acceso</option><option value="revoked">Revocados</option></select></div></div>
+      <article class="table-card"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Acceso</th><th>Suscripción</th><th>Último login</th><th></th></tr></thead><tbody id="users-table"></tbody></table></div><div class="pagination"><button id="users-prev">←</button><span id="users-page">Página 1</span><button id="users-next">→</button></div></article>
+    </section>
+
+    <section id="grants-section" class="admin-section is-hidden">
+      <div class="section-toolbar"><div><span class="eyebrow">INVITACIONES PRIVADAS</span><h2>Acceso gratuito por email</h2></div></div>
+      <article class="control-card grant-manager"><p>El email queda preautorizado. Si ya existe una cuenta con ese email, el acceso se activa inmediatamente.</p><form id="grant-form" class="grant-form horizontal"><input id="grant-email" type="email" placeholder="persona@email.com" required><input id="grant-note" type="text" maxlength="240" placeholder="Ej. familia, beta tester"><button type="submit">AÑADIR EMAIL</button></form></article>
+      <div id="grants-grid" class="grants-grid"></div>
+    </section>
+
+    <section id="subscriptions-section" class="admin-section is-hidden">
+      <div class="section-toolbar"><div><span class="eyebrow">BILLING</span><h2>Suscripciones activas</h2></div><span class="price-pill">$5.99 / MES</span></div>
+      <article class="table-card"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Estado</th><th>Renovación</th><th>Cuenta</th><th></th></tr></thead><tbody id="subscriptions-table"></tbody></table></div></article>
+    </section>
+  </main>
+
+  <div id="admin-toast" class="admin-toast" role="status"></div>
+  <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
+  <script type="module" src="/js/admin.js?v=1.4.26"></script>
+</body>
+</html>

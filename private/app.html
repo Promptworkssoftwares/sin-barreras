@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#d9593d" />
+    <meta name="description" content="Sin Barreras: intérprete de voz, práctica de inglés, coach de conversación y traducción con cámara." />
+    <title>Sin Barreras · Comunícate y aprende</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/styles.css?v=1.4.26" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#conversation" aria-label="Ir a conversación">
+          <img class="brand-logo brand-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras" />
+          <img class="brand-logo brand-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras" />
+        </a>
+        <div class="top-actions">
+          <button class="icon-button" id="theme-button" type="button" aria-label="Cambiar apariencia">◐</button>
+          <button class="icon-button" id="settings-button" type="button" aria-label="Abrir preferencias">⚙</button>
+          <button class="account-button" id="account-button" type="button" aria-label="Abrir mi cuenta">SB</button>
+        </div>
+      </header>
+
+      <section class="hero" id="conversation">
+        <p class="eyebrow">INTÉRPRETE INTELIGENTE</p>
+        <h1>Habla. Entiende.<br /><em>Sigue adelante.</em></h1>
+        <p class="hero-copy">Elige el idioma de la otra persona. Tu idioma se detecta automáticamente y Sin Barreras traduce en la dirección correcta por ti.</p>
+      </section>
+
+      <section class="mode-panel" aria-label="Configuración de conversación">
+        <div class="mode-head">
+          <div>
+            <p class="section-label">Conversación automática</p>
+            <strong id="mode-name">AUTO ↔ English · Vida diaria</strong>
+          </div>
+          <span class="mode-dot" id="mode-dot" aria-hidden="true"></span>
+        </div>
+
+        <div class="auto-language-panel" aria-label="Idiomas de la conversación">
+          <div class="auto-language-card mine">
+            <div class="auto-language-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+            </div>
+            <div><span>MI IDIOMA · AUTO</span><strong id="my-language-name">Detectando automáticamente</strong><small>Sin Barreras reconoce tu idioma cuando hablas.</small></div>
+          </div>
+          <div class="auto-language-flow" aria-hidden="true">
+            <span class="auto-pulse"></span>
+            <svg viewBox="0 0 24 24"><path d="M7 7h10l-3-3M17 17H7l3 3"/></svg>
+            <b>TRADUCE</b>
+          </div>
+          <div class="auto-language-card partner">
+            <div class="auto-language-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5Z"/><path d="M8 9h8M8 12h5"/></svg>
+            </div>
+            <label class="partner-language-control"><span>IDIOMA DE LA OTRA PERSONA</span>
+              <select id="partner-language-select" aria-label="Idioma de la otra persona" required>
+                <option value="" selected disabled>Selecciona su idioma…</option>
+              </select>
+              <small id="auto-language-copy">Selecciona manualmente el idioma de la otra persona. Este valor nunca cambia solo.</small>
+            </label>
+          </div>
+        </div>
+
+        <div class="context-row">
+          <label>Situación
+            <select id="conversation-situation">
+              <option value="everyday" selected>Vida diaria</option>
+              <option value="work">Trabajo</option>
+              <option value="construction">Construcción / trabajo de campo</option>
+              <option value="medical">Doctor / salud</option>
+              <option value="school">Escuela</option>
+              <option value="restaurant">Restaurante</option>
+              <option value="bank">Banco</option>
+              <option value="interview">Entrevista de trabajo</option>
+              <option value="hotel">Hotel / viaje</option>
+              <option value="shopping">Compras / servicio al cliente</option>
+              <option value="emergency">Emergencia</option>
+              <option value="legal">Documento oficial / legal</option>
+            </select>
+          </label>
+          <p class="context-help">La IA usa este contexto para escoger palabras más naturales y precisas.</p>
+        </div>
+      </section>
+
+      <section class="interpreter-stage" aria-live="polite">
+        <div class="stage-topline">
+          <div class="status-row">
+            <span class="status-pill" id="status-pill">LISTO PARA ESCUCHAR</span>
+            <span class="status-copy" id="status-copy">Presiona comenzar una sola vez.</span>
+          </div>
+          <p class="stage-helper">Tu idioma se detecta automáticamente y la traducción cambia de dirección por ti.</p>
+        </div>
+
+        <div class="sound-waves" id="waves" aria-hidden="true">
+          <span class="wave-glow"></span>
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+
+        <button id="conversation-button" class="conversation-button" type="button" aria-label="Comenzar conversación continua">
+          <span class="conversation-button-sheen" aria-hidden="true"></span>
+          <span class="conversation-button-content">
+            <span class="conversation-button-icon-wrap" aria-hidden="true"><span class="mic-icon">●</span></span>
+            <span class="conversation-button-copy-wrap">
+              <span id="conversation-button-text">Comenzar conversación</span>
+              <small class="conversation-button-subtext">Interpretación automática en dos direcciones</small>
+            </span>
+            <span class="conversation-button-arrow" aria-hidden="true">↗</span>
+          </span>
+        </button>
+
+        <div class="privacy-note">
+          <span class="privacy-icon" aria-hidden="true">◌</span>
+          <span>El audio se procesa para interpretar la conversación y no se guarda en el servidor.</span>
+        </div>
+      </section>
+
+      <section class="translation-grid" aria-label="Última interpretación">
+        <article class="speech-card original-card">
+          <div class="card-head"><span id="original-language">PERSONA · ORIGINAL</span><span class="language-flag" id="source-flag">↗</span></div>
+          <p class="translation-text muted" id="original-text">Aquí aparecerá lo que la persona diga.</p>
+        </article>
+        <div class="translation-arrow" aria-hidden="true">↓</div>
+        <article class="speech-card translation-card">
+          <div class="card-head"><span id="translation-language">TRADUCCIÓN</span><button id="repeat-button" class="mini-action" type="button" disabled aria-label="Repetir última traducción">↻</button></div>
+          <p class="translation-text" id="translation-text">La traducción se reproducirá en voz alta.</p>
+          <button id="learn-from-translation" class="learn-from-translation is-hidden" type="button">＋ Aprender palabras de esta frase</button>
+        </article>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Navegación principal">
+        <button type="button" class="nav-item is-active" data-view="conversation" aria-label="Abrir Hablar">
+          <span class="nav-icon-box" aria-hidden="true">
+            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/hablar.png" alt="" />
+            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/hablar-active.png" alt="" />
+          </span>
+          <small>Hablar</small>
+        </button>
+        <button type="button" class="nav-item" data-view="learn" aria-label="Abrir Aprender">
+          <span class="nav-icon-box" aria-hidden="true">
+            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/aprender.png" alt="" />
+            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/aprender-active.png" alt="" />
+          </span>
+          <small>Aprender</small>
+        </button>
+        <button type="button" class="nav-item" data-view="practice" aria-label="Abrir Práctica">
+          <span class="nav-icon-box" aria-hidden="true">
+            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/practica.png" alt="" />
+            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/practica-active.png" alt="" />
+          </span>
+          <small>Práctica</small>
+        </button>
+        <button type="button" class="nav-item" data-view="coach" aria-label="Abrir Coach">
+          <span class="nav-icon-box" aria-hidden="true">
+            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/coach.png" alt="" />
+            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/coach-active.png" alt="" />
+          </span>
+          <small>Coach</small>
+        </button>
+        <button type="button" class="nav-item" data-view="camera" aria-label="Abrir Cámara">
+          <span class="nav-icon-box" aria-hidden="true">
+            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/camara.png" alt="" />
+            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/camara-active.png" alt="" />
+          </span>
+          <small>Cámara</small>
+        </button>
+      </nav>
+
+      <section id="learn-view" class="learn-view is-hidden" aria-labelledby="learn-title">
+        <section id="learn-home" class="learn-home" aria-label="Elegir forma de aprender">
+          <div class="learn-home-copy">
+            <p class="section-label">SIN BARRERAS · APRENDER</p>
+            <h2 id="learn-title">¿Qué quieres practicar <em>hoy?</em></h2>
+            <p>Elige un camino. Mantuvimos Sonidos y las Rutas por situación separados para que puedas concentrarte en una sola meta a la vez.</p>
+          </div>
+
+          <div class="learn-home-stats" aria-label="Tu progreso">
+            <span><b class="learn-stat-icon" data-learn-icon="flame"></b><strong id="learn-streak">0</strong><small>días</small></span>
+            <span><b class="learn-stat-icon" data-learn-icon="spark"></b><strong id="learn-xp">0</strong><small>XP</small></span>
+          </div>
+
+          <div class="learn-path-grid">
+            <button class="learn-path-card learn-path-sounds" type="button" data-learn-path="sounds">
+              <span class="learn-path-visual" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i>
+              </span>
+              <span class="learn-path-copy">
+                <small>PRONUNCIACIÓN</small>
+                <strong>Sonidos y pronunciación</strong>
+                <span>Vocales, consonantes, palabras, frases y práctica con tu voz.</span>
+              </span>
+              <span class="learn-path-meta"><b>39 sonidos</b><b>4 niveles por sonido</b></span>
+              <span class="learn-path-arrow">→</span>
+            </button>
+
+            <button class="learn-path-card learn-path-routes" type="button" data-learn-path="routes">
+              <span class="learn-path-visual route-visual" aria-hidden="true">
+                <i></i><i></i><i></i>
+              </span>
+              <span class="learn-path-copy">
+                <small>INGLÉS PARA TU VIDA</small>
+                <strong>Rutas por situación</strong>
+                <span>Trabajo, vida diaria, construcción, doctor, compras, restaurante y más.</span>
+              </span>
+              <span class="learn-path-meta"><b>Niveles progresivos</b><b>Vocabulario real</b></span>
+              <span class="learn-path-arrow">→</span>
+            </button>
+          </div>
+
+          <p class="learn-home-note">Puedes cambiar de camino cuando quieras. Tu progreso se guarda por separado.</p>
+        </section>
+
+        <section id="learn-sounds-branch" class="learn-branch is-hidden" aria-label="Sonidos y pronunciación">
+          <div class="learn-branch-topbar">
+            <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
+            <div><span>SONIDOS Y PRONUNCIACIÓN</span><strong>Entrena cómo suena tu inglés</strong></div>
+          </div>
+
+          <section id="sound-lab" class="sound-lab" aria-labelledby="sound-lab-title">
+            <div class="sound-lab-head">
+              <div>
+                <span class="section-label">SONIDOS DEL INGLÉS</span>
+                <h3 id="sound-lab-title">Escucha el sonido. <em>Entrena tu boca.</em></h3>
+                <p>Empieza con una palabra, después practica varias palabras, frases y oraciones. Cada sonido avanza por sus propios niveles.</p>
+              </div>
+              <div class="sound-lab-counts" aria-label="Contenido del laboratorio de sonidos">
+                <span><strong>15</strong><small>vocales</small></span>
+                <span><strong>24</strong><small>consonantes</small></span>
+                <span><strong>4</strong><small>niveles</small></span>
+              </div>
+            </div>
+
+            <div class="sound-lab-tabs" role="tablist" aria-label="Tipos de sonidos">
+              <button type="button" class="sound-tab is-active" data-sound-filter="vowels" role="tab" aria-selected="true">Vocales</button>
+              <button type="button" class="sound-tab" data-sound-filter="consonants" role="tab" aria-selected="false">Consonantes</button>
+              <button type="button" class="sound-tab" data-sound-filter="all" role="tab" aria-selected="false">Todos</button>
+            </div>
+
+            <div class="sound-lab-layout">
+              <div><div id="sound-grid" class="sound-grid" aria-live="polite"></div></div>
+              <article id="sound-detail" class="sound-detail" aria-live="polite">
+                <div class="sound-detail-empty">
+                  <span class="sound-orbit" aria-hidden="true">◌</span>
+                  <strong>Selecciona un sonido</strong>
+                  <p>Toca una tarjeta. Primero practicarás una palabra; después pasarás a varias palabras, frases y oraciones.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section id="learn-routes-branch" class="learn-branch is-hidden" aria-label="Rutas por situación">
+          <div class="learn-branch-topbar">
+            <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
+            <div><span>RUTAS POR SITUACIÓN</span><strong>Aprende inglés para momentos reales</strong></div>
+          </div>
+
+          <div class="learn-route-intro">
+            <div>
+              <p class="section-label">APRENDIZAJE POR CONTEXTO</p>
+              <h3>Aprende lo que vas a usar.<br><em>Recuerda lo que importa.</em></h3>
+              <p>Microlecciones adaptativas organizadas por situaciones reales de tu vida.</p>
+            </div>
+            <div class="learn-method-strip" aria-label="Método de aprendizaje">
+              <span><b>01</b> Descubre</span><i></i><span><b>02</b> Recuerda</span><i></i><span><b>03</b> Usa</span><i></i><span><b>04</b> Repite</span>
+            </div>
+          </div>
+
+          <div class="learn-dashboard-grid">
+            <article class="daily-goal-card">
+              <div class="daily-goal-top"><div class="daily-goal-copy"><span>PULSO DE HOY</span><strong id="learn-daily-text">0 / 50 XP</strong></div><span class="daily-goal-signal" aria-hidden="true"><i></i><i></i><i></i></span></div>
+              <div class="progress-track"><i id="learn-daily-bar"></i></div>
+              <p>Una sesión breve mantiene activo lo que ya aprendiste.</p>
+            </article>
+
+            <article class="continue-learning-card">
+              <div class="continue-orb" aria-hidden="true"><span>SB</span><i></i></div>
+              <div class="continue-copy"><span>RUTA ACTIVA</span><h3 id="learn-continue-title">Vida diaria</h3><p id="learn-continue-meta">Empieza con palabras esenciales</p><div class="progress-track compact"><i id="learn-continue-bar"></i></div></div>
+              <button id="learn-continue-button" class="learn-start-button" type="button">ENTRAR A LA SESIÓN <span>→</span></button>
+            </article>
+          </div>
+
+          <article id="learn-review-card" class="review-card is-hidden">
+            <span class="review-icon" data-learn-icon="refresh" aria-hidden="true"></span>
+            <div><strong>Memoria activa</strong><p id="learn-review-count">0 palabras listas para repasar</p></div>
+            <button id="learn-review-button" type="button">REPASAR AHORA</button>
+          </article>
+
+          <div class="learn-section-head">
+            <div><span class="section-label">RUTAS POR SITUACIÓN</span><h3>Inglés que conecta con tu vida</h3></div>
+            <span class="learn-language-chip"><i></i> English</span>
+          </div>
+          <div id="learn-course-grid" class="learn-course-grid"></div>
+
+          <section id="learn-level-panel" class="learn-level-panel is-hidden" aria-label="Niveles de la ruta">
+            <button id="learn-level-back" class="level-back-button" type="button">← TODAS LAS RUTAS</button>
+            <div class="level-panel-hero">
+              <span id="learn-level-icon" class="level-panel-icon"></span>
+              <div class="level-panel-copy"><span class="section-label">PROGRAMA POR NIVELES</span><h3 id="learn-level-title">Vida diaria</h3><p id="learn-level-meta">4 niveles · 20 sesiones · 32 palabras</p><div class="progress-track"><i id="learn-level-progress"></i></div></div>
+            </div>
+            <div id="learn-level-grid" class="learn-level-grid"></div>
+          </section>
+
+          <div class="learn-section-head words-head"><div><span class="section-label">MEMORIA PERSONAL</span><h3>Tu vocabulario en progreso</h3></div></div>
+          <div class="learn-summary-grid">
+            <div><span class="summary-mark">✓</span><strong id="learn-mastered-count">0</strong><span>Dominadas</span></div>
+            <div><span class="summary-mark">↗</span><strong id="learn-learning-count">0</strong><span>Aprendiendo</span></div>
+            <div><span class="summary-mark">＋</span><strong id="learn-custom-count">0</strong><span>De conversaciones</span></div>
+          </div>
+          <div id="learn-words-list" class="learn-words-list"></div>
+        </section>
+      </section>
+
+      <section id="practice-view" class="practice-view is-hidden" aria-labelledby="practice-title">
+        <div class="practice-heading">
+          <p class="section-label">INGLÉS PARA SITUACIONES REALES</p>
+          <h2 id="practice-title">¿Cómo digo esto en inglés?</h2>
+          <p>Escribe lo que quieres comunicar. La IA te dará una frase natural, pronunciación fácil, otra forma de decirlo y práctica con corrección inteligente.</p>
+        </div>
+
+        <form id="practice-form" class="practice-form">
+          <label for="practice-input">¿Qué quieres decir?</label>
+          <textarea id="practice-input" maxlength="500" required placeholder="Ejemplo: Necesito decirle a mi supervisor que mañana llegaré un poco tarde."></textarea>
+          <div class="practice-form-row three">
+            <label>Mi idioma
+              <select id="practice-language">
+                <option value="es" selected>Español</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="ja">日本語</option><option value="it">Italiano</option>
+              </select>
+            </label>
+            <label>Situación
+              <select id="practice-situation">
+                <option value="everyday" selected>Vida diaria</option><option value="work">Trabajo</option><option value="construction">Construcción</option><option value="medical">Doctor / salud</option><option value="school">Escuela</option><option value="restaurant">Restaurante</option><option value="bank">Banco</option><option value="interview">Entrevista</option><option value="hotel">Hotel / viaje</option><option value="shopping">Compras</option><option value="emergency">Emergencia</option><option value="legal">Documento oficial</option>
+              </select>
+            </label>
+            <button class="primary-button" type="submit">Enseñarme</button>
+          </div>
+        </form>
+
+        <article id="practice-result" class="practice-result is-hidden">
+          <div class="practice-points"><span>★</span><strong id="total-points">0 puntos</strong></div>
+          <p class="section-label">FORMA NATURAL EN INGLÉS</p>
+          <h3 id="practice-english"></h3>
+          <p id="practice-meaning" class="practice-meaning"></p>
+
+          <div class="pronunciation-box">
+            <span>PRONUNCIACIÓN FÁCIL · SIN SÍMBOLOS</span>
+            <strong id="practice-pronunciation"></strong>
+            <p id="practice-tip"></p>
+          </div>
+
+          <div class="alternative-box">
+            <span>OTRA FORMA NATURAL</span>
+            <strong id="practice-alternative"></strong>
+            <p id="practice-usage"></p>
+          </div>
+
+          <div class="practice-actions">
+            <button id="listen-practice" class="outline-button" type="button">◖ Escuchar ejemplo</button>
+            <button id="record-practice" class="record-button" type="button">● Practicar mi voz</button>
+          </div>
+
+          <div id="practice-score" class="practice-score is-hidden">
+            <div class="score-line"><strong id="score-number"></strong><span id="score-feedback"></span></div>
+            <div class="correction-block">
+              <span>LO QUE ENTENDÍ</span><p id="heard-text"></p>
+              <span>MEJOR FORMA DE DECIRLO</span><p id="corrected-text"></p>
+              <span>ENFÓCATE EN</span><p id="focus-text"></p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="coach-view" class="coach-view is-hidden" aria-labelledby="coach-title">
+        <div class="section-heading coach-heading">
+          <p class="section-label">SIN BARRERAS · CONVERSATION COACH</p>
+          <h2 id="coach-title">Habla inglés en una situación que se siente real.</h2>
+          <p>El Coach mantiene el contexto, recuerda lo que dijiste y reacciona como la otra persona. Usa ayudas cuando las necesites sin romper la conversación.</p>
+          <div class="coach-feature-strip" aria-label="Funciones del Coach">
+            <span><b>01</b> Contexto real</span><span><b>02</b> 12–18 turnos</span><span><b>03</b> Corrección sin cortar</span><span><b>04</b> Ayuda al instante</span>
+          </div>
+        </div>
+
+        <div class="coach-setup" id="coach-setup">
+          <div class="coach-setup-intro">
+            <span class="coach-setup-orb">AI</span>
+            <div><strong>Prepara tu práctica</strong><small>Elige una situación, tu nivel y cuánta ayuda quieres recibir.</small></div>
+          </div>
+          <label>Situación
+            <select id="coach-scenario">
+              <option value="everyday">Conversación diaria</option>
+              <option value="work" selected>Trabajo · supervisor o compañero</option>
+              <option value="interview">Entrevista de trabajo</option>
+              <option value="medical">Doctor / cita médica</option>
+              <option value="restaurant">Restaurante</option>
+              <option value="school">Escuela</option>
+              <option value="shopping">Compras / servicio al cliente</option>
+              <option value="phone">Llamada telefónica</option>
+              <option value="landlord">Vivienda / landlord</option>
+              <option value="construction">Construcción / trabajo de campo</option>
+              <option value="bank">Banco</option>
+              <option value="hotel">Hotel / viaje</option>
+              <option value="emergency">Situación urgente</option>
+            </select>
+          </label>
+          <label>Mi idioma
+            <select id="coach-language">
+              <option value="es" selected>Español</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option>
+            </select>
+          </label>
+          <label>Nivel
+            <select id="coach-level">
+              <option value="beginner" selected>Principiante</option>
+              <option value="intermediate">Intermedio</option>
+              <option value="advanced">Avanzado</option>
+            </select>
+          </label>
+          <label>Objetivo
+            <select id="coach-goal">
+              <option value="confidence" selected>Hablar con más confianza</option>
+              <option value="questions">Preguntar y responder mejor</option>
+              <option value="problem-solving">Resolver una situación real</option>
+              <option value="vocabulary">Usar más vocabulario</option>
+              <option value="listening">Entender respuestas naturales</option>
+            </select>
+          </label>
+          <label>Ayuda durante la conversación
+            <select id="coach-mode">
+              <option value="guided" selected>Guiado · más apoyo</option>
+              <option value="balanced">Balanceado</option>
+              <option value="challenge">Reto · menos pistas</option>
+            </select>
+          </label>
+          <button id="start-coach" class="primary-button coach-start-button" type="button"><span>▶</span> Empezar conversación</button>
+        </div>
+
+        <div id="coach-session" class="coach-session is-hidden">
+          <div class="coach-session-hero">
+            <div class="coach-persona-avatar" aria-hidden="true"><span>AI</span><i></i></div>
+            <div class="coach-session-copy">
+              <span id="coach-persona-role">CONVERSATION PARTNER</span>
+              <h3 id="coach-session-title">Conversación</h3>
+              <p id="coach-session-objective">Objetivo de la práctica</p>
+            </div>
+            <div class="coach-session-stats">
+              <span><strong id="coach-turn-count">0</strong><small>turnos</small></span>
+              <span><strong id="coach-progress-value">0%</strong><small>objetivo</small></span>
+            </div>
+          </div>
+          <div class="coach-mission-track"><i id="coach-progress-bar"></i></div>
+          <div id="coach-success-criteria" class="coach-success-criteria" aria-label="Metas de esta sesión"></div>
+          <div class="coach-toolbar">
+            <span class="status-pill light" id="coach-status">LISTO PARA PRACTICAR</span>
+            <div class="coach-toolbar-actions"><span id="coach-current-focus">Escucha y responde naturalmente</span><button id="end-coach" class="text-button" type="button">Finalizar sesión</button></div>
+          </div>
+          <div id="coach-thread" class="coach-thread" aria-live="polite"></div>
+          <div id="coach-summary" class="coach-summary is-hidden"></div>
+          <div id="coach-response-box" class="coach-response-box">
+            <div class="coach-composer-head"><span>Tu turno</span><small>Responde como lo harías en la vida real. No tiene que ser perfecto.</small></div>
+            <button id="coach-record" class="record-button large coach-record-primary" type="button"><span>●</span> Responder con mi voz</button>
+            <div class="coach-text-fallback">
+              <input id="coach-text-input" type="text" maxlength="700" placeholder="O escribe tu respuesta en inglés…" autocomplete="off" />
+              <button id="coach-send-text" class="outline-button" type="button">Enviar</button>
+            </div>
+          </div>
+          <button id="new-coach-session" class="outline-button coach-new-session is-hidden" type="button">Nueva práctica</button>
+        </div>
+      </section>
+
+      <section id="camera-view" class="camera-view is-hidden" aria-labelledby="camera-title">
+        <div class="section-heading camera-heading">
+          <p class="section-label">CÁMARA · TRADUCIR Y ENTENDER</p>
+          <h2 id="camera-title">Apunta. Captura. Entiende.</h2>
+          <p>Toma una foto de una carta, formulario, menú, señal o instrucciones. Sin Barreras extrae el texto, lo traduce y te explica qué significa.</p>
+          <div class="camera-flow-strip" aria-label="Flujo de Cámara">
+            <span><b>1</b> Foto</span><i>→</i><span><b>2</b> Traducción</span><i>→</i><span><b>3</b> Explicación</span>
+          </div>
+        </div>
+
+        <div class="camera-panel">
+          <div class="camera-controls">
+            <label>Texto original
+              <select id="camera-source-language">
+                <option value="auto" selected>Detectar automáticamente</option><option value="en">English</option><option value="es">Español</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="ja">日本語</option><option value="it">Italiano</option>
+              </select>
+            </label>
+            <label>Traducir a
+              <select id="camera-target-language">
+                <option value="es" selected>Español</option><option value="en">English</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="ja">日本語</option><option value="it">Italiano</option>
+              </select>
+            </label>
+            <label>Contexto
+              <select id="camera-situation">
+                <option value="everyday" selected>General</option><option value="work">Trabajo</option><option value="construction">Construcción</option><option value="medical">Doctor / salud</option><option value="school">Escuela</option><option value="restaurant">Restaurante</option><option value="bank">Banco</option><option value="hotel">Hotel / viaje</option><option value="shopping">Compras</option><option value="emergency">Emergencia</option><option value="legal">Documento oficial / legal</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="camera-dropzone" for="camera-input" id="camera-dropzone">
+            <input id="camera-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" />
+            <span class="camera-icon camera-lens" aria-hidden="true"><i></i></span>
+            <span class="camera-capture-copy"><strong>Tomar foto</strong><small>o seleccionar una imagen de tu dispositivo</small></span>
+            <span class="camera-format-chip">JPG · PNG · WEBP · GIF · 10 MB</span>
+          </label>
+          <p class="camera-helper-text">Sube o toma una imagen y luego analiza el texto con traducción y contexto.</p>
+          <div id="camera-preview-wrap" class="camera-preview-wrap is-hidden">
+            <img id="camera-preview" alt="Vista previa de la imagen seleccionada" />
+            <button id="remove-camera-image" type="button" class="mini-fab" aria-label="Quitar imagen">×</button>
+          </div>
+          <button id="analyze-image" class="primary-button camera-analyze-button is-hidden" type="button" disabled><span>✦</span><strong>Analizar y traducir</strong><small>Detectar texto + traducción + contexto</small></button>
+        </div>
+
+        <article id="camera-result" class="camera-result is-hidden">
+          <div class="camera-result-head"><span class="section-label" id="camera-document-type">DOCUMENTO</span><span id="camera-detected-language" class="detected-badge"></span></div>
+          <div class="document-grid">
+            <div><span>TEXTO DETECTADO</span><p id="camera-original-text"></p></div>
+            <div class="translated-document"><span>TRADUCCIÓN</span><p id="camera-translated-text"></p></div>
+          </div>
+          <div class="camera-actions">
+            <button id="listen-camera-translation" class="outline-button" type="button">◖ Escuchar traducción</button>
+            <button id="explain-camera-text" class="primary-button inline" type="button">✦ Explícame esto</button>
+          </div>
+          <div id="explanation-box" class="explanation-box is-hidden">
+            <span class="section-label">EXPLICADO EN PALABRAS SIMPLES</span>
+            <h3 id="explanation-summary"></h3>
+            <div id="explanation-points"></div>
+            <div id="explanation-actions"></div>
+            <p id="explanation-caution" class="explanation-caution is-hidden"></p>
+          </div>
+        </article>
+      </section>
+
+      <section id="history-view" class="history-view is-hidden" aria-labelledby="history-title">
+        <div class="history-heading">
+          <div><p class="section-label">EN ESTE DISPOSITIVO</p><h2 id="history-title">Historial</h2></div>
+          <button id="clear-history" class="text-button" type="button">Borrar todo</button>
+        </div>
+        <p id="history-empty" class="empty-state">Todavía no hay conversaciones guardadas.</p>
+        <div id="history-list" class="history-list"></div>
+      </section>
+    </main>
+
+    <section id="lesson-player" class="lesson-player is-hidden" aria-label="Lección interactiva">
+      <header class="lesson-topbar">
+        <button id="lesson-close" class="lesson-close" type="button" aria-label="Cerrar lección">×</button>
+        <div class="lesson-progress-group">
+          <div class="lesson-progress-copy"><span id="lesson-step">1 / 6</span><small id="lesson-course-label">NIVEL · SESIÓN</small></div>
+          <div class="lesson-progress"><i id="lesson-progress-bar"></i></div>
+        </div>
+        <div class="lesson-focus" title="Tu foco baja con errores, pero nunca bloquea la sesión"><span>FOCO</span><strong id="lesson-focus">5</strong><small>/5</small></div>
+      </header>
+      <main class="lesson-content">
+        <div class="lesson-question">
+          <div class="lesson-meta"><span><i></i><b id="lesson-badge">PALABRA NUEVA</b></span><small>RECUERDA · DECIDE · AVANZA</small></div>
+          <div class="lesson-question-shell">
+            <div class="lesson-question-accent" aria-hidden="true"></div>
+            <h2 id="lesson-title">¿Qué significa esta palabra?</h2>
+            <p id="lesson-prompt" class="lesson-prompt is-hidden"></p>
+            <button id="lesson-listen" class="lesson-listen is-hidden" type="button"><span>◖</span> ESCUCHAR OTRA VEZ</button>
+            <button id="lesson-voice" class="lesson-voice is-hidden" type="button"><span>●</span><b>RESPONDER CON MI VOZ</b><small>Habla y la app detectará cuando termines</small></button>
+            <div id="lesson-options" class="lesson-options"></div>
+            <div id="lesson-input-wrap" class="lesson-input-wrap is-hidden">
+              <label for="lesson-input">Escribe lo que recuerdas</label>
+              <input id="lesson-input" type="text" autocomplete="off" autocapitalize="none" placeholder="Escribe la palabra en inglés" />
+            </div>
+            <button id="lesson-check" class="lesson-check" type="button" disabled>CONFIRMAR RESPUESTA</button>
+          </div>
+        </div>
+
+        <div id="lesson-complete" class="lesson-complete is-hidden">
+          <div class="lesson-complete-mark"><span>SB</span><i>✓</i></div>
+          <span>SESIÓN COMPLETADA</span>
+          <h2>Avanzaste dentro del nivel.</h2>
+          <p>Cada nivel tiene 5 sesiones. Las palabras vuelven con menos pistas hasta que puedas recordarlas y usarlas por tu cuenta.</p>
+          <div class="lesson-result-grid">
+            <div><small>XP DE LA SESIÓN</small><strong id="lesson-complete-xp">+0 XP</strong></div>
+            <div><small>PRECISIÓN</small><strong id="lesson-complete-words">0%</strong></div>
+          </div>
+          <button id="lesson-complete-button" class="lesson-complete-button" type="button">VOLVER A MI APRENDIZAJE <span>→</span></button>
+        </div>
+      </main>
+      <footer id="lesson-feedback" class="lesson-feedback is-hidden">
+        <div class="lesson-feedback-icon" id="lesson-feedback-icon">✓</div>
+        <div class="lesson-feedback-copy"><span>RETROALIMENTACIÓN INTELIGENTE</span><strong id="lesson-feedback-title">Conexión correcta.</strong><p id="lesson-feedback-copy"></p></div>
+        <button id="lesson-continue" type="button">SIGUIENTE <span>→</span></button>
+      </footer>
+    </section>
+
+    <dialog id="settings-dialog" class="settings-dialog">
+      <form method="dialog">
+        <div class="dialog-head"><div><p class="section-label">PREFERENCIAS</p><h2>Hazlo tuyo</h2></div><button class="icon-button" value="close" aria-label="Cerrar preferencias">×</button></div>
+        <div class="setting-row auto-setting-summary"><span>Mi idioma</span><div><strong>AUTO</strong><small>Sin Barreras lo detecta automáticamente cuando hablas.</small></div></div>
+        <label class="setting-row voice-setting">Voz del traductor
+          <div class="voice-setting-control">
+            <select id="translator-voice-select">
+              <option value="coral" selected>Coral</option><option value="marin">Marin</option><option value="cedar">Cedar</option><option value="alloy">Alloy</option><option value="ash">Ash</option><option value="ballad">Ballad</option><option value="echo">Echo</option><option value="fable">Fable</option><option value="onyx">Onyx</option><option value="nova">Nova</option><option value="sage">Sage</option><option value="shimmer">Shimmer</option><option value="verse">Verse</option>
+            </select>
+            <button id="preview-voice" type="button" class="voice-preview-button">▶ Probar voz</button>
+          </div>
+          <small>Esta voz se usa para leer tus traducciones, práctica y contenido hablado.</small>
+        </label>
+        <label class="setting-row">Tamaño del texto
+          <select id="font-size-select"><option value="normal">Normal</option><option value="large">Grande</option><option value="xl">Extra grande</option></select>
+        </label>
+        <div class="setting-row stacked"><span>Modo de apariencia</span><div class="segmented compact"><button type="button" class="theme-option" data-theme="light">Claro</button><button type="button" class="theme-option" data-theme="dark">Oscuro</button></div></div>
+        <button id="open-history" class="settings-history-button" type="button"><span>◷</span><span><strong>Historial</strong><small>Ver conversaciones guardadas</small></span><b>→</b></button>
+        <p class="dialog-note">Tu historial, vocabulario, preferencias y progreso se sincronizan con tu cuenta de forma privada.</p>
+      </form>
+    </dialog>
+
+    <dialog id="account-dialog" class="account-dialog">
+      <div class="account-dialog-body">
+        <div class="dialog-head"><div><p class="section-label">MI CUENTA</p><h2>Sin Barreras</h2></div><form method="dialog"><button class="icon-button" value="close" aria-label="Cerrar cuenta">×</button></form></div>
+        <div class="account-profile">
+          <div class="account-avatar" id="account-avatar">SB</div>
+          <div><strong id="account-name">Usuario</strong><span id="account-email"></span><small id="account-plan">PLAN SIN BARRERAS</small></div>
+        </div>
+        <div class="account-actions">
+          <button id="manage-subscription" type="button"><span>◫</span><div><strong>Administrar suscripción</strong><small>Pago, tarjeta o cancelación</small></div><b>→</b></button>
+          <button id="open-admin" type="button" hidden><span>⌘</span><div><strong>Admin Dashboard</strong><small>Usuarios, accesos y suscripciones</small></div><b>→</b></button>
+          <button id="account-logout" type="button" class="danger-lite"><span>↗</span><div><strong>Cerrar sesión</strong><small>Salir de esta cuenta</small></div><b>→</b></button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="onboarding-dialog" class="onboarding-dialog">
+      <div class="onboarding-content">
+        <span class="onboarding-mark" aria-hidden="true">⌁</span>
+        <p class="eyebrow">BIENVENIDO A SIN BARRERAS</p>
+        <h2>Comunícate hoy. Aprende para mañana.</h2>
+        <ol>
+          <li>Selecciona el idioma de la persona con la que vas a hablar. Tu idioma se detecta automáticamente.</li>
+          <li>Escoge la situación para darle contexto a la IA y tu voz favorita en Preferencias.</li>
+          <li>Presiona <strong>Comenzar</strong> una sola vez. Después ambos hablan normalmente y la dirección cambia sola.</li>
+          <li>Usa <strong>Aprender</strong>, <strong>Práctica</strong>, <strong>Coach</strong> y <strong>Cámara</strong> para avanzar cada día.</li>
+        </ol>
+        <p class="dialog-note">Te pediremos permiso para usar el micrófono o la cámara solamente cuando corresponda.</p>
+        <button id="onboarding-continue" class="primary-button" type="button">Entiendo, continuar</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data?.type === 'SIN_BARRERAS_UPDATED') window.location.reload();
+        });
+      }
+    </script>
+    <script type="module" src="/app-bootstrap.js?v=1.4.26"></script>
+  </body>
+</html>
