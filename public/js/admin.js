@@ -34,9 +34,34 @@ async function loadUsers(){ const q=encodeURIComponent($('#user-search').value.t
 async function loadSubscriptions(){ const data=await api('/api/admin/users?status=paid&limit=50&page=1'); $('#subscriptions-table').innerHTML=data.items.length?data.items.map(user=>`<tr><td>${userCell(user)}</td><td><span class="badge paid">${escapeHtml(user.subscriptionStatus.toUpperCase())}</span></td><td>${formatDate(user.currentPeriodEnd)}</td><td>${user.accountStatus==='active'?'Activa':'Revocada'}</td><td><div class="action-menu"><button data-sub-cancel="${user.id}">Cancelar suscripción</button></div></td></tr>`).join(''):`<tr><td colspan="5">No hay suscripciones activas.</td></tr>`; }
 async function loadGrants(){ const data=await api('/api/admin/grants'); $('#grants-grid').innerHTML=data.items.length?data.items.map(grant=>`<article class="grant-item"><div class="grant-item-head"><strong>${escapeHtml(grant.email)}</strong><button data-grant-delete="${grant._id}">REVOCAR</button></div><p>${escapeHtml(grant.note||'Acceso gratuito otorgado por el owner.')}</p><small>${grant.claimedBy?'CUENTA VINCULADA':'ESPERANDO REGISTRO'} · ${formatDate(grant.createdAt)}</small></article>`).join(''):`<article class="grant-item"><strong>No hay emails con acceso gratuito.</strong><p>Añade uno arriba para preautorizarlo.</p></article>`; }
 
-function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); }
+function setMobileMenuState(isOpen){
+  const sidebar = $('#admin-sidebar');
+  const backdrop = $('#admin-backdrop');
+  const isMobile = window.innerWidth <= 900;
+  if (!sidebar || !backdrop) return;
+
+  if (!isMobile) {
+    sidebar.classList.remove('is-open');
+    backdrop.classList.remove('is-visible');
+    document.body.classList.remove('admin-menu-open');
+    return;
+  }
+
+  sidebar.classList.toggle('is-open', isOpen);
+  backdrop.classList.toggle('is-visible', isOpen);
+  document.body.classList.toggle('admin-menu-open', isOpen);
+}
+
+function closeMobileMenu(){ setMobileMenuState(false); }
+
+function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); closeMobileMenu(); }
 function askConfirm(title,copy,handler){ $('#confirm-title').textContent=title; $('#confirm-copy').textContent=copy; confirmHandler=handler; $('#confirm-dialog').showModal(); }
 async function createGrant(email,note){ await api('/api/admin/grants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,note})}); toast(`Acceso gratuito preparado para ${email}`); await Promise.all([loadStats(),loadGrants(),loadUsers().catch(()=>{})]); }
+
+$('#admin-open-menu').addEventListener('click',()=>setMobileMenuState(true));
+$('#admin-close-menu').addEventListener('click',closeMobileMenu);
+$('#admin-backdrop').addEventListener('click',closeMobileMenu);
+window.addEventListener('resize',()=>setMobileMenuState(false));
 
 $$('.side-link').forEach(button=>button.addEventListener('click',()=>showSection(button.dataset.section)));
 $$('[data-go]').forEach(button=>button.addEventListener('click',()=>showSection(button.dataset.go)));

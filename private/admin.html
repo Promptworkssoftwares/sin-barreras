@@ -9,8 +9,13 @@
   <link rel="stylesheet" href="/css/admin.css?v=1.4.26">
 </head>
 <body>
-  <aside class="admin-sidebar">
-    <a href="/admin" class="admin-brand"><img class="admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras"></a>
+  <div id="admin-backdrop" class="admin-backdrop" aria-hidden="true"></div>
+
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="/admin" class="admin-brand"><img class="admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras"></a>
+      <button id="admin-close-menu" class="admin-close-menu" type="button" aria-label="Cerrar menú">✕</button>
+    </div>
     <div class="admin-label">SAAS CONTROL CENTER</div>
     <nav>
       <button class="side-link is-active" data-section="overview"><span>⌂</span>Overview</button>
@@ -27,6 +32,7 @@
   <main class="admin-main">
     <header class="admin-topbar">
       <div class="admin-title-block">
+        <button id="admin-open-menu" class="admin-open-menu" type="button" aria-label="Abrir menú">☰</button>
         <img class="admin-topbar-logo admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-topbar-logo admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras">
         <div><span class="eyebrow">OWNER DASHBOARD</span><h1 id="page-title">Control del SaaS</h1></div>
       </div>
