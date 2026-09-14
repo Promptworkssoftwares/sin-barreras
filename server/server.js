@@ -110,7 +110,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.4.16' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.4.42' }));
+
 
 app.get('/api/public/config', (_request, response) => response.json({
   price: Number(process.env.STRIPE_MONTHLY_AMOUNT || 599) / 100,

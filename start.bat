@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ==========================================
-echo   Sin Barreras SaaS v1.4.16 - Inicio
+echo   Sin Barreras SaaS v1.4.42 - Inicio
 echo ==========================================
 
 where node >nul 2>nul
@@ -14,7 +14,7 @@ if errorlevel 1 (
 )
 
 if not exist "node_modules" (
-  echo [INFO] Instalando dependencias...
+  echo [INFO] Instalando o actualizando dependencias...
   call npm install
   if errorlevel 1 (
     echo [ERROR] No fue posible instalar dependencias.

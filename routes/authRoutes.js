@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import passport from '../config/passport.js';
 import User from '../models/User.js';
 import { publicUser, normalizeEmail, applyFreeGrant } from '../services/accessService.js';
+import { refreshGooglePlayEntitlement } from '../services/googlePlayService.js';
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
@@ -82,7 +83,13 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
       }
       user.lastLoginAt = new Date();
       await user.save();
-      if (user.role !== 'owner') await applyFreeGrant(user);
+      if (user.role !== 'owner') {
+        await applyFreeGrant(user);
+        if (user.billingProvider === 'google_play') {
+          try { await refreshGooglePlayEntitlement(user, { force: true }); }
+          catch (error) { console.warn('Google Play login refresh failed:', error.message); }
+        }
+      }
 
       request.login(user, (error) => {
         if (error) return next(error);
@@ -100,7 +107,11 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
 
   router.get('/google/callback', (request, response, next) => {
     if (!googleEnabled) return response.redirect('/?auth=google-not-configured');
-    passport.authenticate('google', { failureRedirect: '/?auth=failed' })(request, response, () => {
+    passport.authenticate('google', { failureRedirect: '/?auth=failed' })(request, response, async () => {
+      if (request.user?.billingProvider === 'google_play') {
+        try { await refreshGooglePlayEntitlement(request.user, { force: true }); }
+        catch (error) { console.warn('Google Play Google-login refresh failed:', error.message); }
+      }
       response.redirect(authRedirect(request.user));
     });
   });
@@ -112,7 +123,11 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
 
   router.get('/chatgpt/callback', (request, response, next) => {
     if (!chatgptEnabled) return response.redirect('/?auth=chatgpt-unavailable');
-    passport.authenticate('chatgpt', { failureRedirect: '/?auth=failed' })(request, response, () => {
+    passport.authenticate('chatgpt', { failureRedirect: '/?auth=failed' })(request, response, async () => {
+      if (request.user?.billingProvider === 'google_play') {
+        try { await refreshGooglePlayEntitlement(request.user, { force: true }); }
+        catch (error) { console.warn('Google Play ChatGPT-login refresh failed:', error.message); }
+      }
       response.redirect(authRedirect(request.user));
     });
   });

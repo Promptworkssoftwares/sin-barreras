@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+set -eu
+GRADLE_VERSION="9.6.1"
+CACHE_DIR="${GRADLE_USER_HOME:-$HOME/.gradle}/sin-barreras-wrapper"
+GRADLE_HOME="$CACHE_DIR/gradle-$GRADLE_VERSION"
+ZIP_FILE="$CACHE_DIR/gradle-$GRADLE_VERSION-bin.zip"
+GRADLE_BIN="$GRADLE_HOME/bin/gradle"
+
+if [ ! -x "$GRADLE_BIN" ]; then
+  echo "[Sin Barreras] Preparando Gradle $GRADLE_VERSION..."
+  mkdir -p "$CACHE_DIR"
+  if [ ! -f "$ZIP_FILE" ]; then
+    if command -v curl >/dev/null 2>&1; then
+      curl -fL "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip" -o "$ZIP_FILE"
+    elif command -v wget >/dev/null 2>&1; then
+      wget -O "$ZIP_FILE" "https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
+    else
+      echo "ERROR: instala curl o wget para descargar Gradle." >&2
+      exit 1
+    fi
+  fi
+  command -v unzip >/dev/null 2>&1 || { echo "ERROR: instala unzip." >&2; exit 1; }
+  unzip -q -o "$ZIP_FILE" -d "$CACHE_DIR"
+fi
+
+exec "$GRADLE_BIN" "$@"

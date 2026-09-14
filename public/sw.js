@@ -1,9 +1,9 @@
-const CACHE = 'sin-barreras-v1.4.26';
+const CACHE = 'sin-barreras-v1.4.42';
 const ASSETS = [
-  '/', '/manifest.webmanifest', '/css/landing.css?v=1.4.26', '/js/landing.js?v=1.4.26',
-  '/styles.css?v=1.4.26', '/app-bootstrap.js?v=1.4.26', '/cloud.js?v=1.4.26', '/account-ui.js?v=1.4.26',
-  '/app.js?v=1.4.26', '/languages.js?v=1.4.26', '/learn.js?v=1.4.26', '/sounds.js?v=1.4.26', '/voice-turn.js?v=1.4.26', '/icons/icon-192.png', '/icons/icon-512.png',
-  '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
+  '/', '/manifest.webmanifest', '/css/landing.css?v=1.4.42', '/js/landing.js?v=1.4.42',
+  '/styles.css?v=1.4.42', '/app-bootstrap.js?v=1.4.42', '/cloud.js?v=1.4.42', '/account-ui.js?v=1.4.42',
+  '/app.js?v=1.4.42', '/ai-stage.js?v=1.4.42', '/navigation-flow.js?v=1.4.42', '/play-billing.js?v=1.4.42', '/languages.js?v=1.4.42', '/learn.js?v=1.4.42', '/sounds.js?v=1.4.42', '/voice-turn.js?v=1.4.42', '/icons/icon-192.png', '/icons/icon-512.png',
+    '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
   '/assets/learn/everyday.png', '/assets/learn/work.png', '/assets/learn/construction.png', '/assets/learn/medical.png',
   '/assets/learn/shopping.png', '/assets/learn/restaurant.png', '/assets/learn/interview.png', '/assets/learn/school.png',
   '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png', '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',

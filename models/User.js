@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema({
   freeAccessGrantedAt: { type: Date, default: null },
   stripeCustomerId: { type: String, default: null, index: true, sparse: true },
   stripeSubscriptionId: { type: String, default: null, index: true, sparse: true },
+  billingProvider: { type: String, enum: ['none', 'stripe', 'google_play'], default: 'none', index: true },
+  googlePlayProductId: { type: String, default: null },
+  googlePlayPurchaseToken: { type: String, trim: true, index: true, unique: true, sparse: true },
+  googlePlayOrderId: { type: String, default: null },
+  googlePlaySubscriptionState: { type: String, default: '', maxlength: 80 },
+  googlePlayVerifiedAt: { type: Date, default: null },
   subscriptionStatus: {
     type: String,
     enum: ['none', 'active', 'trialing', 'past_due', 'canceled', 'unpaid', 'incomplete', 'incomplete_expired', 'paused'],
@@ -31,7 +37,12 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.hasAppAccess = function hasAppAccess() {
   if (this.accountStatus !== 'active') return false;
   if (this.role === 'owner' || this.freeAccess) return true;
-  return ['active', 'trialing'].includes(this.subscriptionStatus);
+  if (!['active', 'trialing'].includes(this.subscriptionStatus)) return false;
+  if (this.billingProvider === 'google_play') {
+    const expiry = this.currentPeriodEnd ? new Date(this.currentPeriodEnd).getTime() : 0;
+    return Number.isFinite(expiry) && expiry > Date.now();
+  }
+  return true;
 };
 
 export default mongoose.model('User', userSchema);

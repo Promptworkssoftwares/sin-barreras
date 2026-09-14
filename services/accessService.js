@@ -45,7 +45,8 @@ export function publicUser(user) {
     subscriptionStatus: user.subscriptionStatus,
     currentPeriodEnd: user.currentPeriodEnd,
     cancelAtPeriodEnd: Boolean(user.cancelAtPeriodEnd),
-    canManageBilling: user.role !== 'owner' && Boolean(user.stripeCustomerId),
+    billingProvider: user.billingProvider || (user.stripeCustomerId ? 'stripe' : 'none'),
+    canManageBilling: user.role !== 'owner' && Boolean(user.stripeCustomerId || user.googlePlayPurchaseToken),
     hasAccess: user.hasAppAccess()
   };
 }

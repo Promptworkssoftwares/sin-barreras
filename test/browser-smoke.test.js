@@ -10,11 +10,11 @@ const javascript = fs.readFileSync(new URL('../public/app.js', import.meta.url),
 const learnJavascript = fs.readFileSync(new URL('../public/learn.js', import.meta.url), 'utf8');
 
 const syntaxFiles = [
-  'public/app.js', 'public/languages.js', 'public/learn.js', 'public/cloud.js', 'public/account-ui.js', 'public/app-bootstrap.js',
-  'public/js/landing.js', 'public/js/admin.js', 'server/server.js', 'config/db.js', 'config/passport.js',
+  'public/app.js', 'public/ai-stage.js', 'public/navigation-flow.js', 'public/languages.js', 'public/learn.js', 'public/cloud.js', 'public/account-ui.js', 'public/app-bootstrap.js',
+  'public/js/landing.js', 'public/js/admin.js', 'public/play-billing.js', 'server/server.js', 'config/db.js', 'config/passport.js',
   'middleware/auth.js', 'models/User.js', 'models/AccessGrant.js', 'models/UserState.js',
   'routes/authRoutes.js', 'routes/accountRoutes.js', 'routes/billingRoutes.js', 'routes/adminRoutes.js',
-  'services/accessService.js', 'services/stripeService.js', 'scripts/seed-owner.js', 'server/bootstrap.js', 'config/env.js', 'scripts/check-env.js', 'scripts/check-mongodb.js'
+  'services/accessService.js', 'services/stripeService.js', 'services/googlePlayService.js', 'scripts/seed-owner.js', 'server/bootstrap.js', 'config/env.js', 'scripts/check-env.js', 'scripts/check-mongodb.js'
 ];
 
 test('all production JavaScript passes Node syntax validation', () => {

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ignoredDirs = new Set(['node_modules', '.git', 'assets', 'icons']);
 const ignoredFiles = new Set(['.env']);
-const textExtensions = new Set(['.js','.mjs','.cjs','.json','.html','.css','.md','.yaml','.yml','.bat','.txt','.webmanifest','.example']);
+const textExtensions = new Set(['.js','.mjs','.cjs','.json','.html','.css','.md','.yaml','.yml','.bat','.txt','.webmanifest','.example','.java','.gradle','.xml','.properties']);
 
 const patterns = [
   ['OpenAI API key', /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/g],
@@ -45,7 +45,7 @@ function walk(dir) {
 walk(root);
 
 const browserRoots = [path.join(root,'public'), path.join(root,'private')];
-const sensitiveNames = ['OPENAI_API_KEY','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','MONGODB_URI','GOOGLE_CLIENT_SECRET','OWNER_PASSWORD','SESSION_SECRET','CHATGPT_OAUTH_CLIENT_SECRET'];
+const sensitiveNames = ['OPENAI_API_KEY','STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','MONGODB_URI','GOOGLE_CLIENT_SECRET','OWNER_PASSWORD','SESSION_SECRET','CHATGPT_OAUTH_CLIENT_SECRET','GOOGLE_PLAY_SERVICE_ACCOUNT_PRIVATE_KEY'];
 for (const browserRoot of browserRoots) {
   if (!fs.existsSync(browserRoot)) continue;
   const stack=[browserRoot];

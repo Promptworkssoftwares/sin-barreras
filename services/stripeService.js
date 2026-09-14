@@ -33,6 +33,7 @@ export async function syncSubscription(subscription) {
 
   user.stripeCustomerId = String(subscription.customer || user.stripeCustomerId || '');
   user.stripeSubscriptionId = subscription.id;
+  user.billingProvider = 'stripe';
   user.subscriptionStatus = subscription.status || 'none';
   user.currentPeriodEnd = subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : null;
   user.cancelAtPeriodEnd = Boolean(subscription.cancel_at_period_end);
@@ -45,7 +46,7 @@ export async function syncCheckoutSession(session, expectedUser = null) {
   if (!user && session.metadata?.userId) user = await User.findById(session.metadata.userId);
   if (!user) return null;
 
-  if (session.customer) user.stripeCustomerId = String(session.customer);
+  if (session.customer) { user.stripeCustomerId = String(session.customer); user.billingProvider = 'stripe'; }
   if (session.subscription) {
     const subscription = await stripe().subscriptions.retrieve(String(session.subscription));
     return syncSubscription(subscription);

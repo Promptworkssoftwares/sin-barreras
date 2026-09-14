@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.4.26" />
+    <link rel="stylesheet" href="/styles.css?v=1.4.42" />
   </head>
   <body>
     <main class="app-shell">
@@ -90,9 +90,14 @@
         <div class="stage-topline">
           <div class="status-row">
             <span class="status-pill" id="status-pill">LISTO PARA ESCUCHAR</span>
-            <span class="status-copy" id="status-copy">Presiona comenzar una sola vez.</span>
+            <span class="status-copy" id="status-copy">Toca el botón rojo una sola vez y empieza a hablar.</span>
           </div>
           <p class="stage-helper">Tu idioma se detecta automáticamente y la traducción cambia de dirección por ti.</p>
+        </div>
+
+        <div class="ai-stage-background" id="ai-stage" data-ai-state="idle" aria-hidden="true">
+          <canvas id="ai-core-canvas" class="ai-core-canvas" width="720" height="520"></canvas>
+          <div class="ai-stage-fallback" id="ai-stage-fallback"><span></span></div>
         </div>
 
         <div class="sound-waves" id="waves" aria-hidden="true">
@@ -100,13 +105,13 @@
           <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
 
-        <button id="conversation-button" class="conversation-button" type="button" aria-label="Comenzar conversación continua">
+        <button id="conversation-button" class="conversation-button" type="button" aria-label="Comenzar a hablar en modo manos libres">
           <span class="conversation-button-sheen" aria-hidden="true"></span>
           <span class="conversation-button-content">
             <span class="conversation-button-icon-wrap" aria-hidden="true"><span class="mic-icon">●</span></span>
             <span class="conversation-button-copy-wrap">
-              <span id="conversation-button-text">Comenzar conversación</span>
-              <small class="conversation-button-subtext">Interpretación automática en dos direcciones</small>
+              <span id="conversation-button-text">Comenzar a hablar</span>
+              <small class="conversation-button-subtext">Traducción automática manos libres</small>
             </span>
             <span class="conversation-button-arrow" aria-hidden="true">↗</span>
           </span>
@@ -650,6 +655,7 @@
         });
       }
     </script>
-    <script type="module" src="/app-bootstrap.js?v=1.4.26"></script>
+    <script src="/play-billing.js?v=1.4.42"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.4.42"></script>
   </body>
 </html>

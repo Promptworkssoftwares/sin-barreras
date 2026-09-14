@@ -1,8 +1,35 @@
 import express from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { stripe, stripeEnabled, ensureStripeCustomer, syncCheckoutSession } from '../services/stripeService.js';
+import { googlePlayPublicConfig, syncGooglePlaySubscriptionForUser } from '../services/googlePlayService.js';
 
 const router = express.Router();
+
+router.get('/google/config', requireAuth, (_request, response) => {
+  response.json(googlePlayPublicConfig());
+});
+
+router.post('/google/verify', requireAuth, async (request, response, next) => {
+  try {
+    if (request.user.role === 'owner') return response.status(403).json({ error: 'La cuenta owner no necesita una suscripción.' });
+    if (request.user.accountStatus === 'revoked') return response.status(403).json({ error: 'Esta cuenta fue revocada por el administrador.' });
+
+    const verification = await syncGooglePlaySubscriptionForUser(request.user, {
+      purchaseToken: request.body?.purchaseToken,
+      requestedProductId: request.body?.productId,
+      orderId: request.body?.orderId
+    });
+
+    response.json({
+      ok: true,
+      hasAccess: request.user.hasAppAccess(),
+      subscriptionStatus: request.user.subscriptionStatus,
+      currentPeriodEnd: request.user.currentPeriodEnd,
+      cancelAtPeriodEnd: request.user.cancelAtPeriodEnd,
+      acknowledgementState: verification.acknowledgementState
+    });
+  } catch (error) { next(error); }
+});
 
 router.post('/checkout', requireAuth, async (request, response, next) => {
   try {
@@ -43,7 +70,7 @@ router.post('/checkout', requireAuth, async (request, response, next) => {
 router.post('/portal', requireAuth, async (request, response, next) => {
   try {
     if (!stripeEnabled()) return response.status(503).json({ error: 'Stripe no está configurado.' });
-    if (!request.user.stripeCustomerId) return response.status(400).json({ error: 'Esta cuenta no tiene una suscripción administrable.' });
+    if (!request.user.stripeCustomerId) return response.status(400).json({ error: 'Esta cuenta no tiene una suscripción administrable en Stripe.' });
     const appUrl = process.env.APP_URL || `${request.protocol}://${request.get('host')}`;
     const session = await stripe().billingPortal.sessions.create({ customer: request.user.stripeCustomerId, return_url: `${appUrl}/app` });
     response.json({ url: session.url });

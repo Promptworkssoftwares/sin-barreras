@@ -40,6 +40,18 @@ export function initAccountUI() {
   manage?.addEventListener('click', async () => {
     try {
       manage.disabled = true;
+      if (user.billingProvider === 'google_play') {
+        if (window.SinBarrerasPlay?.isNativeAndroid) {
+          window.SinBarrerasPlay.manageSubscription();
+          return;
+        }
+        const config = await jsonRequest('/billing/google/config');
+        const url = new URL('https://play.google.com/store/account/subscriptions');
+        if (config.productId) url.searchParams.set('sku', config.productId);
+        if (config.packageName) url.searchParams.set('package', config.packageName);
+        window.location.assign(url.toString());
+        return;
+      }
       const result = await jsonRequest('/billing/portal', { method: 'POST' });
       window.location.assign(result.url);
     } catch (error) {

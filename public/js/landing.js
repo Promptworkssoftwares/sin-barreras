@@ -62,9 +62,10 @@ function renderAuth() {
   const message = messageFromQuery();
   if (message) setStatus(message);
 
-  google?.classList.toggle('is-hidden', !config?.googleLoginEnabled);
-  chatgpt?.classList.toggle('is-hidden', !config?.chatgptLoginEnabled);
-  socialBlock?.classList.toggle('is-hidden', !config?.googleLoginEnabled && !config?.chatgptLoginEnabled);
+  const nativeAndroid = Boolean(window.SinBarrerasPlay?.isNativeAndroid);
+  google?.classList.toggle('is-hidden', nativeAndroid || !config?.googleLoginEnabled);
+  chatgpt?.classList.toggle('is-hidden', nativeAndroid || !config?.chatgptLoginEnabled);
+  socialBlock?.classList.toggle('is-hidden', nativeAndroid || (!config?.googleLoginEnabled && !config?.chatgptLoginEnabled));
 
   if (!me?.authenticated) {
     localAuth?.classList.remove('is-hidden');
@@ -120,6 +121,11 @@ async function subscribe() {
   const button = $('#subscribe-button');
   try {
     button.disabled = true;
+    if (window.SinBarrerasPlay?.isNativeAndroid) {
+      button.textContent = 'ABRIENDO GOOGLE PLAY…';
+      window.SinBarrerasPlay.subscribe(me?.user?.id || '');
+      return;
+    }
     button.textContent = 'PREPARANDO PAGO…';
     const result = await jsonRequest('/billing/checkout', { method: 'POST' });
     window.location.assign(result.url);
@@ -176,5 +182,7 @@ $('#register-form')?.addEventListener('submit', async (event) => {
 $('#subscribe-button')?.addEventListener('click', subscribe);
 $('#open-app')?.addEventListener('click', () => window.location.assign(me?.user?.role === 'owner' ? '/admin' : '/app'));
 $('#landing-logout')?.addEventListener('click', async () => { await jsonRequest('/auth/logout',{method:'POST'}).catch(()=>{}); location.assign('/'); });
+window.addEventListener('sinbarreras:billing-success', () => { setStatus('Suscripción de Google Play confirmada. Abriendo Sin Barreras…'); setTimeout(() => location.assign('/app?welcome=1'), 350); });
+window.addEventListener('sinbarreras:billing-error', (event) => { const button=$('#subscribe-button'); if(button){button.disabled=false;button.innerHTML='SUSCRIBIRME POR $5.99/MES <span>→</span>';} setStatus(event.detail?.message || 'No se pudo completar el pago.', 'error'); });
 
 init();

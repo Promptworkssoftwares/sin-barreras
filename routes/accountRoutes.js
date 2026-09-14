@@ -2,6 +2,7 @@ import express from 'express';
 import UserState from '../models/UserState.js';
 import { requireAuth } from '../middleware/auth.js';
 import { publicUser } from '../services/accessService.js';
+import { refreshGooglePlayEntitlement } from '../services/googlePlayService.js';
 
 const router = express.Router();
 const MAX_STATE_BYTES = 350_000;
@@ -44,7 +45,11 @@ function sanitizePayload(body = {}) {
   return result;
 }
 
-router.get('/auth/me', (request, response) => {
+router.get('/auth/me', async (request, response) => {
+  if (request.user?.billingProvider === 'google_play') {
+    try { await refreshGooglePlayEntitlement(request.user); }
+    catch (error) { console.warn('Google Play entitlement refresh failed:', error.message); }
+  }
   response.json({ authenticated: Boolean(request.user), user: publicUser(request.user) });
 });
 

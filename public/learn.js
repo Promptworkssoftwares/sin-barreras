@@ -1,3 +1,5 @@
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.42';
+
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
 const LESSON_SIZE = 8;
@@ -548,7 +550,8 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (ui.feedbackCopy) ui.feedbackCopy.innerHTML = isCorrect
       ? `<strong>${escapeHTML(exercise.word.word)}</strong> · ${escapeHTML(exercise.word.meaning)}${exercise.word.example ? `<br><span>${escapeHTML(exercise.word.example)}</span>` : ''}`
       : `La respuesta correcta es <strong>${escapeHTML(expected)}</strong>. Volverá más adelante para ayudarte a fijarla.`;
-    ui.continue?.focus();
+    guidedScroll(ui.feedback, { block: 'end', delay: 60 });
+    ui.continue?.focus({ preventScroll: true });
   }
 
   function continueLesson() { if (!session?.answered) return; if (session.index >= session.exercises.length - 1) { finishLesson(); return; } session.index += 1; renderExercise(); }
@@ -567,6 +570,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     }
     if (ui.playerBar) ui.playerBar.style.width = '100%';
     $('.lesson-question')?.classList.add('is-hidden'); ui.feedback?.classList.add('is-hidden'); ui.complete?.classList.remove('is-hidden');
+    guidedTop(ui.complete, { force: true, delay: 50 });
     if (ui.completeXp) ui.completeXp.textContent = `+${session.xp} XP`;
     if (ui.completeWords) ui.completeWords.textContent = `${session.attempts ? Math.round((session.correct / session.attempts) * 100) : 0}%`;
     persist();
@@ -632,9 +636,9 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   listen(ui.courseGrid, 'click', (event) => {
     const button = event.target.closest('[data-course]'); if (!button) return;
     selectedCourseId = button.dataset.course; renderLevelPanel(COURSES.find((item) => item.id === selectedCourseId));
-    ui.levelPanel?.scrollIntoView({ behavior:'smooth', block:'start' });
+    guidedTop(ui.levelPanel, { delay: 60 });
   });
-  listen(ui.levelBack, 'click', () => { selectedCourseId = null; ui.levelPanel?.classList.add('is-hidden'); ui.courseGrid?.scrollIntoView({ behavior:'smooth', block:'start' }); });
+  listen(ui.levelBack, 'click', () => { selectedCourseId = null; ui.levelPanel?.classList.add('is-hidden'); guidedTop(ui.courseGrid, { delay: 60 }); });
   listen(ui.levelGrid, 'click', (event) => {
     const button = event.target.closest('[data-level]'); if (!button) return;
     if (button.dataset.locked === '1') { notify?.('Completa las 5 sesiones del nivel anterior para desbloquear este nivel.'); return; }

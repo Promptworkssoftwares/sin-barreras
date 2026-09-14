@@ -6,16 +6,22 @@
   <meta name="theme-color" content="#132427">
   <title>Sin Barreras · Admin Dashboard</title>
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/css/admin.css?v=1.4.26">
+  <link rel="stylesheet" href="/css/admin.css?v=1.4.42">
 </head>
 <body>
-  <div id="admin-backdrop" class="admin-backdrop" aria-hidden="true"></div>
+  <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="admin-sidebar">
+    <span></span><span></span><span></span>
+  </button>
+  <div id="admin-sidebar-backdrop" class="admin-sidebar-backdrop" hidden></div>
 
-  <aside class="admin-sidebar" id="admin-sidebar">
-    <div class="admin-sidebar-header">
-      <a href="/admin" class="admin-brand"><img class="admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras"></a>
-      <button id="admin-close-menu" class="admin-close-menu" type="button" aria-label="Cerrar menú">✕</button>
+  <aside id="admin-sidebar" class="admin-sidebar">
+    <div class="admin-sidebar-head">
+      <a href="/admin" class="admin-brand" aria-label="Sin Barreras admin">
+        <img class="admin-sidebar-logo" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras">
+      </a>
+      <button id="admin-menu-close" class="admin-menu-close" type="button" aria-label="Cerrar menú">×</button>
     </div>
+
     <div class="admin-label">SAAS CONTROL CENTER</div>
     <nav>
       <button class="side-link is-active" data-section="overview"><span>⌂</span>Overview</button>
@@ -32,9 +38,8 @@
   <main class="admin-main">
     <header class="admin-topbar">
       <div class="admin-title-block">
-        <button id="admin-open-menu" class="admin-open-menu" type="button" aria-label="Abrir menú">☰</button>
-        <img class="admin-topbar-logo admin-logo-light" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><img class="admin-topbar-logo admin-logo-dark" src="/assets/sin-barreras-logo-dark.png" alt="Sin Barreras">
-        <div><span class="eyebrow">OWNER DASHBOARD</span><h1 id="page-title">Control del SaaS</h1></div>
+        <img class="admin-topbar-logo" src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras">
+        <div class="admin-title-copy"><span class="eyebrow">OWNER DASHBOARD</span><h1 id="page-title">Control del SaaS</h1></div>
       </div>
       <div class="admin-user"><span id="admin-avatar">SB</span><div><strong id="admin-name">Owner</strong><small id="admin-email"></small></div></div>
     </header>
@@ -79,6 +84,6 @@
 
   <div id="admin-toast" class="admin-toast" role="status"></div>
   <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
-  <script type="module" src="/js/admin.js?v=1.4.26"></script>
+  <script type="module" src="/js/admin.js?v=1.4.42"></script>
 </body>
 </html>

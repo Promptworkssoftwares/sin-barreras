@@ -5,15 +5,39 @@ import AccessGrant from '../models/AccessGrant.js';
 import { requireOwner } from '../middleware/auth.js';
 import { normalizeEmail, publicUser } from '../services/accessService.js';
 import { cancelUserSubscriptionNow, scheduleUserSubscriptionCancellation } from '../services/stripeService.js';
+import { cancelGooglePlaySubscription, revokeGooglePlaySubscription } from '../services/googlePlayService.js';
 
 const router = express.Router();
 router.use(requireOwner);
+
+function paidFilter() {
+  return {
+    role: 'user',
+    accountStatus: 'active',
+    subscriptionStatus: { $in: ['active', 'trialing'] },
+    $or: [
+      { billingProvider: { $ne: 'google_play' } },
+      { billingProvider: 'google_play', currentPeriodEnd: { $gt: new Date() } }
+    ]
+  };
+}
+
+function leanUserHasAccess(user) {
+  if (user.accountStatus !== 'active') return false;
+  if (user.freeAccess) return true;
+  if (!['active', 'trialing'].includes(user.subscriptionStatus)) return false;
+  if (user.billingProvider === 'google_play') {
+    const expiry = user.currentPeriodEnd ? new Date(user.currentPeriodEnd).getTime() : 0;
+    return Number.isFinite(expiry) && expiry > Date.now();
+  }
+  return true;
+}
 
 router.get('/stats', async (_request, response, next) => {
   try {
     const [totalUsers, activePaid, freeUsers, revoked, grants] = await Promise.all([
       User.countDocuments({ role: 'user' }),
-      User.countDocuments({ role: 'user', accountStatus: 'active', subscriptionStatus: { $in: ['active', 'trialing'] } }),
+      User.countDocuments(paidFilter()),
       User.countDocuments({ role: 'user', accountStatus: 'active', freeAccess: true }),
       User.countDocuments({ role: 'user', accountStatus: 'revoked' }),
       AccessGrant.countDocuments({ active: true })
@@ -29,20 +53,38 @@ router.get('/users', async (request, response, next) => {
     const page = Math.max(1, Number(request.query.page || 1));
     const limit = Math.min(50, Math.max(10, Number(request.query.limit || 20)));
     const filter = { role: 'user' };
-    if (q) filter.$or = [{ email: { $regex: q, $options: 'i' } }, { name: { $regex: q, $options: 'i' } }];
-    if (status === 'paid') filter.subscriptionStatus = { $in: ['active', 'trialing'] };
-    if (status === 'free') filter.freeAccess = true;
-    if (status === 'revoked') filter.accountStatus = 'revoked';
-    if (status === 'pending') { filter.freeAccess = false; filter.subscriptionStatus = { $nin: ['active', 'trialing'] }; filter.accountStatus = 'active'; }
+    const conditions = [];
+    if (q) conditions.push({ $or: [{ email: { $regex: q, $options: 'i' } }, { name: { $regex: q, $options: 'i' } }] });
+    if (status === 'paid') {
+      const paid = paidFilter();
+      delete paid.role;
+      conditions.push(paid);
+    }
+    if (status === 'free') conditions.push({ freeAccess: true });
+    if (status === 'revoked') conditions.push({ accountStatus: 'revoked' });
+    if (status === 'pending') conditions.push({
+      freeAccess: false,
+      accountStatus: 'active',
+      $or: [
+        { subscriptionStatus: { $nin: ['active', 'trialing'] } },
+        { billingProvider: 'google_play', currentPeriodEnd: { $lte: new Date() } }
+      ]
+    });
+    if (conditions.length) filter.$and = conditions;
 
     const [items, total] = await Promise.all([
       User.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
       User.countDocuments(filter)
     ]);
     response.json({
-      items: items.map((user) => ({ ...publicUser({ ...user, hasAppAccess() {
-        return user.accountStatus === 'active' && (user.freeAccess || ['active', 'trialing'].includes(user.subscriptionStatus));
-      } }), createdAt: user.createdAt, lastLoginAt: user.lastLoginAt, currentPeriodEnd: user.currentPeriodEnd, cancelAtPeriodEnd: Boolean(user.cancelAtPeriodEnd), stripeCustomerId: user.stripeCustomerId })),
+      items: items.map((user) => ({
+        ...publicUser({ ...user, hasAppAccess() { return leanUserHasAccess(user); } }),
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt,
+        currentPeriodEnd: user.currentPeriodEnd,
+        cancelAtPeriodEnd: Boolean(user.cancelAtPeriodEnd),
+        stripeCustomerId: user.stripeCustomerId
+      })),
       page, limit, total, pages: Math.max(1, Math.ceil(total / limit))
     });
   } catch (error) { next(error); }
@@ -68,7 +110,8 @@ router.post('/users/:id/cancel-subscription', async (request, response, next) =>
   try {
     const user = await User.findOne({ _id: request.params.id, role: 'user' });
     if (!user) return response.status(404).json({ error: 'Usuario no encontrado.' });
-    await scheduleUserSubscriptionCancellation(user);
+    if (user.billingProvider === 'google_play') await cancelGooglePlaySubscription(user);
+    else await scheduleUserSubscriptionCancellation(user);
     const refreshed = await User.findById(user._id);
     response.json({ ok: true, user: publicUser(refreshed) });
   } catch (error) { next(error); }
@@ -78,7 +121,8 @@ router.delete('/users/:id', async (request, response, next) => {
   try {
     const user = await User.findOne({ _id: request.params.id, role: 'user' });
     if (!user) return response.status(404).json({ error: 'Usuario no encontrado.' });
-    await cancelUserSubscriptionNow(user);
+    if (user.billingProvider === 'google_play') await revokeGooglePlaySubscription(user);
+    else await cancelUserSubscriptionNow(user);
     await UserState.deleteOne({ user: user._id });
     await AccessGrant.updateMany({ claimedBy: user._id }, { $set: { claimedBy: null, claimedAt: null } });
     await user.deleteOne();

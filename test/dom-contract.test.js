@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.26/);
-  assert.match(appHtml, /styles\.css\?v=1\.4\.26/);
-  assert.match(javascript, /learn\.js\?v=1\.4\.26/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.42/);
+  assert.match(appHtml, /styles\.css\?v=1\.4\.42/);
+  assert.match(javascript, /learn\.js\?v=1\.4\.42/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -425,7 +425,7 @@ test('hands-free interpreter waits through natural thinking pauses and auto-fini
   assert.match(javascript, /conversationSilenceLimit/);
   assert.match(javascript, /setStatus\('thinking'/);
   assert.match(javascript, /finishSegment\(sessionId\)/);
-  assert.match(javascript, /Sin Start \/ Stop por frase/);
+  assert.match(javascript, /Escucha automática activa/);
   assert.match(appHtml, /wave-glow/);
 });
 
@@ -466,7 +466,7 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(voiceTurn, /normalSpeechSilenceMs: 1750/);
   assert.match(voiceTurn, /longSpeechSilenceMs: 1450/);
   assert.match(voiceTurn, /thinkingAfterMs: 480/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.26/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.42/);
 });
 
 
@@ -509,4 +509,34 @@ test('account state accepts a legacy payload long enough to strip old audio and 
   assert.match(accountRoutes, /MAX_STATE_BYTES = 350_000/);
   assert.match(accountRoutes, /UserState\.updateOne\(\{ user: request\.user\._id \}/);
   assert.doesNotMatch(accountRoutes, /audioBase64/);
+});
+
+
+test('guided navigation moves users to the next logical action', () => {
+  const navigationFlow = fs.readFileSync(new URL('../public/navigation-flow.js', import.meta.url), 'utf8');
+  const soundsJavascript = fs.readFileSync(new URL('../public/sounds.js', import.meta.url), 'utf8');
+  assert.match(javascript, /guidedScroll\(ui\.conversationButton/);
+  assert.match(javascript, /guidedTop\(ui\.practiceResult/);
+  assert.match(javascript, /guidedScroll\(ui\.practiceScore/);
+  assert.match(javascript, /guidedScroll\(ui\.coachResponseBox/);
+  assert.match(javascript, /guidedTop\(ui\.cameraResult/);
+  assert.match(javascript, /guidedTop\(ui\.explanationBox/);
+  assert.match(learnJavascript, /guidedTop\(ui\.levelPanel/);
+  assert.match(soundsJavascript, /guidedTop\(ui\.detail/);
+  assert.match(navigationFlow, /prefers-reduced-motion/);
+  assert.match(navigationFlow, /isComfortablyVisible/);
+});
+
+
+test('Three.js conversational AI background is bundled and reacts to real conversation states', () => {
+  const aiStageJavascript = fs.readFileSync(new URL('../public/ai-stage.js', import.meta.url), 'utf8');
+  assert.match(appHtml, /id="ai-stage"/);
+  assert.match(appHtml, /id="ai-core-canvas"/);
+  assert.doesNotMatch(appHtml, /PUENTE DE CONVERSACIÓN|Cambio inteligente|Respuesta inmediata/);
+  assert.match(javascript, /initAIStage/);
+  assert.match(javascript, /aiStageController\?\.setState/);
+  assert.match(javascript, /aiStageController\?\.setVolume/);
+  assert.match(aiStageJavascript, /three@0\.179\.1/);
+  assert.match(aiStageJavascript, /WebGLRenderer/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.42/);
 });

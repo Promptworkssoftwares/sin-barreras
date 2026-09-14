@@ -1,13 +1,19 @@
 {
+  "id": "/",
   "name": "Sin Barreras",
   "short_name": "Sin Barreras",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait-primary",
   "background_color": "#fff8f1",
   "theme_color": "#132427",
-  "description": "SaaS de interpretación de voz, aprendizaje de inglés, AI Coach y traducción con cámara.",
+  "description": "Intérprete de voz, aprendizaje de inglés, AI Coach y traducción con cámara.",
+  "categories": ["education", "utilities"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

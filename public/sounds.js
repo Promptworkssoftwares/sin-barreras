@@ -1,3 +1,5 @@
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.42';
+
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 
 const VOWELS = [
@@ -362,6 +364,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
         selectedLevel = SOUND_LEVELS.find((level) => levelIsUnlocked(entry, level.id) && !levelIsComplete(entry, level.id))?.id || SOUND_LEVEL_COUNT;
       }
       renderGrid(); renderDetail();
+      guidedTop(ui.detail, { delay: 70 });
     }));
   }
 
@@ -494,6 +497,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       selectedLevel = next;
       clearLastRecording();
       renderDetail();
+      guidedTop(ui.detail, { delay: 50 });
     }));
     ui.detail.querySelectorAll('[data-sound-action]').forEach((button) => button.addEventListener('click', () => handleAction(button.dataset.soundAction, button)));
     ui.detail.querySelector('[data-sound-session-action="toggle"]')?.addEventListener('click', togglePracticeSession);
@@ -622,6 +626,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
         </div>
       </div>`;
       renderDetail(resultHtml);
+      guidedScroll(ui.detail.querySelector('#sound-result'), { block: 'center', delay: 70 });
     } catch (error) {
       if (error?.name !== 'AbortError') {
         notify?.(error.message || 'No pudimos revisar tu pronunciación.');

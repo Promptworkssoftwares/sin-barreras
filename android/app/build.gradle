@@ -1,0 +1,68 @@
+import java.util.Properties
+
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'com.promptworks.sinbarreras'
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = 'com.promptworks.sinbarreras'
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 1442
+        versionName = '1.4.42'
+
+        buildConfigField 'String', 'WEB_APP_URL', '"https://sin-barreras.onrender.com/"'
+        buildConfigField 'String', 'WEB_APP_HOST', '"sin-barreras.onrender.com"'
+        buildConfigField 'String', 'PLAY_SUBSCRIPTION_PRODUCT_ID', '"sin_barreras_monthly"'
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    def keystoreProperties = new Properties()
+    def keystoreFile = rootProject.file('keystore.properties')
+    if (keystoreFile.exists()) {
+        keystoreFile.withInputStream { keystoreProperties.load(it) }
+        signingConfigs {
+            release {
+                storeFile = file(keystoreProperties['storeFile'])
+                storePassword = keystoreProperties['storePassword']
+                keyAlias = keystoreProperties['keyAlias']
+                keyPassword = keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix = '.debug'
+            versionNameSuffix = '-debug'
+        }
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystoreFile.exists()) signingConfig = signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources {
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.android.billingclient:billing:9.1.0'
+}

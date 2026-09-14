@@ -1,7 +1,9 @@
-import { initLearning } from './learn.js?v=1.4.26';
-import { initSounds } from './sounds.js?v=1.4.26';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.26';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.26';
+import { initLearning } from './learn.js?v=1.4.42';
+import { initSounds } from './sounds.js?v=1.4.42';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.42';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.42';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.42';
+import { initAIStage } from './ai-stage.js?v=1.4.42';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -20,6 +22,7 @@ const PRACTICE_POINTS_KEY = 'sinBarreras.practicePoints';
 const ui = {
   shell: $('.app-shell'),
   statusPill: $('#status-pill'), statusCopy: $('#status-copy'), stage: $('.interpreter-stage'), modeDot: $('#mode-dot'), modeName: $('#mode-name'),
+  aiStage: $('#ai-stage'), aiCanvas: $('#ai-core-canvas'), aiFallback: $('#ai-stage-fallback'),
   conversationButton: $('#conversation-button'), conversationButtonText: $('#conversation-button-text'), conversationButtonSubtext: $('.conversation-button-subtext'),
   originalText: $('#original-text'), translationText: $('#translation-text'), originalLanguage: $('#original-language'), translationLanguage: $('#translation-language'), sourceFlag: $('#source-flag'), repeatButton: $('#repeat-button'),
   partnerLanguageSelect: $('#partner-language-select'), myLanguageName: $('#my-language-name'), autoLanguageCopy: $('#auto-language-copy'), conversationSituation: $('#conversation-situation'), translatorVoiceSelect: $('#translator-voice-select'), previewVoice: $('#preview-voice'),
@@ -35,7 +38,7 @@ const ui = {
   coachPersonaRole: $('#coach-persona-role'), coachSessionTitle: $('#coach-session-title'), coachSessionObjective: $('#coach-session-objective'), coachTurnCount: $('#coach-turn-count'), coachProgressValue: $('#coach-progress-value'), coachProgressBar: $('#coach-progress-bar'), coachSuccessCriteria: $('#coach-success-criteria'), coachCurrentFocus: $('#coach-current-focus'), coachSummary: $('#coach-summary'), coachResponseBox: $('#coach-response-box'), newCoachSession: $('#new-coach-session'),
   cameraView: $('#camera-view'), cameraInput: $('#camera-input'), cameraSourceLanguage: $('#camera-source-language'), cameraTargetLanguage: $('#camera-target-language'), cameraSituation: $('#camera-situation'),
   cameraDropzone: $('#camera-dropzone'), cameraPreviewWrap: $('#camera-preview-wrap'), cameraPreview: $('#camera-preview'), removeCameraImage: $('#remove-camera-image'), analyzeImage: $('#analyze-image'),
-  cameraResult: $('#camera-result'), cameraDocumentType: $('#camera-document-type'), cameraDetectedLanguage: $('#camera-detected-language'), cameraOriginalText: $('#camera-original-text'), cameraTranslatedText: $('#camera-translated-text'),
+  cameraResult: $('#camera-result'), cameraPanel: $('.camera-panel'), cameraDocumentType: $('#camera-document-type'), cameraDetectedLanguage: $('#camera-detected-language'), cameraOriginalText: $('#camera-original-text'), cameraTranslatedText: $('#camera-translated-text'),
   listenCameraTranslation: $('#listen-camera-translation'), explainCameraText: $('#explain-camera-text'), explanationBox: $('#explanation-box'), explanationSummary: $('#explanation-summary'), explanationPoints: $('#explanation-points'), explanationActions: $('#explanation-actions'), explanationCaution: $('#explanation-caution')
 };
 
@@ -71,6 +74,7 @@ const state = {
 
 let learning = null;
 let sounds = null;
+let aiStageController = null;
 
 const languageName = (language) => (LANGUAGES[language] || language || 'Idioma').toUpperCase();
 const languageFlag = (language) => ({ es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', ar: 'AR', zh: '中', vi: 'VI', ko: '한', tl: 'TL', ht: 'HT', ru: 'RU', de: 'DE', hi: 'हि', ja: '日', it: 'IT' }[language] || String(language || '↗').toUpperCase().slice(0, 3));
@@ -95,7 +99,7 @@ function migrateLocalStorage() {
 
 function setStatus(kind, copy) {
   const values = {
-    idle: ['LISTO PARA ESCUCHAR', copy || 'Presiona comenzar una sola vez.'],
+    idle: ['LISTO PARA ESCUCHAR', copy || 'Toca el botón rojo una sola vez y empieza a hablar.'],
     listening: ['ESCUCHANDO', copy || 'Habla cuando quieras. No necesitas tocar ningún botón al terminar.'],
     thinking: ['SIGUE PENSANDO', copy || 'Puedes pausar unos segundos. Terminaré cuando detecte que acabaste.'],
     translating: ['INTERPRETANDO', copy || 'Detectando idioma y preparando la traducción.'],
@@ -109,6 +113,7 @@ function setStatus(kind, copy) {
   ui.stage?.classList.toggle('thinking', kind === 'thinking');
   ui.stage?.classList.toggle('processing', ['translating','speaking'].includes(kind));
   ui.modeDot?.classList.toggle('active', ['listening','thinking'].includes(kind));
+  aiStageController?.setState?.(kind);
 }
 
 function renderConversationButtonState(mode = state.running ? 'running' : 'idle') {
@@ -117,20 +122,21 @@ function renderConversationButtonState(mode = state.running ? 'running' : 'idle'
   if (mode === 'running') {
     ui.conversationButton.classList.add('stop');
     ui.conversationButtonText.textContent = 'Escucha automática activa';
-    if (ui.conversationButtonSubtext) ui.conversationButtonSubtext.textContent = 'Habla, piensa y termina. Sin Start / Stop por frase.';
+    if (ui.conversationButtonSubtext) ui.conversationButtonSubtext.textContent = 'Escucha automática activa. Habla con fluidez y haré el resto.';
     ui.conversationButton.setAttribute('aria-label', 'Pausar escucha automática');
     return;
   }
   ui.conversationButton.classList.remove('stop');
   ui.conversationButtonText.textContent = selected ? 'Comenzar a hablar' : 'Selecciona el idioma primero';
-  if (ui.conversationButtonSubtext) ui.conversationButtonSubtext.textContent = selected ? 'Un toque activa la conversación manos libres' : 'Después podrás hablar sin presionar para detener';
+  if (ui.conversationButtonSubtext) ui.conversationButtonSubtext.textContent = selected ? 'Un toque activa la conversación manos libres' : 'Selecciona el idioma para activar el modo manos libres';
   ui.conversationButton.setAttribute('aria-label', selected ? 'Activar conversación manos libres' : 'Selecciona el idioma de la otra persona');
 }
 
 function updateWaveVisual(volume = 0, speaking = false) {
+  const level = Math.max(0, Math.min(1, volume * 10));
+  aiStageController?.setVolume?.(level, speaking);
   const bars = ui.stage?.querySelectorAll('.sound-waves i');
   if (!bars?.length) return;
-  const level = Math.max(0, Math.min(1, volume * 10));
   const center = (bars.length - 1) / 2;
   bars.forEach((bar, index) => {
     const distance = Math.abs(index - center) / Math.max(1, center);
@@ -480,6 +486,7 @@ function showInterpretation(result) {
   state.currentResult = result;
   const hasEnglish = result.sourceLanguage === 'en' || result.targetLanguage === 'en';
   ui.learnFromTranslation?.classList.toggle('is-hidden', !hasEnglish);
+  guidedScroll($('.translation-grid'), { block: 'center', highlight: false, delay: 90 });
 }
 
 function playAudio(base64, language, { resumeConversation = false, sessionId = state.conversationSession } = {}) {
@@ -534,6 +541,7 @@ async function preparePractice(event) {
     if (ui.practiceUsage) ui.practiceUsage.textContent = result.usage;
     ui.practiceScore?.classList.add('is-hidden');
     ui.practiceResult?.classList.remove('is-hidden');
+    guidedTop(ui.practiceResult, { delay: 90 });
   } catch (error) {
     notify(error.message || 'No pudimos preparar la práctica.');
   } finally {
@@ -561,6 +569,7 @@ async function scorePracticeAudio(audio) {
     if (ui.correctedText) ui.correctedText.textContent = result.correctedEnglish || state.practice.english;
     if (ui.focusText) ui.focusText.textContent = result.focus || 'Repite la frase con calma.';
     ui.practiceScore?.classList.remove('is-hidden');
+    guidedScroll(ui.practiceScore, { block: 'center', delay: 90 });
     if (result.points) {
       localStorage.setItem(PRACTICE_POINTS_KEY, String(getPracticePoints() + result.points));
       window.SinBarrerasCloud?.queueSync?.();
@@ -884,11 +893,13 @@ async function startCoachSession() {
     ui.coachResponseBox?.classList.remove('is-hidden');
     ui.coachSetup?.classList.add('is-hidden');
     ui.coachSession?.classList.remove('is-hidden');
+    guidedTop(ui.coachSession, { delay: 70 });
     renderCoachSessionHeader(result.session || {});
     appendCoachBubble('coach', result.replyEnglish, result.replyMeaning);
     if (result.coachTip && (ui.coachMode?.value || 'guided') === 'guided') appendCoachBubble('coach-tip', result.coachTip);
     if (ui.coachStatus) ui.coachStatus.textContent = 'CONVERSACIÓN EN CURSO';
     try { await speakText(result.replyEnglish, 'en'); } catch (error) { notify(error.message); }
+    guidedScroll(ui.coachResponseBox, { block: 'center', delay: 80 });
   } catch (error) {
     notify(error.message || 'No pudimos iniciar el Coach.');
   } finally {
@@ -929,6 +940,7 @@ function resetCoachSession() {
   ui.coachResponseBox?.classList.remove('is-hidden');
   if (ui.coachThread) ui.coachThread.innerHTML = '';
   if (ui.coachRecord) { ui.coachRecord.classList.remove('recording'); ui.coachRecord.innerHTML = '<span>●</span> Responder con mi voz'; ui.coachRecord.disabled = false; }
+  guidedTop(ui.coachSetup, { delay: 70 });
 }
 
 async function finishCoachSession() {
@@ -955,6 +967,7 @@ async function finishCoachSession() {
     renderCoachSummary(summary);
     ui.newCoachSession?.classList.remove('is-hidden');
     if (ui.coachStatus) ui.coachStatus.textContent = 'SESIÓN COMPLETADA';
+    guidedTop(ui.coachSummary, { delay: 90 });
   } catch (error) {
     notify(error.message || 'No pudimos preparar el resumen.');
     resetCoachSession();
@@ -998,6 +1011,7 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     if (ui.coachTextInput) ui.coachTextInput.value = '';
     if (ui.coachStatus) ui.coachStatus.textContent = result.missionProgress >= 100 ? 'OBJETIVO COMPLETADO · PUEDES SEGUIR' : 'TU TURNO';
     try { await speakText(result.replyEnglish, 'en'); } catch (error) { notify(error.message); }
+    guidedScroll(ui.coachResponseBox, { block: 'center', delay: 70 });
   } catch (error) {
     notify(error.message || 'No pudimos continuar la conversación.');
   } finally {
@@ -1079,6 +1093,7 @@ function handleCameraFile() {
   if (ui.analyzeImage) { ui.analyzeImage.disabled = false; ui.analyzeImage.classList.remove('is-hidden'); }
   ui.cameraResult?.classList.add('is-hidden');
   ui.explanationBox?.classList.add('is-hidden');
+  guidedScroll(ui.analyzeImage, { block: 'center', delay: 90 });
 }
 
 async function analyzeCameraImage() {
@@ -1099,6 +1114,7 @@ async function analyzeCameraImage() {
     if (ui.cameraTranslatedText) ui.cameraTranslatedText.textContent = result.translatedText;
     ui.explanationBox?.classList.add('is-hidden');
     ui.cameraResult?.classList.remove('is-hidden');
+    guidedTop(ui.cameraResult, { delay: 90 });
   } catch (error) {
     notify(error.message || 'No pudimos leer la imagen.');
   } finally {
@@ -1122,6 +1138,7 @@ function renderExplanation(result) {
     ui.explanationCaution.classList.toggle('is-hidden', !result.caution);
   }
   ui.explanationBox?.classList.remove('is-hidden');
+  guidedTop(ui.explanationBox, { delay: 70 });
 }
 
 async function explainCameraResult() {
@@ -1218,6 +1235,7 @@ listen(ui.conversationButton, 'click', toggleConversation);
 listen(ui.conversationSituation, 'change', () => {
   state.situation = ui.conversationSituation?.value || 'everyday';
   renderAutomaticLanguageState();
+  if (state.partnerLanguage) guidedScroll(ui.conversationButton, { block: 'center', delay: 70 });
 });
 
 listen(ui.partnerLanguageSelect, 'change', () => {
@@ -1232,6 +1250,7 @@ listen(ui.partnerLanguageSelect, 'change', () => {
   persistConversationSettings();
   renderAutomaticLanguageState();
   notify(`Idioma de la otra persona: ${LANGUAGES[nextLanguage]}. Tu idioma seguirá detectándose automáticamente.`);
+  guidedScroll(ui.conversationButton, { block: 'center', delay: 90 });
 });
 
 listen(ui.translatorVoiceSelect, 'change', () => {
@@ -1332,6 +1351,7 @@ $$('.theme-option').forEach((button) => listen(button, 'click', () => {
 listen($('#onboarding-continue'), 'click', () => {
   localStorage.setItem(ONBOARDING_KEY, '1'); window.SinBarrerasCloud?.queueSync?.();
   ui.onboardingDialog?.close();
+  guidedScroll(ui.partnerLanguageSelect, { block: 'center', highlight: true, delay: 150, focus: true });
 });
 
 listen(ui.practiceForm, 'submit', preparePractice);
@@ -1411,6 +1431,7 @@ window.addEventListener('beforeunload', () => {
   state.practiceStream?.getTracks().forEach((track) => track.stop());
   state.coachStream?.getTracks().forEach((track) => track.stop());
   if (state.cameraPreviewUrl) URL.revokeObjectURL(state.cameraPreviewUrl);
+  aiStageController?.destroy?.();
 });
 
 migrateLocalStorage();
@@ -1430,6 +1451,7 @@ updatePartnerSelectionUI();
 renderHistory();
 renderPracticePoints();
 setCameraAnalyzeButton('ready');
+aiStageController = initAIStage({ stage: ui.aiStage, canvas: ui.aiCanvas, fallback: ui.aiFallback });
 renderConversationButtonState('idle');
 setStatus('idle');
 updateWaveVisual(0, false);

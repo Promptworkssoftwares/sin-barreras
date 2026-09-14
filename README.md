@@ -1,5 +1,12 @@
-# Sin Barreras v1.4.28
+# Sin Barreras v1.4.42 · Floating Hablar Card Refinement
 
-Esta versión corrige el layout del tab Cámara en mobile. El área de captura ya no muestra elementos solapados y el botón de análisis aparece únicamente cuando el usuario ya seleccionó una imagen.
+## Qué incluye
+- Contenedor **Hablar** más pequeño y compacto.
+- Apariencia un poco más dark, pero moderada, para que sobresalga entre los demás contenedores.
+- Sensación más flotante con mejor sombra y profundidad.
+- Botón principal más abajo y composición más limpia.
 
-También se mantuvieron las mejoras anteriores de sincronización segura del estado, sin persistir audio TTS dentro del historial en MongoDB.
+## Cómo probar
+1. Copia tu archivo `.env` actual dentro del proyecto.
+2. Ejecuta `start.bat`.
+3. Abre la app y entra a **Hablar**.
