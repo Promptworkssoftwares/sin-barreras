@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.42/);
-  assert.match(appHtml, /styles\.css\?v=1\.4\.42/);
-  assert.match(javascript, /learn\.js\?v=1\.4\.42/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.43/);
+  assert.match(appHtml, /styles\.css\?v=1\.4\.43/);
+  assert.match(javascript, /learn\.js\?v=1\.4\.43/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -466,7 +466,7 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(voiceTurn, /normalSpeechSilenceMs: 1750/);
   assert.match(voiceTurn, /longSpeechSilenceMs: 1450/);
   assert.match(voiceTurn, /thinkingAfterMs: 480/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.42/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.43/);
 });
 
 
@@ -538,5 +538,21 @@ test('Three.js conversational AI background is bundled and reacts to real conver
   assert.match(javascript, /aiStageController\?\.setVolume/);
   assert.match(aiStageJavascript, /three@0\.179\.1/);
   assert.match(aiStageJavascript, /WebGLRenderer/);
-  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.42/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.43/);
+});
+
+
+test('browser audio is unlocked from a user gesture before asynchronous AI playback', () => {
+  const audioPlayback = fs.readFileSync(new URL('../public/audio-playback.js', import.meta.url), 'utf8');
+  assert.match(javascript, /unlockAudioPlayback/);
+  assert.match(javascript, /installAudioUnlock/);
+  assert.match(javascript, /playBase64Audio/);
+  assert.match(javascript, /await audioUnlock;[\s\S]*await ensureMicrophone/);
+  assert.match(audioPlayback, /AudioContext|webkitAudioContext/);
+  assert.match(audioPlayback, /createSilentPulse/);
+  assert.match(audioPlayback, /pointerdown/);
+  assert.match(audioPlayback, /playsinline/);
+  assert.match(audioPlayback, /decodeAudioData/);
+  assert.match(serviceWorker, /audio-playback\.js\?v=1\.4\.43/);
+  assert.doesNotMatch(javascript, /new Audio\(`data:audio\/mpeg;base64/);
 });

@@ -1,9 +1,10 @@
-import { initLearning } from './learn.js?v=1.4.42';
-import { initSounds } from './sounds.js?v=1.4.42';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.42';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.42';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.42';
-import { initAIStage } from './ai-stage.js?v=1.4.42';
+import { initLearning } from './learn.js?v=1.4.43';
+import { initSounds } from './sounds.js?v=1.4.43';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.43';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.43';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.43';
+import { initAIStage } from './ai-stage.js?v=1.4.43';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.4.43';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -490,24 +491,25 @@ function showInterpretation(result) {
 }
 
 function playAudio(base64, language, { resumeConversation = false, sessionId = state.conversationSession } = {}) {
-  return new Promise((resolve) => {
-    state.currentAudio?.pause();
-    const audio = new Audio(`data:audio/mpeg;base64,${base64}`);
-    state.currentAudio = audio;
-    setStatus('speaking');
-    let completed = false;
-    const complete = () => {
-      if (completed) return;
-      completed = true;
-      if (state.currentAudio === audio) state.currentAudio = null;
+  stopAudioPlayback();
+  const playback = { pause: stopAudioPlayback };
+  state.currentAudio = playback;
+  setStatus('speaking');
+
+  return playBase64Audio(base64)
+    .catch((error) => {
+      if (error?.name === 'AudioPlaybackBlockedError') {
+        notify('Audio pausado por el navegador. Toca la app una vez y el audio quedará habilitado.');
+      } else {
+        notify(error?.message || 'No se pudo reproducir la voz.');
+      }
+      throw error;
+    })
+    .finally(() => {
+      if (state.currentAudio === playback) state.currentAudio = null;
       if (resumeConversation && state.running && sessionId === state.conversationSession) startRecordingSegment(sessionId);
       else if (!state.running) setStatus('idle');
-      resolve();
-    };
-    listen(audio, 'ended', complete, { once: true });
-    listen(audio, 'error', () => { notify('No se pudo reproducir la voz.'); complete(); }, { once: true });
-    audio.play().catch(() => { notify('El navegador bloqueó el audio. Toca la pantalla e inténtalo nuevamente.'); complete(); });
-  });
+    });
 }
 
 async function speakText(text, language, { speed = 1 } = {}) {
@@ -614,6 +616,9 @@ async function togglePracticeRecording() {
 }
 
 async function toggleConversation() {
+  // Must run directly inside the user's click gesture so Safari/Chrome authorize
+  // future hands-free TTS responses after asynchronous API calls.
+  const audioUnlock = unlockAudioPlayback();
   if (state.running) {
     state.running = false;
     state.conversationSession += 1;
@@ -638,6 +643,7 @@ async function toggleConversation() {
   try {
     if (ui.conversationButton) ui.conversationButton.disabled = true;
     updateConversationSettings();
+    await audioUnlock;
     await ensureMicrophone();
     state.running = true;
     state.conversationSession += 1;
@@ -1210,6 +1216,8 @@ function showView(view) {
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
+installAudioUnlock();
+
 learning = initLearning({
   notify,
   speakText,
@@ -1431,6 +1439,7 @@ window.addEventListener('beforeunload', () => {
   state.practiceStream?.getTracks().forEach((track) => track.stop());
   state.coachStream?.getTracks().forEach((track) => track.stop());
   if (state.cameraPreviewUrl) URL.revokeObjectURL(state.cameraPreviewUrl);
+  destroyAudioPlayback();
   aiStageController?.destroy?.();
 });
 

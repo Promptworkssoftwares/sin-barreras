@@ -1628,7 +1628,7 @@ html[data-theme="dark"] .nav-item.is-active {
 }
 
 
-/* v1.4.42 · AI lives in the Hablar container background */
+/* v1.4.43 · AI lives in the Hablar container background */
 .interpreter-stage {
   min-height: 440px;
   gap: 12px;
@@ -1764,7 +1764,7 @@ html[data-theme="dark"] .nav-item.is-active {
   .sound-waves { height:70px; }
 }
 
-/* v1.4.42 · Compact tech signal-matrix background */
+/* v1.4.43 · Compact tech signal-matrix background */
 .interpreter-stage {
   min-height: 344px;
   gap: 8px;
@@ -1876,7 +1876,7 @@ html[data-theme="dark"] .nav-item.is-active {
 }
 
 
-/* v1.4.42 · Light premium AI background */
+/* v1.4.43 · Light premium AI background */
 .interpreter-stage {
   min-height: 324px;
   gap: 8px;
@@ -2019,7 +2019,7 @@ html[data-theme="dark"] .nav-item.is-active {
 }
 
 
-/* v1.4.42 · stronger background presence and lower CTA */
+/* v1.4.43 · stronger background presence and lower CTA */
 .interpreter-stage {
   min-height: 392px;
   gap: 0;
@@ -2147,7 +2147,7 @@ html[data-theme="dark"] .nav-item.is-active {
 }
 
 
-/* v1.4.42 · smaller floating darker hablar card */
+/* v1.4.43 · smaller floating darker hablar card */
 .interpreter-stage {
   min-height: 338px;
   gap: 0;
