@@ -1,10 +1,10 @@
-import { initLearning } from './learn.js?v=1.4.43';
-import { initSounds } from './sounds.js?v=1.4.43';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.43';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.43';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.43';
-import { initAIStage } from './ai-stage.js?v=1.4.43';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.4.43';
+import { initLearning } from './learn.js?v=1.4.44';
+import { initSounds } from './sounds.js?v=1.4.44';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.44';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.44';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.44';
+import { initAIStage } from './ai-stage.js?v=1.4.44';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.4.44';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];

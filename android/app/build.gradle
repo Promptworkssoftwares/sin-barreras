@@ -12,8 +12,8 @@ android {
         applicationId = 'com.promptworks.sinbarreras'
         minSdk = 26
         targetSdk = 36
-        versionCode = 1443
-        versionName = '1.4.43'
+        versionCode = 1444
+        versionName = '1.4.44'
 
         buildConfigField 'String', 'WEB_APP_URL', '"https://sin-barreras.onrender.com/"'
         buildConfigField 'String', 'WEB_APP_HOST', '"sin-barreras.onrender.com"'

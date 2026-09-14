@@ -1,14 +1,15 @@
-# Sin Barreras v1.4.43 · Browser Audio Unlock Fix
+# Sin Barreras v1.4.44 · Floating AI Voice Activity
 
-## Qué cambia
-- El audio TTS de la IA se desbloquea desde el primer gesto real del usuario.
-- Nuevo motor persistente de reproducción con Web Audio API para evitar el bloqueo de autoplay después de llamadas asíncronas.
-- Fallback con un único elemento HTMLAudio preparado por el mismo gesto del usuario para Safari/Chrome.
-- El AudioContext de reproducción queda separado del AudioContext usado por el micrófono.
-- El modo manos libres puede seguir reproduciendo respuestas sucesivas sin pedir un toque por cada traducción.
+## Qué incluye
+- Nuevo indicador flotante e independiente para **Aprender → Vocales y consonantes**.
+- El estado de IA ya no depende del texto del botón de grabación.
+- Funciona igual en **Practicar mi voz** y en **Grabar otra vez**.
+- Muestra estados de preparación, escucha, espera, análisis y preparación del resultado.
+- Diseño compacto con animación tech, visible encima de la app mientras la IA trabaja.
 
 ## Cómo probar
 1. Copia tu `.env` actual.
 2. Ejecuta `start.bat`.
-3. Selecciona el idioma de la otra persona.
-4. Toca `Comenzar a hablar` una sola vez y prueba varias rondas consecutivas.
+3. Ve a **Aprender → Vocales o consonantes**.
+4. Selecciona un sonido y pulsa **Practicar mi voz**.
+5. Después del score pulsa **Grabar otra vez** y confirma que el mismo indicador flotante aparece durante el nuevo análisis.

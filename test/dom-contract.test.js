@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.43/);
-  assert.match(appHtml, /styles\.css\?v=1\.4\.43/);
-  assert.match(javascript, /learn\.js\?v=1\.4\.43/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.44/);
+  assert.match(appHtml, /styles\.css\?v=1\.4\.44/);
+  assert.match(javascript, /learn\.js\?v=1\.4\.44/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -466,7 +466,7 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(voiceTurn, /normalSpeechSilenceMs: 1750/);
   assert.match(voiceTurn, /longSpeechSilenceMs: 1450/);
   assert.match(voiceTurn, /thinkingAfterMs: 480/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.43/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.44/);
 });
 
 
@@ -538,7 +538,7 @@ test('Three.js conversational AI background is bundled and reacts to real conver
   assert.match(javascript, /aiStageController\?\.setVolume/);
   assert.match(aiStageJavascript, /three@0\.179\.1/);
   assert.match(aiStageJavascript, /WebGLRenderer/);
-  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.43/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.44/);
 });
 
 
@@ -553,6 +553,19 @@ test('browser audio is unlocked from a user gesture before asynchronous AI playb
   assert.match(audioPlayback, /pointerdown/);
   assert.match(audioPlayback, /playsinline/);
   assert.match(audioPlayback, /decodeAudioData/);
-  assert.match(serviceWorker, /audio-playback\.js\?v=1\.4\.43/);
+  assert.match(serviceWorker, /audio-playback\.js\?v=1\.4\.44/);
   assert.doesNotMatch(javascript, /new Audio\(`data:audio\/mpeg;base64/);
+});
+
+
+test('Sound Lab uses an independent floating AI activity indicator for first practice and retry scoring', () => {
+  const sounds = fs.readFileSync(new URL('../public/sounds.js', import.meta.url), 'utf8');
+  const styles = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8');
+  assert.match(appHtml, /id="sound-ai-activity"/);
+  assert.match(appHtml, /id="sound-ai-activity-text"/);
+  assert.match(sounds, /setAIActivity\('processing'\)/);
+  assert.match(sounds, /setAIActivity\('finalizing'\)/);
+  assert.match(sounds, /data-sound-result-action="retry"/);
+  assert.match(styles, /\.sound-ai-activity/);
+  assert.match(styles, /position:\s*fixed/);
 });

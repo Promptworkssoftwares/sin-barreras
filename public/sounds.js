@@ -1,4 +1,4 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.43';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.44';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 
@@ -227,7 +227,14 @@ function challengeComplete(entry) {
 export function initSounds({ notify, speakText, request, getNativeLanguage, createAutoVoiceTurn } = {}) {
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
-  const ui = { grid:$('#sound-grid'), detail:$('#sound-detail'), tabs:$$('.sound-tab') };
+  const ui = {
+    grid:$('#sound-grid'),
+    detail:$('#sound-detail'),
+    tabs:$$('.sound-tab'),
+    aiActivity:$('#sound-ai-activity'),
+    aiActivityLabel:$('#sound-ai-activity-label'),
+    aiActivityText:$('#sound-ai-activity-text')
+  };
   if (!ui.grid || !ui.detail) return { render() {} };
 
   let state = readState();
@@ -243,6 +250,40 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
   let lastRecordingSoundId = null;
   let practiceSession = null;
   let practiceTimer = null;
+  let aiActivityHideTimer = null;
+
+  const AI_ACTIVITY_STATES = Object.freeze({
+    waiting: { label:'PREPARANDO', text:'Activando el micrófono…' },
+    listening: { label:'ESCUCHANDO', text:'Habla con naturalidad.' },
+    thinking: { label:'IA EN ESPERA', text:'Detectando si terminaste…' },
+    processing: { label:'IA TRABAJANDO', text:'Analizando tu pronunciación…' },
+    finalizing: { label:'CASI LISTO', text:'Preparando tu resultado…' }
+  });
+
+  function setAIActivity(mode = 'hidden', options = {}) {
+    if (!ui.aiActivity) return;
+    window.clearTimeout(aiActivityHideTimer);
+    aiActivityHideTimer = null;
+
+    if (mode === 'hidden') {
+      const delay = Math.max(0, Number(options.delay || 0));
+      const hide = () => {
+        ui.aiActivity.classList.add('is-hidden');
+        ui.aiActivity.classList.remove('is-visible');
+        ui.aiActivity.dataset.state = 'idle';
+      };
+      if (delay) aiActivityHideTimer = window.setTimeout(hide, delay);
+      else hide();
+      return;
+    }
+
+    const copy = AI_ACTIVITY_STATES[mode] || AI_ACTIVITY_STATES.processing;
+    ui.aiActivity.dataset.state = mode;
+    if (ui.aiActivityLabel) ui.aiActivityLabel.textContent = options.label || copy.label;
+    if (ui.aiActivityText) ui.aiActivityText.textContent = options.text || copy.text;
+    ui.aiActivity.classList.remove('is-hidden');
+    window.requestAnimationFrame(() => ui.aiActivity?.classList.add('is-visible'));
+  }
 
   function clearLastRecording() {
     if (lastRecordingUrl) URL.revokeObjectURL(lastRecordingUrl);
@@ -355,6 +396,9 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
     ui.grid.querySelectorAll('[data-sound-id]').forEach((button) => button.addEventListener('click', () => {
       const nextSelected = ALL_SOUNDS.find((item) => item.id === button.dataset.soundId) || null;
       if (selected?.id !== nextSelected?.id) {
+        autoVoiceCapture?.cancel?.();
+        autoVoiceCapture = null;
+        setAIActivity('hidden');
         finishPracticeSession({ silent:true });
         clearLastRecording();
       }
@@ -553,19 +597,33 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       busy = true;
       button.classList.add('is-recording');
       button.textContent = '● Habla cuando estés listo';
+      setAIActivity('waiting');
       const capture = await createAutoVoiceTurn({
         onState: (mode) => {
-          if (mode === 'waiting') button.textContent = '● Habla cuando estés listo';
-          if (mode === 'listening') button.textContent = '● Te escucho…';
-          if (mode === 'thinking') button.textContent = '◌ Esperando por si continúas…';
-          if (mode === 'processing') button.textContent = '✓ Revisando automáticamente…';
+          if (mode === 'waiting') {
+            button.textContent = '● Habla cuando estés listo';
+            setAIActivity('waiting');
+          }
+          if (mode === 'listening') {
+            button.textContent = '● Escuchando tu voz';
+            setAIActivity('listening');
+          }
+          if (mode === 'thinking') {
+            button.textContent = '● Grabación activa';
+            setAIActivity('thinking');
+          }
+          if (mode === 'processing') {
+            button.textContent = '✓ Voz recibida';
+            setAIActivity('processing');
+          }
         }
       });
       autoVoiceCapture = capture;
       const blob = await capture.promise;
       autoVoiceCapture = null;
       button.disabled = true;
-      button.textContent = 'Revisando…';
+      button.textContent = '✓ Voz recibida';
+      setAIActivity('processing');
       if (blob.size < 800) throw new Error('Habla un poco más fuerte y vuelve a intentarlo.');
       saveLastRecording(blob);
       const form = new FormData();
@@ -598,6 +656,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       updateChallengeUI();
       const resultState = ['success','almost','retry'].includes(result.status) ? result.status : (result.score >= 90 ? 'success' : result.score >= 60 ? 'almost' : 'retry');
       const resultIcon = resultState === 'success' ? '✓' : resultState === 'almost' ? '↗' : '↻';
+      setAIActivity('finalizing');
       const resultHtml = `<div class="sound-feedback-card is-${resultState}">
         <div class="sound-feedback-head">
           <span class="sound-feedback-icon" aria-hidden="true">${resultIcon}</span>
@@ -626,8 +685,10 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
         </div>
       </div>`;
       renderDetail(resultHtml);
+      setAIActivity('hidden', { delay: 320 });
       guidedScroll(ui.detail.querySelector('#sound-result'), { block: 'center', delay: 70 });
     } catch (error) {
+      setAIActivity('hidden');
       if (error?.name !== 'AbortError') {
         notify?.(error.message || 'No pudimos revisar tu pronunciación.');
         renderDetail();
@@ -637,10 +698,16 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       busy = false;
       button.disabled = false;
       button.classList.remove('is-recording');
+      if (!ui.aiActivity?.classList.contains('is-hidden') && ui.aiActivity?.dataset.state !== 'finalizing') {
+        setAIActivity('hidden', { delay: 180 });
+      }
     }
   }
 
   ui.tabs.forEach((button) => button.addEventListener('click', () => {
+    autoVoiceCapture?.cancel?.();
+    autoVoiceCapture = null;
+    setAIActivity('hidden');
     filter = button.dataset.soundFilter || 'vowels';
     ui.tabs.forEach((tab) => { const active = tab === button; tab.classList.toggle('is-active', active); tab.setAttribute('aria-selected', String(active)); });
     if (selected && filter !== 'all' && selected.group !== filter) {
@@ -651,9 +718,12 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
   }));
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') finishPracticeSession({ silent:true });
+    if (document.visibilityState === 'hidden') {
+      setAIActivity('hidden');
+      finishPracticeSession({ silent:true });
+    }
   });
-  window.addEventListener('pagehide', () => { autoVoiceCapture?.cancel?.(); autoVoiceCapture = null; finishPracticeSession({ silent:true }); });
+  window.addEventListener('pagehide', () => { setAIActivity('hidden'); autoVoiceCapture?.cancel?.(); autoVoiceCapture = null; finishPracticeSession({ silent:true }); });
 
   renderGrid(); renderDetail();
   return { render(){ state = readState(); renderGrid(); renderDetail(); } };
