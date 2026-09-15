@@ -28,21 +28,28 @@ function messageFromQuery() {
   if (params.get('billing') === 'cancelled') return 'El pago fue cancelado. No se hizo ningún cargo nuevo.';
   if (params.get('billing') === 'pending') return 'Estamos confirmando tu suscripción. Intenta abrir la app nuevamente en unos segundos.';
   if (params.get('session') === 'expired') return 'Tu sesión expiró. Inicia sesión nuevamente.';
+  if (params.get('email') === 'verified') return 'Email verificado correctamente. Ya puedes iniciar sesión.';
+  if (params.get('email') === 'invalid') return 'El enlace de verificación no es válido o ya venció. Solicita uno nuevo.';
+  if (params.get('account') === 'deleted') return 'Tu cuenta y sus datos fueron eliminados.';
+  if (params.get('password') === 'reset') return 'Contraseña actualizada. Inicia sesión con tu nueva contraseña.';
   return '';
 }
 
 function setAuthMode(mode) {
-  authMode = mode === 'register' ? 'register' : 'login';
+  authMode = ['login', 'register', 'forgot'].includes(mode) ? mode : 'login';
   $('#login-form')?.classList.toggle('is-hidden', authMode !== 'login');
   $('#register-form')?.classList.toggle('is-hidden', authMode !== 'register');
+  $('#forgot-form')?.classList.toggle('is-hidden', authMode !== 'forgot');
   $('#login-tab')?.classList.toggle('is-active', authMode === 'login');
   $('#register-tab')?.classList.toggle('is-active', authMode === 'register');
   const title = $('#auth-title');
   const copy = $('#auth-copy');
-  if (title) title.textContent = authMode === 'login' ? 'Entra a tu cuenta.' : 'Crea tu cuenta de Sin Barreras.';
+  if (title) title.textContent = authMode === 'login' ? 'Entra a tu cuenta.' : authMode === 'register' ? 'Crea tu cuenta de Sin Barreras.' : 'Recupera tu contraseña.';
   if (copy) copy.textContent = authMode === 'login'
     ? 'Tu cuenta de Sin Barreras es el acceso principal. Google es opcional.'
-    : 'Crea una cuenta personal. Después podrás activar el plan de $5.99/mes o usar un acceso gratuito asignado a tu email.';
+    : authMode === 'register'
+      ? 'Crea una cuenta personal. Te enviaremos un enlace para verificar tu email antes de iniciar sesión.'
+      : 'Escribe el email de tu cuenta local y te enviaremos un enlace de un solo uso.';
   setStatus(messageFromQuery());
 }
 
@@ -107,6 +114,14 @@ async function submitAccountForm(endpoint, payload, submitButton) {
       body: JSON.stringify(payload)
     });
     if (result.redirect) return location.assign(result.redirect);
+    if (result.verificationRequired) {
+      const registeredEmail = $('#register-email')?.value || '';
+      setAuthMode('login');
+      if ($('#login-email')) $('#login-email').value = registeredEmail;
+      setStatus(result.message || 'Revisa tu email para verificar la cuenta.');
+      submitButton.innerHTML = original;
+      return;
+    }
     me = { authenticated: true, user: result.user };
     renderAuth();
     submitButton.innerHTML = original;
@@ -177,6 +192,30 @@ $('#register-form')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const button = event.currentTarget.querySelector('button[type="submit"]');
   await submitAccountForm('/auth/register', { name: $('#register-name').value, email: $('#register-email').value, password: $('#register-password').value }, button);
+});
+
+$('#forgot-password-link')?.addEventListener('click', () => {
+  if ($('#forgot-email')) $('#forgot-email').value = $('#login-email')?.value || '';
+  setAuthMode('forgot');
+});
+$('#back-to-login')?.addEventListener('click', () => setAuthMode('login'));
+$('#forgot-form')?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  try {
+    button.disabled = true;
+    const result = await jsonRequest('/auth/forgot-password', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email: $('#forgot-email').value }) });
+    setStatus(result.message);
+  } catch (error) { setStatus(error.message, 'error'); }
+  finally { button.disabled = false; }
+});
+$('#resend-verification')?.addEventListener('click', async () => {
+  const email = $('#login-email')?.value?.trim();
+  if (!email) return setStatus('Escribe primero el email de tu cuenta.', 'error');
+  try {
+    const result = await jsonRequest('/auth/resend-verification', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email }) });
+    setStatus(result.message);
+  } catch (error) { setStatus(error.message, 'error'); }
 });
 
 $('#subscribe-button')?.addEventListener('click', subscribe);

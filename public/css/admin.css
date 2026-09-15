@@ -9,7 +9,7 @@
 @media(max-width:1000px){body.admin-menu-open{overflow:hidden}.admin-menu-toggle{position:fixed;top:18px;left:16px;z-index:60;display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:46px;height:46px;border:1px solid rgba(19,36,39,.12);border-radius:14px;background:rgba(255,255,255,.92);box-shadow:0 12px 30px rgba(19,36,39,.12);backdrop-filter:blur(10px)}.admin-menu-toggle span{display:block;width:20px;height:2px;margin:0 auto;border-radius:999px;background:#132427}.admin-sidebar-backdrop{position:fixed;inset:0;z-index:40;background:rgba(8,24,26,.42);backdrop-filter:blur(2px)}.admin-sidebar{left:0;transform:translateX(-100%);transition:transform .22s ease,box-shadow .22s ease;width:min(82vw,320px);padding:20px 16px 22px;border-right:none;box-shadow:none}.admin-menu-open .admin-sidebar{transform:translateX(0);box-shadow:var(--shadow)}.admin-menu-close{display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border:1px solid rgba(255,255,255,.14);border-radius:12px;color:white;background:rgba(255,255,255,.08);font-size:26px;line-height:1}.admin-brand{padding:0;gap:12px}.admin-brand-icon{display:block}.admin-brand-full{display:block;width:164px;max-width:calc(100% - 58px)}.admin-label{margin:22px 4px 12px}.sidebar-bottom{display:grid}.admin-main{margin-left:0;padding:82px 22px 70px}.admin-topbar{padding-left:42px}.admin-topbar-logo{width:160px;max-width:44vw}.grants-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.admin-main{padding:82px 13px 20px}.admin-topbar{align-items:flex-start;gap:14px;padding-left:44px}.admin-user div{display:none}.stats-grid{gap:8px;grid-template-columns:1fr}.stats-grid article{padding:15px}.stats-grid strong{font-size:25px}.grant-form,.grant-form.horizontal{grid-template-columns:1fr}.grant-form button{min-height:43px}.section-toolbar{align-items:stretch;flex-direction:column}.filters{flex-direction:column}.filters input{width:100%}.grants-grid{grid-template-columns:1fr}.admin-topbar h1{font-size:25px}.admin-title-block{display:grid;gap:10px}.admin-topbar-logo{width:148px;max-width:56vw}.admin-menu-toggle{top:14px;left:12px}.table-card-head{padding:16px}.card-head h2,.table-card-head h2,.section-toolbar h2{font-size:18px}}
 
-/* v1.4.44 · Mobile admin polish + single brand identity */
+/* v1.4.45 · Mobile admin polish + single brand identity */
 .admin-brand { min-height:56px; overflow:hidden; }
 .admin-sidebar-logo { display:block; width:194px; max-width:100%; height:auto; object-fit:contain; object-position:left center; }
 .admin-title-copy { min-width:0; }
@@ -51,7 +51,7 @@
   .admin-sidebar-logo{width:164px}
 }
 
-/* v1.4.44 · billing provider metadata */
+/* v1.4.45 · billing provider metadata */
 .provider-note {
   display: block;
   margin-top: 5px;
@@ -60,3 +60,4 @@
   font-weight: 800;
   letter-spacing: .08em;
 }
+.usage-stats{margin-bottom:13px}.usage-stats strong{font-size:27px}@media(min-width:1201px){.stats-grid{grid-template-columns:repeat(3,1fr)}}

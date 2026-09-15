@@ -4,7 +4,8 @@ const KEYS = {
   onboarding: 'sinBarreras.onboarded.v2',
   practicePoints: 'sinBarreras.practicePoints',
   learning: 'sinBarreras.learn.v1',
-  sounds: 'sinBarreras.sounds.v1'
+  sounds: 'sinBarreras.sounds.v1',
+  phrasebook: 'sinBarreras.phrasebook.v1'
 };
 const USER_KEY = 'sinBarreras.currentUserId';
 let syncing = false;
@@ -50,6 +51,20 @@ function sanitizedHistory(value) {
     .filter(Boolean);
 }
 
+
+function sanitizePhrasebook(value) {
+  return (Array.isArray(value) ? value : []).slice(0, 150).map((item) => ({
+    id: String(item?.id || '').slice(0, 120),
+    sourceText: String(item?.sourceText || '').trim().slice(0, 1200),
+    translatedText: String(item?.translatedText || '').trim().slice(0, 1200),
+    sourceLanguage: item?.sourceLanguage || null,
+    targetLanguage: item?.targetLanguage || null,
+    category: String(item?.category || 'general').slice(0, 40),
+    situation: String(item?.situation || 'everyday').slice(0, 40),
+    createdAt: item?.createdAt || null
+  })).filter((item) => item.id && item.sourceText && item.translatedText);
+}
+
 function capture() {
   return {
     history: sanitizedHistory(readJson(KEYS.history, [])),
@@ -57,7 +72,8 @@ function capture() {
     onboarding: localStorage.getItem(KEYS.onboarding) === '1',
     practicePoints: Math.max(0, Number(localStorage.getItem(KEYS.practicePoints) || 0)),
     learning: readJson(KEYS.learning, {}),
-    sounds: readJson(KEYS.sounds, {})
+    sounds: readJson(KEYS.sounds, {}),
+    phrasebook: sanitizePhrasebook(readJson(KEYS.phrasebook, []))
   };
 }
 
@@ -68,6 +84,7 @@ function apply(state = {}) {
   localStorage.setItem(KEYS.practicePoints, String(Math.max(0, Number(state.practicePoints) || 0)));
   localStorage.setItem(KEYS.learning, JSON.stringify(state.learning && typeof state.learning === 'object' ? state.learning : {}));
   localStorage.setItem(KEYS.sounds, JSON.stringify(state.sounds && typeof state.sounds === 'object' ? state.sounds : {}));
+  localStorage.setItem(KEYS.phrasebook, JSON.stringify(sanitizePhrasebook(state.phrasebook)));
 }
 
 async function request(url, options = {}) {

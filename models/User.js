@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
   avatarUrl: { type: String, trim: true, maxlength: 800, default: '' },
   role: { type: String, enum: ['user', 'owner'], default: 'user', index: true },
   passwordHash: { type: String, select: false, default: null },
+  emailVerifiedAt: { type: Date, default: null },
+  emailVerificationRequired: { type: Boolean, default: false, index: true },
   providers: { type: [providerSchema], default: [] },
   accountStatus: { type: String, enum: ['active', 'revoked'], default: 'active', index: true },
   freeAccess: { type: Boolean, default: false, index: true },
@@ -31,7 +33,11 @@ const userSchema = new mongoose.Schema({
   },
   currentPeriodEnd: { type: Date, default: null },
   cancelAtPeriodEnd: { type: Boolean, default: false },
-  lastLoginAt: { type: Date, default: null }
+  lastLoginAt: { type: Date, default: null },
+  subscriptionAmount: { type: Number, default: null, min: 0 },
+  subscriptionCurrency: { type: String, default: 'usd', lowercase: true, trim: true, maxlength: 8 },
+  subscriptionInterval: { type: String, enum: ['day', 'week', 'month', 'year', null], default: null },
+  subscriptionIntervalCount: { type: Number, default: 1, min: 1 }
 }, { timestamps: true });
 
 userSchema.methods.hasAppAccess = function hasAppAccess() {

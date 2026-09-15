@@ -19,6 +19,12 @@ export function initAccountUI() {
   const manage = $('#manage-subscription');
   const admin = $('#open-admin');
   const logout = $('#account-logout');
+  const deleteButton = $('#account-delete');
+  const deleteDialog = $('#delete-account-dialog');
+  const deleteForm = $('#delete-account-form');
+  const deletePassword = $('#delete-account-password');
+  const deleteConfirmation = $('#delete-account-confirmation');
+  const deleteStatus = $('#delete-account-status');
 
   if (avatar) {
     if (user.avatarUrl) avatar.innerHTML = `<img src="${user.avatarUrl.replace(/"/g, '&quot;')}" alt="" referrerpolicy="no-referrer">`;
@@ -34,6 +40,7 @@ export function initAccountUI() {
     else plan.textContent = 'SIN SUSCRIPCIÓN ACTIVA';
   }
   if (admin) admin.hidden = user.role !== 'owner';
+  if (deleteButton) deleteButton.hidden = user.role === 'owner';
   if (manage) manage.hidden = user.role === 'owner' || !user.canManageBilling;
 
   button?.addEventListener('click', () => dialog?.showModal());
@@ -59,6 +66,37 @@ export function initAccountUI() {
     } finally { manage.disabled = false; }
   });
   admin?.addEventListener('click', () => window.location.assign('/admin'));
+
+  deleteButton?.addEventListener('click', () => {
+    dialog?.close();
+    if (deletePassword) deletePassword.value = '';
+    if (deleteConfirmation) deleteConfirmation.value = '';
+    if (deleteStatus) deleteStatus.textContent = '';
+    deleteDialog?.showModal();
+  });
+  deleteForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const confirmation = String(deleteConfirmation?.value || '').trim().toUpperCase();
+    const submit = $('#delete-account-confirm');
+    if (confirmation !== 'ELIMINAR') {
+      if (deleteStatus) deleteStatus.textContent = 'Escribe ELIMINAR para confirmar.';
+      return;
+    }
+    try {
+      if (submit) submit.disabled = true;
+      if (deleteStatus) deleteStatus.textContent = 'Eliminando cuenta…';
+      await jsonRequest('/api/account', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: 'ELIMINAR', currentPassword: deletePassword?.value || '' })
+      });
+      localStorage.clear();
+      window.location.assign('/?account=deleted');
+    } catch (error) {
+      if (deleteStatus) deleteStatus.textContent = error.message;
+      if (submit) submit.disabled = false;
+    }
+  });
   logout?.addEventListener('click', async () => {
     try { await window.SinBarrerasCloud?.syncNow?.(); } catch {}
     await jsonRequest('/auth/logout', { method: 'POST' }).catch(() => ({}));

@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.4.44" />
+    <link rel="stylesheet" href="/styles.css?v=1.5.2" />
   </head>
   <body>
     <main class="app-shell">
@@ -86,6 +86,12 @@
         </div>
       </section>
 
+      <section class="conversation-tools" aria-label="Herramientas de conversación">
+        <button id="open-face-to-face" class="conversation-tool" type="button"><span>↕</span><strong>Cara a cara</strong><small>Pantalla para dos personas</small></button>
+        <button id="open-phrasebook" class="conversation-tool" type="button"><span>★</span><strong>Mis frases</strong><small>Acceso rápido y offline</small></button>
+        <button id="open-qr-conversation" class="conversation-tool" type="button"><span>▦</span><strong>Conectar por QR</strong><small>Dos teléfonos · sin instalar</small></button>
+      </section>
+
       <section class="interpreter-stage" aria-live="polite">
         <div class="stage-topline">
           <div class="status-row">
@@ -132,8 +138,33 @@
         <article class="speech-card translation-card">
           <div class="card-head"><span id="translation-language">TRADUCCIÓN</span><button id="repeat-button" class="mini-action" type="button" disabled aria-label="Repetir última traducción">↻</button></div>
           <p class="translation-text" id="translation-text">La traducción se reproducirá en voz alta.</p>
-          <button id="learn-from-translation" class="learn-from-translation is-hidden" type="button">＋ Aprender palabras de esta frase</button>
+          <div class="translation-card-actions">
+            <button id="save-current-translation" class="save-phrase-button" type="button" disabled>★ Guardar frase</button>
+            <button id="learn-from-translation" class="learn-from-translation is-hidden" type="button">＋ Guardar en Mis palabras</button>
+          </div>
         </article>
+      </section>
+
+      <section id="face-to-face-view" class="face-to-face-view is-hidden" aria-label="Conversación cara a cara">
+        <div class="face-half face-partner">
+          <div class="face-copy">
+            <span id="face-partner-language">OTRA PERSONA</span>
+            <p id="face-partner-text">La traducción para la otra persona aparecerá aquí.</p>
+            <button id="face-partner-repeat" type="button" class="face-repeat is-hidden">▶ Escuchar</button>
+          </div>
+        </div>
+        <div class="face-center">
+          <button id="close-face-to-face" type="button" aria-label="Cerrar modo cara a cara">×</button>
+          <div><span id="face-status-dot"></span><strong id="face-status">LISTO</strong></div>
+          <button id="face-toggle-listening" type="button">● Comenzar</button>
+        </div>
+        <div class="face-half face-user">
+          <div class="face-copy">
+            <span id="face-user-language">TÚ</span>
+            <p id="face-user-text">Tu parte de la conversación aparecerá aquí.</p>
+            <button id="face-user-repeat" type="button" class="face-repeat is-hidden">▶ Escuchar</button>
+          </div>
+        </div>
       </section>
 
       <nav class="bottom-nav" aria-label="Navegación principal">
@@ -213,6 +244,28 @@
               <span class="learn-path-meta"><b>Niveles progresivos</b><b>Vocabulario real</b></span>
               <span class="learn-path-arrow">→</span>
             </button>
+
+            <button class="learn-path-card learn-path-conversations" type="button" data-learn-path="conversations">
+              <span class="learn-path-visual conversation-visual" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="learn-path-copy">
+                <small>DE TU VIDA REAL</small>
+                <strong>Aprender de mis conversaciones</strong>
+                <span>Convierte lo que ya dijiste y tradujiste en frases para escuchar, guardar y practicar.</span>
+              </span>
+              <span class="learn-path-meta"><b>Tu historial</b><b>Práctica personalizada</b></span>
+              <span class="learn-path-arrow">→</span>
+            </button>
+
+            <button class="learn-path-card learn-path-words" type="button" data-learn-path="words">
+              <span class="learn-path-visual words-visual" aria-hidden="true">★</span>
+              <span class="learn-path-copy">
+                <small>MIS PALABRAS</small>
+                <strong>Palabras que guardé</strong>
+                <span>Todo lo que guardas desde Hablar aparece aquí, listo para escuchar y practicar.</span>
+              </span>
+              <span class="learn-path-meta"><b id="learn-home-custom-count">0 guardadas</b><b>Acceso rápido</b></span>
+              <span class="learn-path-arrow">→</span>
+            </button>
           </div>
 
           <p class="learn-home-note">Puedes cambiar de camino cuando quieras. Tu progreso se guarda por separado.</p>
@@ -255,6 +308,40 @@
               </article>
             </div>
           </section>
+        </section>
+
+        <section id="learn-conversations-branch" class="learn-branch is-hidden" aria-label="Aprender de mis conversaciones">
+          <div class="learn-branch-topbar">
+            <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
+            <div><span>DE MIS CONVERSACIONES</span><strong>Practica lo que realmente necesitas decir</strong></div>
+          </div>
+          <div class="conversation-learning-hero">
+            <div><p class="section-label">TU HISTORIAL SE VUELVE PRÁCTICA</p><h3>De traducirlo hoy,<br><em>a decirlo tú mañana.</em></h3><p>Sin Barreras encuentra frases en inglés de tus conversaciones recientes y te permite escucharlas, guardarlas o llevarlas directamente a Práctica.</p></div>
+            <div class="conversation-learning-stat"><strong id="conversation-learning-count">0</strong><span>frases disponibles</span></div>
+          </div>
+          <div id="conversation-learning-empty" class="conversation-learning-empty">Usa <strong>Hablar</strong> varias veces y aquí aparecerán frases reales de tus conversaciones.</div>
+          <div id="conversation-learning-list" class="conversation-learning-list"></div>
+        </section>
+
+        <section id="learn-words-branch" class="learn-branch is-hidden" aria-label="Mis palabras guardadas">
+          <div class="learn-branch-topbar">
+            <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
+            <div><span>MIS PALABRAS</span><strong>Lo que guardas queda listo para practicar</strong></div>
+          </div>
+          <div class="saved-words-hero">
+            <div>
+              <p class="section-label">ACCESO RÁPIDO</p>
+              <h3>Guárdala una vez.<br><em>Practícala cuando quieras.</em></h3>
+              <p>Cuando tocas <strong>“Guardar en Mis palabras”</strong> desde una traducción, las palabras útiles llegan directamente aquí.</p>
+            </div>
+            <div class="saved-words-count"><strong id="learn-custom-branch-count">0</strong><span>guardadas</span></div>
+          </div>
+          <div class="saved-words-actions">
+            <button id="learn-custom-practice-all" class="saved-words-primary" type="button">▶ Practicar mis palabras</button>
+            <small>La práctica mezcla significado, escucha, escritura y pronunciación.</small>
+          </div>
+          <div id="learn-custom-empty" class="conversation-learning-empty">Todavía no has guardado palabras. Ve a <strong>Hablar</strong>, traduce una frase y toca <strong>“Guardar en Mis palabras”</strong>.</div>
+          <div id="learn-custom-list" class="saved-words-list" aria-live="polite"></div>
         </section>
 
         <section id="learn-routes-branch" class="learn-branch is-hidden" aria-label="Rutas por situación">
@@ -321,19 +408,20 @@
 
       <section id="practice-view" class="practice-view is-hidden" aria-labelledby="practice-title">
         <div class="practice-heading">
-          <p class="section-label">INGLÉS PARA SITUACIONES REALES</p>
-          <h2 id="practice-title">¿Cómo digo esto en inglés?</h2>
-          <p>Escribe lo que quieres comunicar. La IA te dará una frase natural, pronunciación fácil, otra forma de decirlo y práctica con corrección inteligente.</p>
+          <p class="section-label">PRÁCTICA MULTILENGUAJE · SITUACIONES REALES</p>
+          <h2 id="practice-title">¿Cómo digo esto en otro idioma?</h2>
+          <p>Escribe lo que quieres comunicar, elige el idioma que quieres practicar y recibe una frase natural, pronunciación fácil, otra forma de decirlo y corrección inteligente.</p>
         </div>
 
         <form id="practice-form" class="practice-form">
           <label for="practice-input">¿Qué quieres decir?</label>
           <textarea id="practice-input" maxlength="500" required placeholder="Ejemplo: Necesito decirle a mi supervisor que mañana llegaré un poco tarde."></textarea>
-          <div class="practice-form-row three">
+          <div class="practice-form-row four">
             <label>Mi idioma
-              <select id="practice-language">
-                <option value="es" selected>Español</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="ja">日本語</option><option value="it">Italiano</option>
-              </select>
+              <select id="practice-language" aria-label="Mi idioma"></select>
+            </label>
+            <label>Idioma que quiero practicar
+              <select id="practice-target-language" aria-label="Idioma que quiero practicar"></select>
             </label>
             <label>Situación
               <select id="practice-situation">
@@ -346,7 +434,7 @@
 
         <article id="practice-result" class="practice-result is-hidden">
           <div class="practice-points"><span>★</span><strong id="total-points">0 puntos</strong></div>
-          <p class="section-label">FORMA NATURAL EN INGLÉS</p>
+          <p id="practice-target-label" class="section-label">FORMA NATURAL EN EL IDIOMA ELEGIDO</p>
           <h3 id="practice-english"></h3>
           <p id="practice-meaning" class="practice-meaning"></p>
 
@@ -391,7 +479,7 @@
         <div class="coach-setup" id="coach-setup">
           <div class="coach-setup-intro">
             <span class="coach-setup-orb">AI</span>
-            <div><strong>Prepara tu práctica</strong><small>Elige una situación, tu nivel y cuánta ayuda quieres recibir.</small></div>
+            <div><strong>Prepara tu práctica</strong><small>Elige una situación y tu nivel. En Principiante, el Coach usa frases muy cortas, traducción visible y ayuda para responder.</small></div>
           </div>
           <label>Situación
             <select id="coach-scenario">
@@ -417,7 +505,7 @@
           </label>
           <label>Nivel
             <select id="coach-level">
-              <option value="beginner" selected>Principiante</option>
+              <option value="beginner" selected>Principiante · empezando desde cero</option>
               <option value="intermediate">Intermedio</option>
               <option value="advanced">Avanzado</option>
             </select>
@@ -537,6 +625,22 @@
         </article>
       </section>
 
+      <section id="phrasebook-view" class="phrasebook-view is-hidden" aria-labelledby="phrasebook-title">
+        <div class="phrasebook-heading">
+          <div><p class="section-label">ACCESO RÁPIDO · TAMBIÉN OFFLINE</p><h2 id="phrasebook-title">Mis frases</h2><p>Guarda frases importantes y vuelve a escucharlas incluso cuando la señal falle.</p></div>
+          <span id="phrasebook-count" class="phrasebook-count">0 frases</span>
+        </div>
+        <div class="phrasebook-toolbar">
+          <input id="phrasebook-search" type="search" placeholder="Buscar una frase…" autocomplete="off" />
+          <div id="phrasebook-filters" class="phrasebook-filters" aria-label="Categorías">
+            <button type="button" class="is-active" data-phrase-category="all">Todas</button><button type="button" data-phrase-category="general">General</button><button type="button" data-phrase-category="work">Trabajo</button><button type="button" data-phrase-category="medical">Salud</button><button type="button" data-phrase-category="school">Escuela</button><button type="button" data-phrase-category="emergency">Emergencia</button><button type="button" data-phrase-category="restaurant">Restaurante</button><button type="button" data-phrase-category="bank">Banco</button><button type="button" data-phrase-category="travel">Viaje</button>
+          </div>
+        </div>
+        <p id="phrasebook-empty" class="empty-state">Todavía no tienes frases guardadas. Desde Hablar toca <strong>Guardar frase</strong>.</p>
+        <div id="phrasebook-list" class="phrasebook-list"></div>
+        <button id="save-current-phrase" class="is-hidden" type="button">Guardar actual</button>
+      </section>
+
       <section id="history-view" class="history-view is-hidden" aria-labelledby="history-title">
         <div class="history-heading">
           <div><p class="section-label">EN ESTE DISPOSITIVO</p><h2 id="history-title">Historial</h2></div>
@@ -610,9 +714,34 @@
           <select id="font-size-select"><option value="normal">Normal</option><option value="large">Grande</option><option value="xl">Extra grande</option></select>
         </label>
         <div class="setting-row stacked"><span>Modo de apariencia</span><div class="segmented compact"><button type="button" class="theme-option" data-theme="light">Claro</button><button type="button" class="theme-option" data-theme="dark">Oscuro</button></div></div>
+        <button id="settings-open-phrasebook" class="settings-history-button" type="button"><span>★</span><span><strong>Mis frases</strong><small>Frases guardadas y disponibles offline</small></span><b>→</b></button>
         <button id="open-history" class="settings-history-button" type="button"><span>◷</span><span><strong>Historial</strong><small>Ver conversaciones guardadas</small></span><b>→</b></button>
         <p class="dialog-note">Tu historial, vocabulario, preferencias y progreso se sincronizan con tu cuenta de forma privada.</p>
       </form>
+    </dialog>
+
+    <dialog id="qr-conversation-dialog" class="qr-conversation-dialog">
+      <div class="qr-dialog-body">
+        <div class="dialog-head"><div><p class="section-label">CONVERSACIÓN ENTRE TELÉFONOS</p><h2>Conectar por QR</h2></div><form method="dialog"><button class="icon-button" value="close" aria-label="Cerrar">×</button></form></div>
+        <section id="qr-room-setup" class="qr-room-setup">
+          <p>El otro teléfono no necesita instalar Sin Barreras ni crear una cuenta. Escanea el QR y cada persona habla desde su propio dispositivo.</p>
+          <div class="qr-language-grid">
+            <label>Mi idioma<select id="qr-host-language"><option value="">Selecciona…</option></select></label>
+            <label>Idioma de la otra persona<select id="qr-guest-language"><option value="">Selecciona…</option></select></label>
+          </div>
+          <button id="create-qr-room" class="primary-button" type="button">Crear conversación por QR</button>
+        </section>
+        <section id="qr-room-active" class="qr-room-active is-hidden">
+          <div class="qr-share-grid">
+            <div id="qr-code" class="qr-code" aria-label="Código QR de invitación"></div>
+            <div class="qr-share-copy"><span>CÓDIGO</span><strong id="qr-room-code">------</strong><a id="qr-room-link" href="#" target="_blank" rel="noopener">Enlace de invitación</a><div><button id="qr-copy-link" type="button">Copiar enlace</button><button id="qr-share-link" type="button">Compartir</button></div></div>
+          </div>
+          <div id="qr-room-status" class="qr-room-status">Esperando conexión…</div>
+          <div id="qr-room-transcript" class="qr-room-transcript"></div>
+          <button id="qr-room-talk" class="qr-room-talk" type="button">● Hablar desde este teléfono</button>
+          <button id="end-qr-room" class="qr-room-end" type="button">Terminar conversación</button>
+        </section>
+      </div>
     </dialog>
 
     <dialog id="account-dialog" class="account-dialog">
@@ -625,8 +754,22 @@
         <div class="account-actions">
           <button id="manage-subscription" type="button"><span>◫</span><div><strong>Administrar suscripción</strong><small>Pago, tarjeta o cancelación</small></div><b>→</b></button>
           <button id="open-admin" type="button" hidden><span>⌘</span><div><strong>Admin Dashboard</strong><small>Usuarios, accesos y suscripciones</small></div><b>→</b></button>
+          <button id="account-delete" type="button" class="danger-lite"><span>×</span><div><strong>Eliminar cuenta</strong><small>Borrar permanentemente cuenta y datos</small></div><b>→</b></button>
           <button id="account-logout" type="button" class="danger-lite"><span>↗</span><div><strong>Cerrar sesión</strong><small>Salir de esta cuenta</small></div><b>→</b></button>
         </div>
+      </div>
+    </dialog>
+
+    <dialog id="delete-account-dialog" class="account-dialog">
+      <div class="account-dialog-body">
+        <div class="dialog-head"><div><p class="section-label">ELIMINAR CUENTA</p><h2>Acción permanente</h2></div><form method="dialog"><button class="icon-button" value="close" aria-label="Cerrar">×</button></form></div>
+        <p class="dialog-note">Se eliminarán tu cuenta, progreso, historial sincronizado y registros de uso. También se cancelará cualquier suscripción activa para evitar cobros futuros.</p>
+        <form id="delete-account-form" class="delete-account-form">
+          <label>Contraseña actual <small>Solo si tu cuenta usa contraseña</small><input id="delete-account-password" type="password" autocomplete="current-password"></label>
+          <label>Escribe <strong>ELIMINAR</strong> para confirmar<input id="delete-account-confirmation" type="text" autocomplete="off" required></label>
+          <div id="delete-account-status" class="delete-account-status" role="status"></div>
+          <button id="delete-account-confirm" class="primary-button delete-account-confirm" type="submit">ELIMINAR MI CUENTA Y DATOS</button>
+        </form>
       </div>
     </dialog>
 
@@ -659,15 +802,8 @@
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data?.type === 'SIN_BARRERAS_UPDATED') window.location.reload();
-        });
-      }
-    </script>
-    <script src="/play-billing.js?v=1.4.44"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.4.44"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+    <script src="/play-billing.js?v=1.5.2"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.5.2"></script>
   </body>
 </html>

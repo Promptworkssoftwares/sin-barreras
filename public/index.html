@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/css/landing.css?v=1.4.44">
+  <link rel="stylesheet" href="/css/landing.css?v=1.5.2">
 </head>
 <body>
   <header class="landing-nav">
@@ -87,6 +87,7 @@
           <label>Email<input id="login-email" name="email" type="email" autocomplete="username" required></label>
           <label>Contraseña<input id="login-password" name="password" type="password" autocomplete="current-password" required></label>
           <button class="cta-primary" type="submit">INICIAR SESIÓN <span>→</span></button>
+          <div class="auth-help-row"><button id="forgot-password-link" class="text-action" type="button">¿Olvidaste tu contraseña?</button><button id="resend-verification" class="text-action" type="button">Reenviar verificación</button></div>
         </form>
 
         <form id="register-form" class="account-form is-hidden">
@@ -95,6 +96,12 @@
           <label>Contraseña<input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required></label>
           <small class="password-note">Mínimo 10 caracteres.</small>
           <button class="cta-primary" type="submit">CREAR MI CUENTA <span>→</span></button>
+        </form>
+
+        <form id="forgot-form" class="account-form is-hidden">
+          <label>Email<input id="forgot-email" name="email" type="email" autocomplete="email" required></label>
+          <button class="cta-primary" type="submit">ENVIAR ENLACE <span>→</span></button>
+          <button id="back-to-login" class="text-action" type="button">← Volver a iniciar sesión</button>
         </form>
       </div>
 
@@ -112,11 +119,11 @@
         <button id="subscribe-button" class="cta-primary is-hidden" type="button">SUSCRIBIRME POR $5.99/MES <span>→</span></button>
         <button id="landing-logout" class="text-action" type="button">Cerrar sesión</button>
       </div>
-      <p class="auth-legal">El acceso requiere una suscripción activa de $5.99/mes o un acceso gratuito otorgado por el owner. La cuenta owner tiene acceso total sin suscripción.</p>
+      <p class="auth-legal"><a href="/account-deletion">Eliminar cuenta y datos</a> · El acceso requiere una suscripción activa de $5.99/mes o un acceso gratuito otorgado por el owner. La cuenta owner tiene acceso total sin suscripción.</p>
     </div>
   </dialog>
 
-  <script src="/play-billing.js?v=1.4.44"></script>
-  <script type="module" src="/js/landing.js?v=1.4.44"></script>
+  <script src="/play-billing.js?v=1.5.2"></script>
+  <script type="module" src="/js/landing.js?v=1.5.2"></script>
 </body>
 </html>

@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#132427">
   <title>Sin Barreras · Admin Dashboard</title>
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/css/admin.css?v=1.4.44">
+  <link rel="stylesheet" href="/css/admin.css?v=1.5.2">
 </head>
 <body>
   <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="admin-sidebar">
@@ -28,6 +28,7 @@
       <button class="side-link" data-section="users"><span>◎</span>Usuarios</button>
       <button class="side-link" data-section="grants"><span>◇</span>Acceso gratis</button>
       <button class="side-link" data-section="subscriptions"><span>◫</span>Suscripciones</button>
+      <button class="side-link" data-section="usage"><span>⌁</span>Uso IA</button>
     </nav>
     <div class="sidebar-bottom">
       <a href="/app">← Volver a la app</a>
@@ -49,7 +50,9 @@
         <article><span>USUARIOS</span><strong id="stat-users">—</strong><small>Cuentas registradas</small></article>
         <article><span>PAGADOS</span><strong id="stat-paid">—</strong><small>Suscripciones activas</small></article>
         <article><span>GRATIS</span><strong id="stat-free">—</strong><small>Accesos otorgados</small></article>
-        <article><span>MRR EST.</span><strong id="stat-mrr">—</strong><small>USD / mes</small></article>
+        <article><span>MRR BRUTO</span><strong id="stat-mrr">—</strong><small>Stripe + Google Play</small></article>
+        <article><span>COSTO IA</span><strong id="stat-ai-cost">—</strong><small>Estimado · mes actual</small></article>
+        <article><span>MARGEN BRUTO</span><strong id="stat-margin">—</strong><small>MRR − costo IA</small></article>
       </div>
       <div class="overview-grid">
         <article class="control-card">
@@ -59,7 +62,7 @@
         </article>
         <article class="control-card compact-card">
           <div class="card-head"><div><span>ESTADO</span><h2>Operación</h2></div><i>●</i></div>
-          <div class="status-list"><div><span>Plan actual</span><b>$5.99 / mes</b></div><div><span>Revocados</span><b id="stat-revoked">—</b></div><div><span>Emails gratis activos</span><b id="stat-grants">—</b></div></div>
+          <div class="status-list"><div><span>Plan actual</span><b>$5.99 / mes</b></div><div><span>Stripe MRR</span><b id="stat-stripe-mrr">—</b></div><div><span>Google Play MRR</span><b id="stat-play-mrr">—</b></div><div><span>Revocados</span><b id="stat-revoked">—</b></div><div><span>Emails gratis activos</span><b id="stat-grants">—</b></div></div>
         </article>
       </div>
       <article class="table-card"><div class="table-card-head"><div><span>RECIENTES</span><h2>Últimos usuarios</h2></div><button type="button" data-go="users">VER TODOS</button></div><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Acceso</th><th>Estado</th><th>Registro</th></tr></thead><tbody id="recent-users"></tbody></table></div></article>
@@ -80,10 +83,21 @@
       <div class="section-toolbar"><div><span class="eyebrow">BILLING</span><h2>Suscripciones activas</h2></div><span class="price-pill">$5.99 / MES</span></div>
       <article class="table-card"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Estado</th><th>Renovación</th><th>Cuenta</th><th></th></tr></thead><tbody id="subscriptions-table"></tbody></table></div></article>
     </section>
+
+    <section id="usage-section" class="admin-section is-hidden">
+      <div class="section-toolbar"><div><span class="eyebrow">OPENAI · 30 DÍAS</span><h2>Uso y costo de IA</h2></div></div>
+      <div class="stats-grid usage-stats">
+        <article><span>SOLICITUDES</span><strong id="usage-requests">—</strong><small>Funciones de IA usadas</small></article>
+        <article><span>OPENAI CALLS</span><strong id="usage-calls">—</strong><small>Llamadas reales al API</small></article>
+        <article><span>TRANSCRIPCIÓN</span><strong id="usage-minutes">—</strong><small>Minutos procesados</small></article>
+        <article><span>COSTO EST.</span><strong id="usage-cost">—</strong><small>USD · según tarifas configuradas</small></article>
+      </div>
+      <article class="table-card"><div class="table-card-head"><div><span>DIARIO</span><h2>Consumo de los últimos 30 días</h2></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Solicitudes</th><th>API calls</th><th>Tokens</th><th>Transcripción</th><th>TTS chars</th><th>Costo est.</th></tr></thead><tbody id="usage-table"></tbody></table></div></article>
+    </section>
   </main>
 
   <div id="admin-toast" class="admin-toast" role="status"></div>
   <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
-  <script type="module" src="/js/admin.js?v=1.4.44"></script>
+  <script type="module" src="/js/admin.js?v=1.5.2"></script>
 </body>
 </html>

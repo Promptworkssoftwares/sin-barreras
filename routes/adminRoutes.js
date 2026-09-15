@@ -1,11 +1,12 @@
 import express from 'express';
 import User from '../models/User.js';
-import UserState from '../models/UserState.js';
 import AccessGrant from '../models/AccessGrant.js';
 import { requireOwner } from '../middleware/auth.js';
 import { normalizeEmail, publicUser } from '../services/accessService.js';
-import { cancelUserSubscriptionNow, scheduleUserSubscriptionCancellation } from '../services/stripeService.js';
-import { cancelGooglePlaySubscription, revokeGooglePlaySubscription } from '../services/googlePlayService.js';
+import { calculateStripeMrr, scheduleUserSubscriptionCancellation } from '../services/stripeService.js';
+import { cancelGooglePlaySubscription } from '../services/googlePlayService.js';
+import { deleteUserAccount } from '../services/accountService.js';
+import { getAiUsageSummary, getCurrentMonthAiCostUsd } from '../services/aiUsageService.js';
 
 const router = express.Router();
 router.use(requireOwner);
@@ -35,14 +36,60 @@ function leanUserHasAccess(user) {
 
 router.get('/stats', async (_request, response, next) => {
   try {
-    const [totalUsers, activePaid, freeUsers, revoked, grants] = await Promise.all([
+    const paidQuery = paidFilter();
+    const [totalUsers, paidUsers, freeUsers, revoked, grants, aiCostMonthUsd] = await Promise.all([
       User.countDocuments({ role: 'user' }),
-      User.countDocuments(paidFilter()),
+      User.find(paidQuery),
       User.countDocuments({ role: 'user', accountStatus: 'active', freeAccess: true }),
       User.countDocuments({ role: 'user', accountStatus: 'revoked' }),
-      AccessGrant.countDocuments({ active: true })
+      AccessGrant.countDocuments({ active: true }),
+      getCurrentMonthAiCostUsd()
     ]);
-    response.json({ totalUsers, activePaid, freeUsers, revoked, grants, monthlyRevenue: activePaid * ((Number(process.env.STRIPE_MONTHLY_AMOUNT || 599)) / 100) });
+
+    const stripeUsers = paidUsers.filter((user) => user.billingProvider === 'stripe');
+    const googleUsers = paidUsers.filter((user) => user.billingProvider === 'google_play');
+    const stripeMrr = await calculateStripeMrr(stripeUsers);
+    const googleCurrency = String(process.env.GOOGLE_PLAY_CURRENCY || process.env.STRIPE_CURRENCY || 'usd').toUpperCase();
+    const configuredGoogleCents = Math.max(0, Number(process.env.GOOGLE_PLAY_MONTHLY_AMOUNT || process.env.STRIPE_MONTHLY_AMOUNT || 599));
+    let googlePlayMrrUsd = 0;
+    let googlePlayEstimatedUsers = 0;
+    for (const user of googleUsers) {
+      const sameCurrency = String(user.subscriptionCurrency || googleCurrency).toUpperCase() === googleCurrency;
+      const stored = sameCurrency && Number.isFinite(Number(user.subscriptionAmount)) ? Number(user.subscriptionAmount) : null;
+      googlePlayMrrUsd += (stored ?? configuredGoogleCents) / 100;
+      if (stored == null) googlePlayEstimatedUsers += 1;
+    }
+
+    const comparableCurrency = stripeMrr.currency === googleCurrency;
+    const grossMrrUsd = comparableCurrency ? stripeMrr.amountUsd + googlePlayMrrUsd : stripeMrr.amountUsd;
+    response.json({
+      totalUsers,
+      activePaid: paidUsers.length,
+      freeUsers,
+      revoked,
+      grants,
+      monthlyRevenue: grossMrrUsd,
+      revenue: {
+        currency: 'USD',
+        grossMrrUsd,
+        stripeMrrUsd: stripeMrr.amountUsd,
+        googlePlayMrrUsd: comparableCurrency ? googlePlayMrrUsd : 0,
+        stripeExactUsers: stripeMrr.exactUsers,
+        stripeMissingUsers: stripeMrr.missingUsers,
+        googlePlayEstimatedUsers,
+        basis: 'Stripe usa el precio recurrente sincronizado. Google Play usa el precio mensual configurado cuando la compra no expone un precio regional.'
+      },
+      aiCostMonthUsd,
+      estimatedGrossMarginUsd: grossMrrUsd - aiCostMonthUsd
+    });
+  } catch (error) { next(error); }
+});
+
+
+router.get('/usage', async (request, response, next) => {
+  try {
+    const days = Math.max(1, Math.min(365, Number(request.query.days || 30)));
+    response.json(await getAiUsageSummary({ days }));
   } catch (error) { next(error); }
 });
 
@@ -121,11 +168,7 @@ router.delete('/users/:id', async (request, response, next) => {
   try {
     const user = await User.findOne({ _id: request.params.id, role: 'user' });
     if (!user) return response.status(404).json({ error: 'Usuario no encontrado.' });
-    if (user.billingProvider === 'google_play') await revokeGooglePlaySubscription(user);
-    else await cancelUserSubscriptionNow(user);
-    await UserState.deleteOne({ user: user._id });
-    await AccessGrant.updateMany({ claimedBy: user._id }, { $set: { claimedBy: null, claimedAt: null } });
-    await user.deleteOne();
+    await deleteUserAccount(user);
     response.json({ ok: true });
   } catch (error) { next(error); }
 });

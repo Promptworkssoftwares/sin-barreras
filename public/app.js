@@ -1,10 +1,12 @@
-import { initLearning } from './learn.js?v=1.4.44';
-import { initSounds } from './sounds.js?v=1.4.44';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.4.44';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.4.44';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.44';
-import { initAIStage } from './ai-stage.js?v=1.4.44';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.4.44';
+import { initLearning } from './learn.js?v=1.5.2';
+import { initSounds } from './sounds.js?v=1.5.2';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.5.2';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.5.2';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.5.2';
+import { initAIStage } from './ai-stage.js?v=1.5.2';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.5.2';
+import { initPhrasebook } from './phrasebook.js?v=1.5.2';
+import { initQrConversation } from './qr-conversation.js?v=1.5.2';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -28,10 +30,12 @@ const ui = {
   originalText: $('#original-text'), translationText: $('#translation-text'), originalLanguage: $('#original-language'), translationLanguage: $('#translation-language'), sourceFlag: $('#source-flag'), repeatButton: $('#repeat-button'),
   partnerLanguageSelect: $('#partner-language-select'), myLanguageName: $('#my-language-name'), autoLanguageCopy: $('#auto-language-copy'), conversationSituation: $('#conversation-situation'), translatorVoiceSelect: $('#translator-voice-select'), previewVoice: $('#preview-voice'),
   toast: $('#toast'), historyView: $('#history-view'), historyList: $('#history-list'), historyEmpty: $('#history-empty'), clearHistory: $('#clear-history'), openHistory: $('#open-history'),
-  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnFromTranslation: $('#learn-from-translation'),
+  phrasebookView: $('#phrasebook-view'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
+  faceView: $('#face-to-face-view'), openFaceToFace: $('#open-face-to-face'), closeFaceToFace: $('#close-face-to-face'), faceToggleListening: $('#face-toggle-listening'), faceStatus: $('#face-status'), faceStatusDot: $('#face-status-dot'), facePartnerLanguage: $('#face-partner-language'), faceUserLanguage: $('#face-user-language'), facePartnerText: $('#face-partner-text'), faceUserText: $('#face-user-text'), facePartnerRepeat: $('#face-partner-repeat'), faceUserRepeat: $('#face-user-repeat'),
+  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
   settingsDialog: $('#settings-dialog'), onboardingDialog: $('#onboarding-dialog'), fontSize: $('#font-size-select'), themeButton: $('#theme-button'),
-  practiceView: $('#practice-view'), practiceForm: $('#practice-form'), practiceInput: $('#practice-input'), practiceLanguage: $('#practice-language'), practiceSituation: $('#practice-situation'),
-  practiceResult: $('#practice-result'), practiceEnglish: $('#practice-english'), practiceMeaning: $('#practice-meaning'), practicePronunciation: $('#practice-pronunciation'), practiceTip: $('#practice-tip'),
+  practiceView: $('#practice-view'), practiceForm: $('#practice-form'), practiceInput: $('#practice-input'), practiceLanguage: $('#practice-language'), practiceTargetLanguage: $('#practice-target-language'), practiceSituation: $('#practice-situation'),
+  practiceResult: $('#practice-result'), practiceEnglish: $('#practice-english'), practiceTargetLabel: $('#practice-target-label'), practiceMeaning: $('#practice-meaning'), practicePronunciation: $('#practice-pronunciation'), practiceTip: $('#practice-tip'),
   practiceAlternative: $('#practice-alternative'), practiceUsage: $('#practice-usage'), listenPractice: $('#listen-practice'), recordPractice: $('#record-practice'),
   practiceScore: $('#practice-score'), scoreNumber: $('#score-number'), scoreFeedback: $('#score-feedback'), heardText: $('#heard-text'), correctedText: $('#corrected-text'), focusText: $('#focus-text'), totalPoints: $('#total-points'),
   coachView: $('#coach-view'), coachScenario: $('#coach-scenario'), coachLanguage: $('#coach-language'), coachLevel: $('#coach-level'), coachGoal: $('#coach-goal'), coachMode: $('#coach-mode'), startCoach: $('#start-coach'), coachSetup: $('#coach-setup'), coachSession: $('#coach-session'),
@@ -51,10 +55,10 @@ const SITUATIONS = {
 const TTS_VOICES = new Set(['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'onyx', 'nova', 'sage', 'shimmer', 'verse', 'marin', 'cedar']);
 
 const HANDS_FREE = Object.freeze({
-  shortSpeechGraceMs: 2150,
-  normalSpeechGraceMs: 1750,
-  longSpeechGraceMs: 1450,
-  thinkingStatusAfterMs: 480,
+  shortSpeechGraceMs: 1800,
+  normalSpeechGraceMs: 1450,
+  longSpeechGraceMs: 1200,
+  thinkingStatusAfterMs: 420,
   maxSegmentMs: 45_000,
   silentRecycleMs: 55_000,
   minVoiceFrames: 3,
@@ -66,7 +70,7 @@ const state = {
   userLanguage: null, userLanguageHint: null, partnerLanguage: null, situation: 'everyday',
   running: false, processing: false, stream: null, audioContext: null, analyser: null, animationFrame: null, recorder: null, chunks: [], heardVoice: false, silenceSince: null, segmentStartedAt: null, voiceStartedAt: null, voiceFrames: 0, noiseFloor: 0.008, lastVoiceAt: null,
   currentAudio: null, currentBase64: null, currentLanguage: null, currentTranslation: null, currentResult: null,
-  conversationSession: 0, conversationController: null,
+  conversationSession: 0, conversationController: null, faceToFace: false, faceUserAudio: null, facePartnerAudio: null,
   settings: { theme: 'light', fontSize: 'normal', translatorVoice: 'coral', detectedUserLanguage: null },
   practice: null, practiceRecorder: null, practiceStream: null, practiceChunks: [], practiceVoiceCapture: null, practiceVoiceBusy: false,
   coachActive: false, coachHistory: [], coachLastReply: '', coachSessionContext: null, coachTurnCount: 0, coachProgress: 0, coachScores: [], coachRecorder: null, coachStream: null, coachChunks: [], coachBusy: false, coachVoiceCapture: null, coachVoiceBusy: false, coachPhraseRecorder: null, coachPhraseStream: null, coachPhraseChunks: [],
@@ -76,6 +80,8 @@ const state = {
 let learning = null;
 let sounds = null;
 let aiStageController = null;
+let phrasebook = null;
+let qrConversation = null;
 
 const languageName = (language) => (LANGUAGES[language] || language || 'Idioma').toUpperCase();
 const languageFlag = (language) => ({ es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', ar: 'AR', zh: '中', vi: 'VI', ko: '한', tl: 'TL', ht: 'HT', ru: 'RU', de: 'DE', hi: 'हि', ja: '日', it: 'IT' }[language] || String(language || '↗').toUpperCase().slice(0, 3));
@@ -115,6 +121,9 @@ function setStatus(kind, copy) {
   ui.stage?.classList.toggle('processing', ['translating','speaking'].includes(kind));
   ui.modeDot?.classList.toggle('active', ['listening','thinking'].includes(kind));
   aiStageController?.setState?.(kind);
+  if (ui.faceStatus) ui.faceStatus.textContent = pill;
+  if (ui.faceStatusDot) ui.faceStatusDot.dataset.state = kind;
+  if (ui.faceToggleListening) ui.faceToggleListening.textContent = state.running ? '■ Pausar' : '● Comenzar';
 }
 
 function renderConversationButtonState(mode = state.running ? 'running' : 'idle') {
@@ -182,7 +191,7 @@ function renderHistory() {
       <div class="history-meta"><span>${languageName(item.sourceLanguage)} → ${languageName(item.targetLanguage)}${item.situation ? ` · ${escapeHTML(SITUATIONS[item.situation] || item.situation)}` : ''}</span><time>${new Date(item.createdAt).toLocaleString('es-US', { dateStyle: 'medium', timeStyle: 'short' })}</time></div>
       <p class="history-original">${escapeHTML(item.originalText)}</p>
       <p class="history-translation">${escapeHTML(item.translatedText)}</p>
-      <div class="history-actions"><button type="button" data-action="speak">Escuchar</button><button type="button" data-action="copy">Copiar</button><button type="button" data-action="share">Compartir</button><button type="button" data-action="delete">Eliminar</button></div>
+      <div class="history-actions"><button type="button" data-action="speak">Escuchar</button><button type="button" data-action="learn">Practicar</button><button type="button" data-action="save">★ Guardar</button><button type="button" data-action="copy">Copiar</button><button type="button" data-action="share">Compartir</button><button type="button" data-action="delete">Eliminar</button></div>
     </article>`).join('');
 }
 
@@ -208,6 +217,106 @@ function saveInterpretation(result) {
   // grow by hundreds of KB per turn and can trigger HTTP 413 errors.
   const item = historySafeInterpretation(result);
   writeHistory([item, ...readHistory().filter((entry) => entry.id !== item.id).map(historySafeInterpretation)]);
+}
+
+
+function conversationLearningCandidates() {
+  const grouped = new Map();
+  for (const item of readHistory()) {
+    const englishText = item.sourceLanguage === 'en' ? item.originalText : item.targetLanguage === 'en' ? item.translatedText : '';
+    if (!englishText) continue;
+    const meaning = item.sourceLanguage === 'en' ? item.translatedText : item.originalText;
+    const nativeLanguage = item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage;
+    const key = englishText.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!key) continue;
+    const previous = grouped.get(key);
+    const createdAt = item.createdAt || new Date().toISOString();
+    grouped.set(key, {
+      id: item.id, englishText, meaning, nativeLanguage, situation: item.situation || 'everyday',
+      sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage, count: (previous?.count || 0) + 1,
+      createdAt: previous && new Date(previous.createdAt) > new Date(createdAt) ? previous.createdAt : createdAt
+    });
+  }
+  return [...grouped.values()]
+    .sort((a, b) => (b.count - a.count) || (new Date(b.createdAt) - new Date(a.createdAt)))
+    .slice(0, 16);
+}
+
+function renderConversationLearning() {
+  if (!ui.conversationLearningList || !ui.conversationLearningEmpty) return;
+  const items = conversationLearningCandidates();
+  ui.conversationLearningEmpty.hidden = items.length > 0;
+  if (ui.conversationLearningCount) ui.conversationLearningCount.textContent = String(items.length);
+  ui.conversationLearningList.innerHTML = items.map((item) => `
+    <article class="conversation-learning-card" data-learning-id="${escapeHTML(item.id)}">
+      <div class="conversation-learning-card-top"><span>${escapeHTML(SITUATIONS[item.situation] || 'Vida diaria')}</span>${item.count > 1 ? `<b>${item.count}× usada</b>` : ''}</div>
+      <strong>${escapeHTML(item.englishText)}</strong>
+      <p>${escapeHTML(item.meaning)}</p>
+      <div><button type="button" data-learning-action="listen">▶ Escuchar</button><button type="button" data-learning-action="practice">✦ Practicar</button><button type="button" data-learning-action="save">★ Guardar frase</button></div>
+    </article>`).join('');
+}
+
+function preparePhraseForPractice(item) {
+  if (!item) return;
+  const englishText = item.englishText || (item.sourceLanguage === 'en' ? item.originalText : item.targetLanguage === 'en' ? item.translatedText : '');
+  const meaning = item.meaning || (item.sourceLanguage === 'en' ? item.translatedText : item.originalText);
+  const nativeLanguage = item.nativeLanguage || (item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage) || state.userLanguage || state.userLanguageHint || 'es';
+  if (!englishText || !meaning) { notify('Esta conversación no contiene una frase en inglés para practicar.'); return; }
+  if (ui.practiceInput) ui.practiceInput.value = meaning;
+  if (ui.practiceLanguage && LANGUAGES[nativeLanguage]) ui.practiceLanguage.value = nativeLanguage;
+  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = nativeLanguage === 'en' ? 'es' : 'en';
+  keepPracticeLanguagesDistinct('native');
+  if (ui.practiceSituation) ui.practiceSituation.value = item.situation || 'everyday';
+  showView('practice');
+  guidedScroll(ui.practiceForm, { block: 'center', highlight: true, delay: 90, focus: true });
+  notify('Frase cargada desde tu conversación. Toca “Enseñarme” para practicarla.');
+}
+
+function updateFaceLabels() {
+  const userLanguage = state.userLanguage || state.userLanguageHint || state.settings.detectedUserLanguage || 'es';
+  if (ui.faceUserLanguage) ui.faceUserLanguage.textContent = `TÚ · ${languageName(userLanguage)}`;
+  if (ui.facePartnerLanguage) ui.facePartnerLanguage.textContent = `OTRA PERSONA · ${languageName(state.partnerLanguage)}`;
+}
+
+function renderFaceToFace(result) {
+  if (!state.faceToFace || !result) return;
+  updateFaceLabels();
+  ui.faceUserRepeat?.classList.add('is-hidden');
+  ui.facePartnerRepeat?.classList.add('is-hidden');
+  state.faceUserAudio = null;
+  state.facePartnerAudio = null;
+  if (result.direction === 'outbound') {
+    if (ui.faceUserText) ui.faceUserText.textContent = result.originalText;
+    if (ui.facePartnerText) ui.facePartnerText.textContent = result.translatedText;
+    state.facePartnerAudio = { base64: result.audioBase64, language: result.targetLanguage };
+    ui.facePartnerRepeat?.classList.remove('is-hidden');
+  } else {
+    if (ui.facePartnerText) ui.facePartnerText.textContent = result.originalText;
+    if (ui.faceUserText) ui.faceUserText.textContent = result.translatedText;
+    state.faceUserAudio = { base64: result.audioBase64, language: result.targetLanguage };
+    ui.faceUserRepeat?.classList.remove('is-hidden');
+  }
+}
+
+async function openFaceToFace() {
+  if (!state.partnerLanguage || !LANGUAGES[state.partnerLanguage]) {
+    notify('Selecciona primero el idioma de la otra persona.');
+    guidedScroll(ui.partnerLanguageSelect, { block: 'center', highlight: true, focus: true });
+    return;
+  }
+  state.faceToFace = true;
+  ui.faceView?.classList.remove('is-hidden');
+  document.body.classList.add('face-mode-open');
+  updateFaceLabels();
+  if (!state.running) await toggleConversation();
+  setStatus(state.running ? 'listening' : 'idle');
+}
+
+async function closeFaceToFace() {
+  state.faceToFace = false;
+  ui.faceView?.classList.add('is-hidden');
+  document.body.classList.remove('face-mode-open');
+  if (state.running) await toggleConversation();
 }
 
 function populatePartnerLanguageSelect() {
@@ -248,6 +357,41 @@ function populatePartnerLanguageSelect() {
 
   ui.partnerLanguageSelect.value = LANGUAGES[selected] ? selected : '';
   updatePartnerSelectionUI();
+}
+
+function populatePracticeLanguageSelects() {
+  if (!ui.practiceLanguage || !ui.practiceTargetLanguage) return;
+  const populate = (select) => {
+    const previous = select.value;
+    select.replaceChildren();
+    LANGUAGE_CATALOG
+      .slice()
+      .sort((a, b) => a.apiName.localeCompare(b.apiName))
+      .forEach(({ code, label }) => {
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = label;
+        select.append(option);
+      });
+    if (LANGUAGES[previous]) select.value = previous;
+  };
+
+  populate(ui.practiceLanguage);
+  populate(ui.practiceTargetLanguage);
+
+  const nativeDefault = LANGUAGES[state.settings.detectedUserLanguage]
+    ? state.settings.detectedUserLanguage
+    : (browserLanguageHint() || 'es');
+  ui.practiceLanguage.value = nativeDefault;
+  ui.practiceTargetLanguage.value = nativeDefault === 'en' ? 'es' : 'en';
+}
+
+function keepPracticeLanguagesDistinct(changed = 'native') {
+  if (!ui.practiceLanguage || !ui.practiceTargetLanguage) return;
+  if (ui.practiceLanguage.value !== ui.practiceTargetLanguage.value) return;
+  const fallback = ui.practiceLanguage.value === 'en' ? 'es' : 'en';
+  if (changed === 'target') ui.practiceLanguage.value = fallback;
+  else ui.practiceTargetLanguage.value = fallback;
 }
 
 function updatePartnerSelectionUI() {
@@ -481,13 +625,15 @@ function showInterpretation(result) {
   if (ui.translationLanguage) ui.translationLanguage.textContent = `TRADUCCIÓN · ${languageName(result.targetLanguage)}`;
   if (ui.sourceFlag) ui.sourceFlag.textContent = languageFlag(result.sourceLanguage);
   if (ui.repeatButton) ui.repeatButton.disabled = false;
+  if (ui.saveCurrentTranslation) ui.saveCurrentTranslation.disabled = false;
   state.currentBase64 = result.audioBase64;
   state.currentLanguage = result.targetLanguage;
   state.currentTranslation = result.translatedText;
   state.currentResult = result;
   const hasEnglish = result.sourceLanguage === 'en' || result.targetLanguage === 'en';
   ui.learnFromTranslation?.classList.toggle('is-hidden', !hasEnglish);
-  guidedScroll($('.translation-grid'), { block: 'center', highlight: false, delay: 90 });
+  renderFaceToFace(result);
+  if (!state.faceToFace) guidedScroll($('.translation-grid'), { block: 'center', highlight: false, delay: 90 });
 }
 
 function playAudio(base64, language, { resumeConversation = false, sessionId = state.conversationSession } = {}) {
@@ -526,16 +672,36 @@ function renderPracticePoints() { if (ui.totalPoints) ui.totalPoints.textContent
 
 async function preparePractice(event) {
   event.preventDefault();
-  if (!ui.practiceForm || !ui.practiceInput || !ui.practiceLanguage) return;
+  if (!ui.practiceForm || !ui.practiceInput || !ui.practiceLanguage || !ui.practiceTargetLanguage) return;
   const submit = ui.practiceForm.querySelector('button[type="submit"]');
+  const nativeLanguage = ui.practiceLanguage.value;
+  const targetLanguage = ui.practiceTargetLanguage.value;
+  if (nativeLanguage === targetLanguage) {
+    notify('Elige un idioma diferente para practicar.');
+    return;
+  }
   try {
     if (submit) { submit.disabled = true; submit.textContent = 'Preparando…'; }
     const result = await request('/api/practice', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phrase: ui.practiceInput.value.trim(), nativeLanguage: ui.practiceLanguage.value, situation: ui.practiceSituation?.value || 'everyday' })
+      body: JSON.stringify({
+        phrase: ui.practiceInput.value.trim(),
+        nativeLanguage,
+        targetLanguage,
+        situation: ui.practiceSituation?.value || 'everyday'
+      })
     });
-    state.practice = { ...result, nativeLanguage: ui.practiceLanguage.value, originalIntent: ui.practiceInput.value.trim(), situation: ui.practiceSituation?.value || 'everyday' };
-    if (ui.practiceEnglish) ui.practiceEnglish.textContent = result.english;
+    const targetText = result.targetText || result.english || '';
+    state.practice = {
+      ...result,
+      targetText,
+      nativeLanguage,
+      targetLanguage,
+      originalIntent: ui.practiceInput.value.trim(),
+      situation: ui.practiceSituation?.value || 'everyday'
+    };
+    if (ui.practiceEnglish) ui.practiceEnglish.textContent = targetText;
+    if (ui.practiceTargetLabel) ui.practiceTargetLabel.textContent = `FORMA NATURAL EN ${languageName(targetLanguage)}`;
     if (ui.practiceMeaning) ui.practiceMeaning.textContent = result.meaning;
     if (ui.practicePronunciation) ui.practicePronunciation.textContent = result.pronunciation;
     if (ui.practiceTip) ui.practiceTip.textContent = result.tip;
@@ -561,14 +727,15 @@ async function scorePracticeAudio(audio) {
     if (ui.recordPractice) { ui.recordPractice.disabled = true; ui.recordPractice.textContent = 'Revisando…'; }
     const form = new FormData();
     form.append('audio', audio, 'practice.webm');
-    form.append('targetText', state.practice.english);
+    form.append('targetText', state.practice.targetText || state.practice.english);
     form.append('originalIntent', state.practice.originalIntent || '');
     form.append('nativeLanguage', state.practice.nativeLanguage || 'es');
+    form.append('targetLanguage', state.practice.targetLanguage || 'en');
     const result = await request('/api/practice/score', { method: 'POST', body: form });
     if (ui.scoreNumber) ui.scoreNumber.textContent = `${result.score}% claro · +${result.points} puntos`;
     if (ui.scoreFeedback) ui.scoreFeedback.textContent = result.feedback;
     if (ui.heardText) ui.heardText.textContent = result.heardText ? `“${result.heardText}”` : 'No logramos reconocer palabras.';
-    if (ui.correctedText) ui.correctedText.textContent = result.correctedEnglish || state.practice.english;
+    if (ui.correctedText) ui.correctedText.textContent = result.correctedEnglish || state.practice.targetText || state.practice.english;
     if (ui.focusText) ui.focusText.textContent = result.focus || 'Repite la frase con calma.';
     ui.practiceScore?.classList.remove('is-hidden');
     guidedScroll(ui.practiceScore, { block: 'center', delay: 90 });
@@ -666,11 +833,13 @@ function appendCoachBubble(role, content, meta = '') {
   const label = role === 'coach' ? 'COACH' : role === 'coach-tip' ? 'PISTA' : 'TÚ';
 
   if (role === 'coach') {
+    const beginnerMode = (ui.coachLevel?.value || 'beginner') === 'beginner';
     article.dataset.coachText = content;
     article.dataset.quickMeaning = meta || '';
     article.innerHTML = `
       <span>${label}</span>
       <p>${escapeHTML(content)}</p>
+      ${beginnerMode && meta ? `<small class="coach-beginner-meaning"><b>Significa:</b> ${escapeHTML(meta)}</small>` : ''}
       <div class="coach-tools" aria-label="Herramientas para entender y practicar esta frase">
         <button type="button" data-coach-action="meaning">¿Qué significa?</button>
         <button type="button" data-coach-action="listen">🔊 Escuchar</button>
@@ -691,7 +860,9 @@ function appendCoachBubble(role, content, meta = '') {
 
 function appendCoachCorrection(result = {}) {
   if (!ui.coachThread) return null;
-  const needsCorrection = Boolean(result.correctionNeeded) || Number(result.score || 0) < 88;
+  const beginnerMode = (ui.coachLevel?.value || 'beginner') === 'beginner';
+  const correctionThreshold = beginnerMode ? 72 : 88;
+  const needsCorrection = Boolean(result.correctionNeeded) || Number(result.score || 0) < correctionThreshold;
   const card = document.createElement('article');
   card.className = `coach-turn-feedback ${needsCorrection ? 'needs-work' : 'good'}`;
   const score = Math.max(0, Math.min(100, Math.round(Number(result.score || 0))));
@@ -701,7 +872,7 @@ function appendCoachCorrection(result = {}) {
   const nextFocus = String(result.nextFocus || '').trim();
 
   card.innerHTML = needsCorrection ? `
-    <div class="coach-feedback-headline"><span>MICRO-FEEDBACK</span><strong>${score}%</strong></div>
+    <div class="coach-feedback-headline"><span>${beginnerMode ? 'PEQUEÑA AYUDA' : 'MICRO-FEEDBACK'}</span><strong>${score}%</strong></div>
     <div class="coach-feedback-main">
       <div><small>UNA FORMA MÁS NATURAL</small><b>${escapeHTML(corrected)}</b></div>
       ${explanation ? `<p>${escapeHTML(explanation)}</p>` : ''}
@@ -902,9 +1073,9 @@ async function startCoachSession() {
     guidedTop(ui.coachSession, { delay: 70 });
     renderCoachSessionHeader(result.session || {});
     appendCoachBubble('coach', result.replyEnglish, result.replyMeaning);
-    if (result.coachTip && (ui.coachMode?.value || 'guided') === 'guided') appendCoachBubble('coach-tip', result.coachTip);
+    if (result.coachTip && ((ui.coachMode?.value || 'guided') === 'guided' || (ui.coachLevel?.value || 'beginner') === 'beginner')) appendCoachBubble('coach-tip', result.coachTip);
     if (ui.coachStatus) ui.coachStatus.textContent = 'CONVERSACIÓN EN CURSO';
-    try { await speakText(result.replyEnglish, 'en'); } catch (error) { notify(error.message); }
+    try { await speakText(result.replyEnglish, 'en', { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
     guidedScroll(ui.coachResponseBox, { block: 'center', delay: 80 });
   } catch (error) {
     notify(error.message || 'No pudimos iniciar el Coach.');
@@ -1007,6 +1178,7 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     appendCoachBubble('learner', result.heardText);
     appendCoachCorrection(result);
     appendCoachBubble('coach', result.replyEnglish, result.replyMeaning);
+    if ((ui.coachLevel?.value || 'beginner') === 'beginner' && result.beginnerHelp) appendCoachBubble('coach-tip', result.beginnerHelp);
     state.coachHistory.push({ coach: state.coachLastReply, learner: result.heardText, coachReply: result.replyEnglish });
     state.coachHistory = state.coachHistory.slice(-24);
     state.coachLastReply = result.replyEnglish;
@@ -1016,7 +1188,7 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     updateCoachSessionUI({ progress: result.missionProgress, focus: result.nextFocus || result.progressNote || 'Continúa la conversación' });
     if (ui.coachTextInput) ui.coachTextInput.value = '';
     if (ui.coachStatus) ui.coachStatus.textContent = result.missionProgress >= 100 ? 'OBJETIVO COMPLETADO · PUEDES SEGUIR' : 'TU TURNO';
-    try { await speakText(result.replyEnglish, 'en'); } catch (error) { notify(error.message); }
+    try { await speakText(result.replyEnglish, 'en', { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
     guidedScroll(ui.coachResponseBox, { block: 'center', delay: 70 });
   } catch (error) {
     notify(error.message || 'No pudimos continuar la conversación.');
@@ -1185,6 +1357,8 @@ function showLearnHome() {
   ui.learnHome?.classList.remove('is-hidden');
   ui.learnSoundsBranch?.classList.add('is-hidden');
   ui.learnRoutesBranch?.classList.add('is-hidden');
+  ui.learnConversationsBranch?.classList.add('is-hidden');
+  ui.learnWordsBranch?.classList.add('is-hidden');
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
@@ -1192,8 +1366,11 @@ function openLearnPath(path) {
   ui.learnHome?.classList.add('is-hidden');
   ui.learnSoundsBranch?.classList.toggle('is-hidden', path !== 'sounds');
   ui.learnRoutesBranch?.classList.toggle('is-hidden', path !== 'routes');
+  ui.learnConversationsBranch?.classList.toggle('is-hidden', path !== 'conversations');
+  ui.learnWordsBranch?.classList.toggle('is-hidden', path !== 'words');
   if (path === 'sounds') sounds?.render();
-  if (path === 'routes') learning?.render();
+  if (path === 'routes' || path === 'words') learning?.render();
+  if (path === 'conversations') renderConversationLearning();
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
@@ -1205,12 +1382,14 @@ function showView(view) {
   if (view !== 'coach' && state.coachActive) resetCoachSession();
   ui.shell?.classList.toggle('secondary-view', secondary);
   ui.historyView?.classList.toggle('is-hidden', view !== 'history');
+  ui.phrasebookView?.classList.toggle('is-hidden', view !== 'phrasebook');
   ui.learnView?.classList.toggle('is-hidden', view !== 'learn');
   ui.practiceView?.classList.toggle('is-hidden', view !== 'practice');
   ui.coachView?.classList.toggle('is-hidden', view !== 'coach');
   ui.cameraView?.classList.toggle('is-hidden', view !== 'camera');
   $$('.nav-item').forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
   if (view === 'history') renderHistory();
+  if (view === 'phrasebook') phrasebook?.render();
   if (view === 'practice') renderPracticePoints();
   if (view === 'learn') { learning?.render(); sounds?.render(); if (enteringLearn) showLearnHome(); }
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
@@ -1235,10 +1414,51 @@ sounds = initSounds({
   getNativeLanguage: () => state.settings.detectedUserLanguage || state.userLanguage || 'es'
 });
 
+phrasebook = initPhrasebook({
+  notify,
+  request,
+  onPractice: (item) => preparePhraseForPractice({
+    englishText: item.sourceLanguage === 'en' ? item.sourceText : item.targetLanguage === 'en' ? item.translatedText : '',
+    meaning: item.sourceLanguage === 'en' ? item.translatedText : item.sourceText,
+    nativeLanguage: item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage,
+    situation: item.situation
+  })
+});
+
+qrConversation = initQrConversation({
+  notify,
+  request,
+  languages: LANGUAGES,
+  createAutoVoiceTurn,
+  getDefaults: () => ({
+    hostLanguage: state.userLanguage || state.settings.detectedUserLanguage || state.userLanguageHint || browserLanguageHint() || 'es',
+    guestLanguage: state.partnerLanguage || (state.userLanguage === 'en' ? 'es' : 'en'),
+    situation: state.situation || 'everyday',
+    voice: state.settings.translatorVoice || 'coral'
+  })
+});
+
 $$('[data-learn-path]').forEach((button) => listen(button, 'click', () => openLearnPath(button.dataset.learnPath)));
 $$('[data-learn-back]').forEach((button) => listen(button, 'click', showLearnHome));
 
 listen(ui.conversationButton, 'click', toggleConversation);
+listen(ui.openFaceToFace, 'click', openFaceToFace);
+listen(ui.closeFaceToFace, 'click', closeFaceToFace);
+listen(ui.faceToggleListening, 'click', toggleConversation);
+listen(ui.facePartnerRepeat, 'click', async () => {
+  if (state.running) return notify('Pausa la conversación antes de repetir el audio.');
+  if (state.facePartnerAudio) await playAudio(state.facePartnerAudio.base64, state.facePartnerAudio.language, { resumeConversation: false });
+});
+listen(ui.faceUserRepeat, 'click', async () => {
+  if (state.running) return notify('Pausa la conversación antes de repetir el audio.');
+  if (state.faceUserAudio) await playAudio(state.faceUserAudio.base64, state.faceUserAudio.language, { resumeConversation: false });
+});
+listen(ui.openPhrasebook, 'click', () => showView('phrasebook'));
+listen(ui.settingsOpenPhrasebook, 'click', () => { ui.settingsDialog?.close(); showView('phrasebook'); });
+listen(ui.saveCurrentTranslation, 'click', async () => {
+  try { await phrasebook?.saveInterpretation(state.currentResult); }
+  catch (error) { notify(error.message || 'No pudimos guardar la frase.'); }
+});
 
 listen(ui.conversationSituation, 'change', () => {
   state.situation = ui.conversationSituation?.value || 'everyday';
@@ -1298,11 +1518,12 @@ listen(ui.learnFromTranslation, 'click', async () => {
     ui.learnFromTranslation.disabled = true;
     ui.learnFromTranslation.textContent = 'Buscando palabras útiles…';
     const added = await learning.importFromEnglishText(englishText, result.situation || state.situation);
+    showView('learn');
+    openLearnPath('words');
     if (added > 0) {
-      notify(`${added} ${added === 1 ? 'palabra añadida' : 'palabras añadidas'} a tu aprendizaje.`);
-      showView('learn');
+      notify(`${added} ${added === 1 ? 'palabra guardada' : 'palabras guardadas'} en Mis palabras. Ya puedes practicarlas.`);
     } else {
-      notify('Estas palabras ya estaban guardadas en tu aprendizaje.');
+      notify('Estas palabras ya estaban guardadas. Te llevé a Mis palabras para que puedas practicarlas.');
     }
   } catch (error) {
     notify(error.message || 'No pudimos preparar estas palabras.');
@@ -1310,6 +1531,21 @@ listen(ui.learnFromTranslation, 'click', async () => {
     ui.learnFromTranslation.disabled = false;
     ui.learnFromTranslation.textContent = originalLabel;
   }
+});
+
+listen(ui.conversationLearningList, 'click', async (event) => {
+  const action = event.target?.dataset?.learningAction;
+  if (!action) return;
+  const id = event.target.closest('[data-learning-id]')?.dataset?.learningId;
+  const item = conversationLearningCandidates().find((entry) => entry.id === id);
+  if (!item) return;
+  try {
+    if (action === 'listen') await speakText(item.englishText, 'en');
+    if (action === 'practice') preparePhraseForPractice(item);
+    if (action === 'save') await phrasebook?.savePhrase({
+      sourceText: item.meaning, translatedText: item.englishText, sourceLanguage: item.nativeLanguage, targetLanguage: 'en', situation: item.situation
+    });
+  } catch (error) { notify(error.message || 'No pudimos completar la acción.'); }
 });
 
 $$('.nav-item').forEach((button) => listen(button, 'click', () => showView(button.dataset.view)));
@@ -1331,6 +1567,8 @@ listen(ui.historyList, 'click', async (event) => {
     if (action === 'copy') await copyText(item);
     if (action === 'share') await shareText(item);
     if (action === 'speak') await speakText(item.translatedText, item.targetLanguage);
+    if (action === 'learn') preparePhraseForPractice(item);
+    if (action === 'save') await phrasebook?.savePhrase({ sourceText: item.originalText, translatedText: item.translatedText, sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage, situation: item.situation, createdAt: item.createdAt });
   } catch (error) {
     if (error.name !== 'AbortError') notify(error.message || 'No fue posible completar la acción.');
   }
@@ -1363,9 +1601,11 @@ listen($('#onboarding-continue'), 'click', () => {
 });
 
 listen(ui.practiceForm, 'submit', preparePractice);
+listen(ui.practiceLanguage, 'change', () => keepPracticeLanguagesDistinct('native'));
+listen(ui.practiceTargetLanguage, 'change', () => keepPracticeLanguagesDistinct('target'));
 listen(ui.listenPractice, 'click', async () => {
   if (!state.practice) return;
-  try { await speakText(state.practice.english, 'en'); } catch (error) { notify(error.message); }
+  try { await speakText(state.practice.targetText || state.practice.english, state.practice.targetLanguage || 'en'); } catch (error) { notify(error.message); }
 });
 listen(ui.recordPractice, 'click', togglePracticeRecording);
 
@@ -1454,6 +1694,7 @@ if (!LANGUAGES[state.settings.detectedUserLanguage] && LANGUAGES[state.settings.
 if (!TTS_VOICES.has(state.settings.translatorVoice)) state.settings.translatorVoice = 'coral';
 delete state.settings.primaryLanguage;
 populatePartnerLanguageSelect();
+populatePracticeLanguageSelects();
 applySettings();
 updateConversationSettings();
 updatePartnerSelectionUI();

@@ -13,3 +13,5 @@ npm-debug.log*
 service-account*.json
 credentials*.json
 secrets*.json
+dist/
+.release-tmp/

@@ -1,8 +1,8 @@
 const DEFAULTS = Object.freeze({
-  thinkingAfterMs: 480,
-  shortSpeechSilenceMs: 2150,
-  normalSpeechSilenceMs: 1750,
-  longSpeechSilenceMs: 1450,
+  thinkingAfterMs: 420,
+  shortSpeechSilenceMs: 1800,
+  normalSpeechSilenceMs: 1450,
+  longSpeechSilenceMs: 1200,
   noSpeechTimeoutMs: 45_000,
   maxTurnMs: 45_000,
   minVoiceFrames: 3,

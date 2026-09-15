@@ -1,9 +1,16 @@
-import { bootstrapCloudState, startCloudSync } from './cloud.js?v=1.4.44';
-import { initAccountUI } from './account-ui.js?v=1.4.44';
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {});
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data?.type === 'SIN_BARRERAS_UPDATED') window.location.reload();
+  });
+}
+
+import { bootstrapCloudState, startCloudSync } from './cloud.js?v=1.5.2';
+import { initAccountUI } from './account-ui.js?v=1.5.2';
 
 try {
   await bootstrapCloudState();
-  await import('./app.js?v=1.4.44');
+  await import('./app.js?v=1.5.2');
   initAccountUI();
   startCloudSync();
 } catch (error) {

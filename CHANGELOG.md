@@ -1,5 +1,55 @@
 # Changelog
 
+## 1.5.2 · Mis palabras accesibles
+
+- El botón de la traducción ahora dice **Guardar en Mis palabras** para dejar claro el destino.
+- Después de guardar, la app abre directamente **Aprender → Mis palabras** en vez de dejar al usuario en el inicio.
+- Nuevo acceso principal **Mis palabras** dentro de Aprender con contador visible.
+- Nueva vista dedicada con lista de vocabulario, escuchar, practicar, eliminar y **Practicar mis palabras**.
+- Las palabras extraídas conservan la situación de la conversación para dar más contexto.
+- Android actualizado a `1.5.2` (`versionCode 1502`).
+
+## 1.5.1 · Multilanguage Practice + Absolute Beginner Coach
+
+- Práctica ahora permite elegir idioma nativo e idioma objetivo usando el catálogo completo de idiomas.
+- Generación, TTS, transcripción y evaluación de Práctica respetan el idioma objetivo seleccionado.
+- Comparación de texto de Práctica mejorada para escrituras no latinas mediante normalización Unicode.
+- Coach Principiante convertido a pre-A1/A1: frases de 2–7 palabras, vocabulario básico y una idea por turno.
+- En Principiante la traducción del Coach se muestra automáticamente, el audio se reproduce más lento y se ofrecen respuestas pequeñas para copiar.
+- Evaluación de Principiante acepta respuestas de una palabra o frases muy cortas cuando comunican correctamente.
+- Android actualizado a `1.5.1` (`versionCode 1501`).
+
+## 1.5.0 · Real Conversation Toolkit
+
+- Nuevo modo **Cara a cara** con pantalla dividida para dos personas y traducción manos libres.
+- Nuevo **Aprender de mis conversaciones**: convierte frases reales del historial en práctica personalizada.
+- Nuevo **Mis frases** con categorías, búsqueda, audio local y acceso offline mediante Cache Storage.
+- Nuevo fallback `/offline-phrases.html` cuando `/app` se abre sin conexión.
+- Nueva **Conversación por QR** entre dos teléfonos: el invitado no necesita cuenta ni instalar la app.
+- Salas QR temporales con tokens hasheados, expiración automática y eventos en tiempo real.
+- Audio de frases guardadas se mantiene fuera del estado cloud para evitar payloads grandes.
+- Android sincronizado a `1.5.0` (`versionCode 1500`).
+
+## 1.4.46 · Faster Voice Turn Detection
+
+- Acorta la pausa final para que las conversaciones respondan más rápido sin eliminar la tolerancia a pausas naturales.
+- Habla corta: `1.80 s` (antes `2.15 s`).
+- Habla normal: `1.45 s` (antes `1.75 s`).
+- Habla larga: `1.20 s` (antes `1.45 s`).
+- Indicador de pausa/pensando: `0.42 s` (antes `0.48 s`).
+- Sincroniza los mismos valores entre el intérprete principal y el motor compartido de turnos de voz.
+- Web y Android sincronizados a `1.4.46` (`versionCode 1446`).
+
+## 1.4.45 · Account Security & Release Hardening
+- Verificación obligatoria de email para nuevas cuentas locales y reenvío de verificación.
+- Recuperación de contraseña con tokens SHA-256 de un solo uso y expiración.
+- Eliminación de cuenta desde la app y desde `/account-deletion`, incluso sin entitlement activo.
+- Tracking diario por usuario del uso/costo estimado de OpenAI y nuevo panel Admin **Uso IA**.
+- MRR separado por Stripe/Google Play y margen bruto estimado después del costo de IA.
+- Content Security Policy activada y Service Worker endurecido para no cachear páginas sensibles.
+- Packaging de release seguro con exclusión de `.env`, `node_modules`, `.git`, keystores y credenciales.
+- Web y Android sincronizados a `1.4.45` (`versionCode 1445`).
+
 ## 1.4.44 · Floating AI Voice Activity
 - Separado el procesamiento de IA del botón de práctica de voz.
 - Nuevo indicador flotante persistente para escuchar, esperar, analizar y preparar el score.

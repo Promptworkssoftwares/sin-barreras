@@ -26,6 +26,8 @@ export async function ensureOwnerAccount() {
   user.role = 'owner';
   user.accountStatus = 'active';
   user.freeAccess = true;
+  user.emailVerifiedAt = user.emailVerifiedAt || new Date();
+  user.emailVerificationRequired = false;
   if (!user.freeAccessGrantedAt) user.freeAccessGrantedAt = new Date();
   await user.save();
 

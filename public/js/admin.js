@@ -50,7 +50,19 @@ function closeMenu() { setMenuState(false); }
 function openMenu() { setMenuState(true); }
 
 async function loadMe(){ const result=await api('/api/auth/me'); const user=result.user; if(!user||user.role!=='owner') return location.assign('/'); $('#admin-name').textContent=user.name||'Owner'; $('#admin-email').textContent=user.email; const avatar=$('#admin-avatar'); avatar.innerHTML=user.avatarUrl?`<img src="${escapeHtml(user.avatarUrl)}" alt="">`:(user.name||user.email||'SB').slice(0,2).toUpperCase(); }
-async function loadStats(){ const s=await api('/api/admin/stats'); $('#stat-users').textContent=s.totalUsers; $('#stat-paid').textContent=s.activePaid; $('#stat-free').textContent=s.freeUsers; $('#stat-mrr').textContent=`$${Number(s.monthlyRevenue).toFixed(2)}`; $('#stat-revoked').textContent=s.revoked; $('#stat-grants').textContent=s.grants; }
+async function loadStats(){
+  const s=await api('/api/admin/stats');
+  $('#stat-users').textContent=s.totalUsers;
+  $('#stat-paid').textContent=s.activePaid;
+  $('#stat-free').textContent=s.freeUsers;
+  $('#stat-mrr').textContent=`$${Number(s.revenue?.grossMrrUsd ?? s.monthlyRevenue ?? 0).toFixed(2)}`;
+  $('#stat-ai-cost').textContent=`$${Number(s.aiCostMonthUsd||0).toFixed(3)}`;
+  $('#stat-margin').textContent=`$${Number(s.estimatedGrossMarginUsd||0).toFixed(2)}`;
+  $('#stat-stripe-mrr').textContent=`$${Number(s.revenue?.stripeMrrUsd||0).toFixed(2)}`;
+  $('#stat-play-mrr').textContent=`$${Number(s.revenue?.googlePlayMrrUsd||0).toFixed(2)}`;
+  $('#stat-revoked').textContent=s.revoked;
+  $('#stat-grants').textContent=s.grants;
+}
 async function loadRecent(){ const data=await api('/api/admin/users?limit=6&page=1'); $('#recent-users').innerHTML=data.items.length?data.items.map(user=>{const [label,cls]=accessInfo(user);return `<tr><td>${userCell(user)}</td><td><span class="badge ${cls}">${label}</span></td><td>${escapeHtml(user.subscriptionStatus||'none')}</td><td>${formatDate(user.createdAt)}</td></tr>`}).join(''):`<tr><td colspan="4">No hay usuarios todavía.</td></tr>`; }
 function providerLabel(provider) {
   if (provider === 'google_play') return 'GOOGLE PLAY';
@@ -88,7 +100,18 @@ async function loadSubscriptions(){
 }
 async function loadGrants(){ const data=await api('/api/admin/grants'); $('#grants-grid').innerHTML=data.items.length?data.items.map(grant=>`<article class="grant-item"><div class="grant-item-head"><strong>${escapeHtml(grant.email)}</strong><button data-grant-delete="${grant._id}">REVOCAR</button></div><p>${escapeHtml(grant.note||'Acceso gratuito otorgado por el owner.')}</p><small>${grant.claimedBy?'CUENTA VINCULADA':'ESPERANDO REGISTRO'} · ${formatDate(grant.createdAt)}</small></article>`).join(''):`<article class="grant-item"><strong>No hay emails con acceso gratuito.</strong><p>Añade uno arriba para preautorizarlo.</p></article>`; }
 
-function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); closeMenu(); }
+
+async function loadUsage(){
+  const data=await api('/api/admin/usage?days=30');
+  const totals=data.totals||{};
+  $('#usage-requests').textContent=Number(totals.featureRequests||0).toLocaleString();
+  $('#usage-calls').textContent=Number(totals.openAiCalls||0).toLocaleString();
+  $('#usage-minutes').textContent=(Number(totals.transcriptionSeconds||0)/60).toFixed(1);
+  $('#usage-cost').textContent=`$${Number(totals.estimatedCostUsd||0).toFixed(3)}`;
+  const rows=[...(data.daily||[])].reverse();
+  $('#usage-table').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.date)}</td><td>${Number(row.featureRequests||0).toLocaleString()}</td><td>${Number(row.openAiCalls||0).toLocaleString()}</td><td>${Number((row.inputTokens||0)+(row.outputTokens||0)).toLocaleString()}</td><td>${(Number(row.transcriptionSeconds||0)/60).toFixed(1)} min</td><td>${Number(row.ttsCharacters||0).toLocaleString()}</td><td>$${Number(row.estimatedCostUsd||0).toFixed(4)}</td></tr>`).join(''):`<tr><td colspan="7">Todavía no hay consumo de IA registrado.</td></tr>`;
+}
+function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones',usage:'Uso y costo de IA'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); if(name==='usage')loadUsage(); closeMenu(); }
 function askConfirm(title,copy,handler){ $('#confirm-title').textContent=title; $('#confirm-copy').textContent=copy; confirmHandler=handler; $('#confirm-dialog').showModal(); }
 async function createGrant(email,note){ await api('/api/admin/grants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,note})}); toast(`Acceso gratuito preparado para ${email}`); await Promise.all([loadStats(),loadGrants(),loadUsers().catch(()=>{})]); }
 

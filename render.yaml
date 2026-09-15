@@ -42,5 +42,33 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: QR_CONVERSATION_RATE_LIMIT
+        value: 90
       - key: ALLOWED_ORIGINS
         sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: GOOGLE_PLAY_MONTHLY_AMOUNT
+        value: "599"
+      - key: GOOGLE_PLAY_CURRENCY
+        value: usd
+      - key: AI_COST_CHAT_INPUT_PER_1M_USD
+        value: "0.05"
+      - key: AI_COST_CHAT_CACHED_INPUT_PER_1M_USD
+        value: "0.005"
+      - key: AI_COST_CHAT_OUTPUT_PER_1M_USD
+        value: "0.40"
+      - key: AI_COST_TRANSCRIPTION_PER_MINUTE_USD
+        value: "0.006"
+      - key: AI_COST_TTS_PER_MINUTE_USD
+        value: "0.015"
+      - key: AI_TTS_CHARS_PER_MINUTE
+        value: "900"

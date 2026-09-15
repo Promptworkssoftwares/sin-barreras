@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132427">
+  <title>Eliminar cuenta · Sin Barreras</title>
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/css/landing.css?v=1.5.2">
+  <link rel="stylesheet" href="/css/account-pages.css?v=1.5.2">
+</head>
+<body class="account-page-body">
+  <main class="account-page-shell">
+    <a class="account-page-brand" href="/"><img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"></a>
+    <section class="account-page-card danger-card">
+      <span class="auth-kicker">PRIVACIDAD Y DATOS</span>
+      <h1>Eliminar cuenta</h1>
+      <p>Este proceso elimina permanentemente tu cuenta, progreso, historial sincronizado y registros de uso asociados. Si tienes una suscripción activa, también se cancela para evitar futuros cobros.</p>
+      <div id="delete-status" class="auth-status is-hidden" role="status"></div>
+
+      <form id="deletion-login-form" class="account-form is-hidden">
+        <h2>Primero inicia sesión</h2>
+        <label>Email<input id="deletion-email" type="email" autocomplete="username" required></label>
+        <label>Contraseña<input id="deletion-password" type="password" autocomplete="current-password" required></label>
+        <button class="cta-primary" type="submit">INICIAR SESIÓN <span>→</span></button>
+        <a class="account-page-link" href="/">¿Usas Google? Inicia sesión desde la página principal y vuelve aquí.</a>
+      </form>
+
+      <form id="delete-account-form" class="account-form is-hidden">
+        <div class="delete-account-summary"><strong id="delete-account-email">—</strong><small>Cuenta autenticada</small></div>
+        <label>Contraseña actual <span>(si tu cuenta usa contraseña)</span><input id="delete-current-password" type="password" autocomplete="current-password"></label>
+        <label>Escribe <strong>ELIMINAR</strong> para confirmar<input id="delete-confirmation" type="text" autocomplete="off" required></label>
+        <button class="cta-primary delete-primary" type="submit">ELIMINAR MI CUENTA Y DATOS</button>
+      </form>
+
+      <a class="account-page-link" href="/">← Cancelar y volver</a>
+    </section>
+  </main>
+  <script type="module" src="/js/account-deletion.js?v=1.5.2"></script>
+</body>
+</html>

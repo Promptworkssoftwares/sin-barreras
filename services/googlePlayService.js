@@ -169,6 +169,10 @@ export async function applyGooglePlayVerification(user, verification, { orderId 
   user.subscriptionStatus = verification.subscriptionStatus;
   user.currentPeriodEnd = verification.currentPeriodEnd;
   user.cancelAtPeriodEnd = Boolean(verification.cancelAtPeriodEnd);
+  user.subscriptionAmount = Math.max(0, Number(process.env.GOOGLE_PLAY_MONTHLY_AMOUNT || process.env.STRIPE_MONTHLY_AMOUNT || 599));
+  user.subscriptionCurrency = String(process.env.GOOGLE_PLAY_CURRENCY || process.env.STRIPE_CURRENCY || 'usd').toLowerCase();
+  user.subscriptionInterval = 'month';
+  user.subscriptionIntervalCount = 1;
   await user.save();
   return user;
 }

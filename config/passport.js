@@ -18,6 +18,8 @@ async function upsertSocialUser({ provider, providerId, email, name, avatarUrl }
       role: normalizedEmail === ownerEmail ? 'owner' : 'user',
       providers: [{ provider, providerId }],
       accountStatus: 'active',
+      emailVerifiedAt: new Date(),
+      emailVerificationRequired: false,
       lastLoginAt: new Date()
     });
   } else {
@@ -27,6 +29,8 @@ async function upsertSocialUser({ provider, providerId, email, name, avatarUrl }
     if (name) user.name = String(name).slice(0, 120);
     if (avatarUrl) user.avatarUrl = String(avatarUrl).slice(0, 800);
     if (normalizedEmail === ownerEmail) user.role = 'owner';
+    user.emailVerifiedAt = user.emailVerifiedAt || new Date();
+    user.emailVerificationRequired = false;
     user.lastLoginAt = new Date();
   }
 

@@ -1,14 +1,17 @@
 import express from 'express';
+import bcrypt from 'bcryptjs';
+import User from '../models/User.js';
 import UserState from '../models/UserState.js';
 import { requireAuth } from '../middleware/auth.js';
 import { publicUser } from '../services/accessService.js';
 import { refreshGooglePlayEntitlement } from '../services/googlePlayService.js';
+import { deleteUserAccount } from '../services/accountService.js';
 
 const router = express.Router();
-const MAX_STATE_BYTES = 350_000;
+const MAX_STATE_BYTES = 750_000;
 
 function defaultState() {
-  return { history: [], settings: {}, onboarding: false, practicePoints: 0, learning: {}, sounds: {} };
+  return { history: [], settings: {}, onboarding: false, practicePoints: 0, learning: {}, sounds: {}, phrasebook: [] };
 }
 
 function sanitizeHistoryItem(item = {}) {
@@ -33,6 +36,27 @@ function sanitizeHistory(value) {
   return (Array.isArray(value) ? value : []).slice(0, 100).map(sanitizeHistoryItem).filter(Boolean);
 }
 
+
+function sanitizePhraseItem(item = {}) {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+  const id = String(item.id || '').slice(0, 120);
+  const sourceText = String(item.sourceText || '').trim().slice(0, 1200);
+  const translatedText = String(item.translatedText || '').trim().slice(0, 1200);
+  if (!id || !sourceText || !translatedText) return null;
+  return {
+    id, sourceText, translatedText,
+    sourceLanguage: String(item.sourceLanguage || '').slice(0, 12) || null,
+    targetLanguage: String(item.targetLanguage || '').slice(0, 12) || null,
+    category: String(item.category || 'general').slice(0, 40),
+    situation: String(item.situation || 'everyday').slice(0, 40),
+    createdAt: item.createdAt || null
+  };
+}
+
+function sanitizePhrasebook(value) {
+  return (Array.isArray(value) ? value : []).slice(0, 150).map(sanitizePhraseItem).filter(Boolean);
+}
+
 function sanitizePayload(body = {}) {
   const result = defaultState();
   result.history = sanitizeHistory(body.history);
@@ -41,6 +65,7 @@ function sanitizePayload(body = {}) {
   result.practicePoints = Math.max(0, Number(body.practicePoints) || 0);
   result.learning = body.learning && typeof body.learning === 'object' && !Array.isArray(body.learning) ? body.learning : {};
   result.sounds = body.sounds && typeof body.sounds === 'object' && !Array.isArray(body.sounds) ? body.sounds : {};
+  result.phrasebook = sanitizePhrasebook(body.phrasebook);
   if (Buffer.byteLength(JSON.stringify(result), 'utf8') > MAX_STATE_BYTES) throw new Error('El estado de la cuenta es demasiado grande para sincronizar.');
   return result;
 }
@@ -67,7 +92,7 @@ router.get('/account/state', requireAuth, async (request, response, next) => {
 
     response.json({ user: publicUser(request.user), state: {
       history: cleanHistory, settings: state.settings || {}, onboarding: Boolean(state.onboarding),
-      practicePoints: state.practicePoints || 0, learning: state.learning || {}, sounds: state.sounds || {}
+      practicePoints: state.practicePoints || 0, learning: state.learning || {}, sounds: state.sounds || {}, phrasebook: sanitizePhrasebook(state.phrasebook)
     } });
   } catch (error) { next(error); }
 });
@@ -81,6 +106,29 @@ router.put('/account/state', requireAuth, async (request, response, next) => {
     if (error.message.includes('demasiado grande')) return response.status(413).json({ error: error.message });
     next(error);
   }
+});
+
+
+router.delete('/account', requireAuth, async (request, response, next) => {
+  try {
+    if (request.user.role === 'owner') return response.status(403).json({ error: 'La cuenta owner no puede eliminarse desde este flujo.' });
+    const confirmation = String(request.body?.confirmation || '').trim().toUpperCase();
+    if (confirmation !== 'ELIMINAR') return response.status(400).json({ error: 'Escribe ELIMINAR para confirmar.' });
+
+    const user = await User.findById(request.user._id).select('+passwordHash');
+    if (!user) return response.status(404).json({ error: 'Cuenta no encontrada.' });
+    if (user.passwordHash) {
+      const currentPassword = String(request.body?.currentPassword || '');
+      if (!currentPassword || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+        return response.status(401).json({ error: 'La contraseña actual no es correcta.' });
+      }
+    }
+
+    await deleteUserAccount(user);
+    request.logout(() => {
+      request.session?.destroy(() => response.json({ ok: true, redirect: '/?account=deleted' }));
+    });
+  } catch (error) { next(error); }
 });
 
 export default router;

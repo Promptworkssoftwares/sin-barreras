@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "background_color": "#fff8f1",
   "theme_color": "#132427",
-  "description": "Intérprete de voz, aprendizaje de inglés, AI Coach y traducción con cámara.",
+  "description": "Intérprete de voz con modo cara a cara, frases offline, aprendizaje personalizado, AI Coach, cámara y conversaciones por QR.",
   "categories": ["education", "utilities"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

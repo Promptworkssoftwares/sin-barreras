@@ -7,7 +7,8 @@ const userStateSchema = new mongoose.Schema({
   onboarding: { type: Boolean, default: false },
   practicePoints: { type: Number, default: 0, min: 0 },
   learning: { type: mongoose.Schema.Types.Mixed, default: {} },
-  sounds: { type: mongoose.Schema.Types.Mixed, default: {} }
+  sounds: { type: mongoose.Schema.Types.Mixed, default: {} },
+  phrasebook: { type: [mongoose.Schema.Types.Mixed], default: [] }
 }, { timestamps: true, minimize: false });
 
 export default mongoose.model('UserState', userStateSchema);

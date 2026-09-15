@@ -4,3 +4,5 @@
 
 /* v1.4.7 · Local account first */
 .local-auth{display:grid;gap:13px;margin-top:4px}.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;border-radius:14px;background:var(--paper)}.auth-tab{min-height:40px;border:0;border-radius:10px;color:var(--muted);background:transparent;font-size:11px;font-weight:800}.auth-tab.is-active{color:var(--ink);background:var(--surface);box-shadow:0 3px 12px rgba(37,26,20,.08)}.account-form{display:grid;gap:11px}.account-form .cta-primary{width:100%;margin-top:3px}.password-note{margin-top:-5px;color:var(--muted);font-size:9px}.social-auth-block{display:grid;gap:10px}.auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:9px}.auth-divider:before,.auth-divider:after{content:'';height:1px;flex:1;background:var(--line)}.auth-divider span{white-space:nowrap}.provider-actions{margin-top:0}.provider-button.google>span{color:#4285f4;background:#f7f9ff}
+
+.auth-help-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.auth-help-row .text-action{padding:4px 0;text-align:left}.auth-legal a{color:var(--coral);font-weight:700;text-decoration:none}

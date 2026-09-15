@@ -1,4 +1,4 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.4.44';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.5.2';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
@@ -319,6 +319,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     reviewCard: $('#learn-review-card'), reviewCount: $('#learn-review-count'), reviewButton: $('#learn-review-button'), courseGrid: $('#learn-course-grid'),
     levelPanel: $('#learn-level-panel'), levelBack: $('#learn-level-back'), levelIcon: $('#learn-level-icon'), levelTitle: $('#learn-level-title'), levelMeta: $('#learn-level-meta'), levelProgress: $('#learn-level-progress'), levelGrid: $('#learn-level-grid'),
     mastered: $('#learn-mastered-count'), learning: $('#learn-learning-count'), customCount: $('#learn-custom-count'), wordsList: $('#learn-words-list'),
+    homeCustomCount: $('#learn-home-custom-count'), customBranchCount: $('#learn-custom-branch-count'), customList: $('#learn-custom-list'), customEmpty: $('#learn-custom-empty'), customPracticeAll: $('#learn-custom-practice-all'),
     player: $('#lesson-player'), close: $('#lesson-close'), playerBar: $('#lesson-progress-bar'), playerStep: $('#lesson-step'), courseLabel: $('#lesson-course-label'), focus: $('#lesson-focus'),
     badge: $('#lesson-badge'), title: $('#lesson-title'), prompt: $('#lesson-prompt'), options: $('#lesson-options'), listen: $('#lesson-listen'), voice: $('#lesson-voice'), inputWrap: $('#lesson-input-wrap'), input: $('#lesson-input'), check: $('#lesson-check'),
     feedback: $('#lesson-feedback'), feedbackIcon: $('#lesson-feedback-icon'), feedbackTitle: $('#lesson-feedback-title'), feedbackCopy: $('#lesson-feedback-copy'), continue: $('#lesson-continue'),
@@ -353,6 +354,46 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
         <span><strong>${escapeHTML(item.word)}</strong><small>${escapeHTML(item.meaning)} · ${escapeHTML(item.courseTitle)}</small></span>
         <span class="mastery-ring" style="--mastery:${Math.max(5, item.mastery)}%"><b>${item.mastery}%</b></span>
       </button>`).join('') : `<div class="learn-empty"><span>${iconSvg('memory')}</span><strong>Tus palabras aparecerán aquí</strong><p>Completa un nivel o guarda vocabulario desde una traducción.</p></div>`;
+  }
+
+  function renderCustomWords() {
+    const words = Array.isArray(state.customWords) ? state.customWords : [];
+    const count = words.length;
+    if (ui.homeCustomCount) ui.homeCustomCount.textContent = `${count} ${count === 1 ? 'guardada' : 'guardadas'}`;
+    if (ui.customBranchCount) ui.customBranchCount.textContent = String(count);
+    if (ui.customPracticeAll) ui.customPracticeAll.disabled = count === 0;
+    if (ui.customEmpty) ui.customEmpty.hidden = count > 0;
+    if (!ui.customList) return;
+    ui.customList.innerHTML = words.map((item) => {
+      const encodedWord = encodeURIComponent(item.word);
+      return `<article class="saved-word-card" data-custom-word="${encodedWord}">
+        <div class="saved-word-copy">
+          <span>${escapeHTML(item.situation ? String(item.situation).toUpperCase() : 'DE UNA CONVERSACIÓN')}</span>
+          <strong>${escapeHTML(item.word)}</strong>
+          <p>${escapeHTML(item.meaning)}</p>
+          ${item.example ? `<small>${escapeHTML(item.example)}${item.exampleMeaning ? ` · ${escapeHTML(item.exampleMeaning)}` : ''}</small>` : ''}
+        </div>
+        <div class="saved-word-tools">
+          <button type="button" data-custom-action="listen">🔊 Escuchar</button>
+          <button type="button" data-custom-action="practice">▶ Practicar</button>
+          <button type="button" class="saved-word-delete" data-custom-action="delete" aria-label="Eliminar ${escapeHTML(item.word)} de Mis palabras">Eliminar</button>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  function findCustomWord(encodedWord) {
+    let value = '';
+    try { value = decodeURIComponent(encodedWord || ''); } catch { value = String(encodedWord || ''); }
+    return state.customWords.find((item) => normalize(item.word) === normalize(value));
+  }
+
+  function practiceCustomWord(item) {
+    if (!item) return;
+    const others = state.customWords.filter((word) => normalize(word.word) !== normalize(item.word));
+    const selected = [item, ...others].slice(0, LESSON_SIZE);
+    resetQuestionVisibility();
+    startLesson('custom', selected);
   }
 
   function currentLevelFor(course) {
@@ -439,6 +480,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     }
     if (selectedCourseId) renderLevelPanel(COURSES.find((item) => item.id === selectedCourseId));
     renderWords();
+    renderCustomWords();
   }
 
   function showPlayer() { if (!ui.player) return; ui.player.classList.remove('is-hidden'); document.body.classList.add('lesson-open'); }
@@ -585,7 +627,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     for (const item of words) {
       const word = String(item.word || '').trim(), meaning = String(item.meaning || '').trim();
       if (!word || !meaning || state.customWords.some((saved) => normalize(saved.word) === normalize(word))) continue;
-      state.customWords.unshift({ word, meaning, example:String(item.example || '').trim(), exampleMeaning:String(item.exampleMeaning || '').trim() }); added += 1;
+      state.customWords.unshift({ word, meaning, example:String(item.example || '').trim(), exampleMeaning:String(item.exampleMeaning || '').trim(), situation:String(situation || 'everyday') }); added += 1;
     }
     state.customWords = state.customWords.slice(0,100); saveState(state); render(); return added;
   }
@@ -645,6 +687,28 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     resetQuestionVisibility(); startLesson(button.dataset.course, null, button.dataset.level);
   });
   listen(ui.wordsList, 'click', async (event) => { const button = event.target.closest('[data-speak-word]'); if (!button) return; try { await speakText?.(decodeURIComponent(button.dataset.speakWord), 'en'); } catch (error) { notify?.(error.message); } });
+  listen(ui.customPracticeAll, 'click', () => { resetQuestionVisibility(); startLesson('custom'); });
+  listen(ui.customList, 'click', async (event) => {
+    const button = event.target.closest('[data-custom-action]');
+    const card = event.target.closest('[data-custom-word]');
+    if (!button || !card) return;
+    const item = findCustomWord(card.dataset.customWord);
+    if (!item) return;
+    const action = button.dataset.customAction;
+    if (action === 'listen') {
+      try { await speakText?.(item.word, 'en'); } catch (error) { notify?.(error.message); }
+      return;
+    }
+    if (action === 'practice') { practiceCustomWord(item); return; }
+    if (action === 'delete') {
+      if (!window.confirm(`¿Eliminar “${item.word}” de Mis palabras?`)) return;
+      state.customWords = state.customWords.filter((word) => normalize(word.word) !== normalize(item.word));
+      delete state.progress[wordKey('custom', item.word)];
+      saveState(state);
+      render();
+      notify?.('Palabra eliminada de Mis palabras.');
+    }
+  });
   listen(ui.close, 'click', () => { lessonVoiceCapture?.cancel?.(); lessonVoiceCapture = null; lessonVoiceBusy = false; hidePlayer(); });
   listen(ui.voice, 'click', answerWithVoice);
   listen(ui.listen, 'click', async () => { const exercise = session?.exercises?.[session.index]; if (!exercise) return; try { await speakText?.(exercise.word.word, 'en'); } catch (error) { notify?.(error.message); } });

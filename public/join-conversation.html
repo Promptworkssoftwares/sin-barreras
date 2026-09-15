@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#132427" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <title>Conversación · Sin Barreras</title>
+  <link rel="stylesheet" href="/css/room.css?v=1.5.2" />
+</head>
+<body>
+  <main class="room-shell">
+    <header class="room-header">
+      <img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras" />
+      <span id="room-code">CONVERSACIÓN</span>
+    </header>
+    <section id="room-loading" class="room-card"><div class="room-pulse"></div><h1>Conectando…</h1><p>Validando el enlace seguro.</p></section>
+    <section id="room-app" class="is-hidden">
+      <div class="room-language-line"><span id="room-my-language">MI IDIOMA</span><b>↔</b><span id="room-other-language">OTRO IDIOMA</span></div>
+      <div id="room-status" class="room-status">Conectado</div>
+      <div id="room-transcript" class="room-transcript" aria-live="polite"></div>
+      <button id="room-talk" class="room-talk" type="button"><span>●</span><strong>Hablar</strong><small>Toca una vez y habla normalmente</small></button>
+      <p class="room-privacy">Tu audio se procesa para traducir este turno y no se guarda en esta página.</p>
+    </section>
+    <section id="room-error" class="room-card is-hidden"><h1>Enlace no disponible</h1><p id="room-error-copy">Esta conversación terminó o el enlace expiró.</p></section>
+  </main>
+  <script type="module" src="/js/join-conversation.js?v=1.5.2"></script>
+</body>
+</html>

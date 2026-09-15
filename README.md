@@ -1,4 +1,4 @@
-# Sin Barreras v1.4.44 · Floating AI Voice Activity
+# Sin Barreras v1.5.2 · Face-to-Face, Offline Phrasebook & QR Conversations
 
 ## Qué incluye
 - Nuevo indicador flotante e independiente para **Aprender → Vocales y consonantes**.

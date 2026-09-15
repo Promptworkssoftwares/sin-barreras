@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.4\.44/);
-  assert.match(appHtml, /styles\.css\?v=1\.4\.44/);
-  assert.match(javascript, /learn\.js\?v=1\.4\.44/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.5\.2/);
+  assert.match(appHtml, /styles\.css\?v=1\.5\.2/);
+  assert.match(javascript, /learn\.js\?v=1\.5\.2/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -44,7 +44,7 @@ test('public landing contains real signup and pricing surfaces', () => {
 test('protected application and admin dashboard are server-gated', () => {
   assert.match(server, /app\.get\('\/app', requireAccess/);
   assert.match(server, /app\.get\('\/admin', requireOwner/);
-  assert.match(server, /app\.use\('\/api', requireAccess\)/);
+  assert.match(server, /app\.use\('\/api', requireAccess(?:, aiUsageContextMiddleware)?\)/);
 });
 
 test('SaaS billing creates a recurring $5.99 monthly Stripe Checkout subscription', () => {
@@ -79,9 +79,14 @@ test('each authenticated user gets an isolated cloud state record', () => {
   assert.match(accountRoutes, /UserState\.findOneAndUpdate\(\{ user: request\.user\._id \}/);
 });
 
-test('service worker does not cache private app, admin, API, auth, or billing routes', () => {
+test('service worker keeps sensitive routes private and gives /app an offline phrasebook fallback', () => {
   assert.match(serviceWorker, /PRIVATE_PREFIXES/);
-  for (const path of ['/app', '/admin', '/api/', '/auth/', '/billing/']) assert.match(serviceWorker, new RegExp(path.replaceAll('/', '\\/')));
+  for (const path of ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/join/']) {
+    assert.match(serviceWorker, new RegExp(path.replaceAll('/', '\\/')));
+  }
+  assert.match(serviceWorker, /url\.pathname === '\/app'/);
+  assert.match(serviceWorker, /caches\.match\('\/offline-phrases\.html'\)/);
+  assert.doesNotMatch(serviceWorker, /cache\.put\([^\n]*\/app/);
 });
 
 test('conversation auto-detects the user language while the partner language is selected explicitly', () => {
@@ -369,7 +374,7 @@ test('Coach keeps a coherent long conversation with session context and extended
   assert.match(javascript, /form\.append\('turnNumber'/);
   assert.match(server, /CONTINUITY IS CRITICAL/);
   assert.match(server, /Never restart the scene/);
-  assert.match(server, /roughly 12-18 learner turns/);
+  assert.match(server, /8-12 learner turns at beginner level and 12-18 at intermediate\/advanced/);
   assert.match(server, /sanitizeCoachSession/);
 });
 
@@ -416,10 +421,10 @@ test('Sound Lab focused practice timer stops when the app is hidden', () => {
 
 
 test('hands-free interpreter waits through natural thinking pauses and auto-finishes the utterance', () => {
-  assert.match(javascript, /shortSpeechGraceMs: 2150/);
-  assert.match(javascript, /normalSpeechGraceMs: 1750/);
-  assert.match(javascript, /longSpeechGraceMs: 1450/);
-  assert.match(javascript, /thinkingStatusAfterMs: 480/);
+  assert.match(javascript, /shortSpeechGraceMs: 1800/);
+  assert.match(javascript, /normalSpeechGraceMs: 1450/);
+  assert.match(javascript, /longSpeechGraceMs: 1200/);
+  assert.match(javascript, /thinkingStatusAfterMs: 420/);
   assert.match(javascript, /noiseFloor/);
   assert.match(javascript, /noiseMultiplier/);
   assert.match(javascript, /conversationSilenceLimit/);
@@ -462,20 +467,24 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(javascript, /createAutoVoiceTurn/);
   assert.match(javascript, /Habla cuando estés listo/);
   assert.match(sounds, /createAutoVoiceTurn/);
-  assert.match(voiceTurn, /shortSpeechSilenceMs: 2150/);
-  assert.match(voiceTurn, /normalSpeechSilenceMs: 1750/);
-  assert.match(voiceTurn, /longSpeechSilenceMs: 1450/);
-  assert.match(voiceTurn, /thinkingAfterMs: 480/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.4\.44/);
+  assert.match(voiceTurn, /shortSpeechSilenceMs: 1800/);
+  assert.match(voiceTurn, /normalSpeechSilenceMs: 1450/);
+  assert.match(voiceTurn, /longSpeechSilenceMs: 1200/);
+  assert.match(voiceTurn, /thinkingAfterMs: 420/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.5\.2/);
 });
 
 
-test('Learn opens as a simple two-path hub instead of showing all learning content at once', () => {
+test('Learn opens as a four-path hub with direct access to saved words', () => {
   assert.match(appHtml, /id="learn-home"/);
   assert.match(appHtml, /data-learn-path="sounds"/);
   assert.match(appHtml, /data-learn-path="routes"/);
+  assert.match(appHtml, /data-learn-path="conversations"/);
+  assert.match(appHtml, /data-learn-path="words"/);
   assert.match(appHtml, /id="learn-sounds-branch" class="learn-branch is-hidden"/);
   assert.match(appHtml, /id="learn-routes-branch" class="learn-branch is-hidden"/);
+  assert.match(appHtml, /id="learn-conversations-branch" class="learn-branch is-hidden"/);
+  assert.match(appHtml, /id="learn-words-branch" class="learn-branch is-hidden"/);
   assert.match(javascript, /function showLearnHome\(\)/);
   assert.match(javascript, /function openLearnPath\(path\)/);
 });
@@ -506,7 +515,7 @@ test('account state accepts a legacy payload long enough to strip old audio and 
   assert.match(server, /express\.json\(\{ limit: '1mb' \}\)/);
   assert.match(server, /entity\.too\.large/);
   assert.match(accountRoutes, /function sanitizeHistoryItem/);
-  assert.match(accountRoutes, /MAX_STATE_BYTES = 350_000/);
+  assert.match(accountRoutes, /MAX_STATE_BYTES = 750_000/);
   assert.match(accountRoutes, /UserState\.updateOne\(\{ user: request\.user\._id \}/);
   assert.doesNotMatch(accountRoutes, /audioBase64/);
 });
@@ -538,7 +547,7 @@ test('Three.js conversational AI background is bundled and reacts to real conver
   assert.match(javascript, /aiStageController\?\.setVolume/);
   assert.match(aiStageJavascript, /three@0\.179\.1/);
   assert.match(aiStageJavascript, /WebGLRenderer/);
-  assert.match(serviceWorker, /ai-stage\.js\?v=1\.4\.44/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.5\.2/);
 });
 
 
@@ -553,7 +562,7 @@ test('browser audio is unlocked from a user gesture before asynchronous AI playb
   assert.match(audioPlayback, /pointerdown/);
   assert.match(audioPlayback, /playsinline/);
   assert.match(audioPlayback, /decodeAudioData/);
-  assert.match(serviceWorker, /audio-playback\.js\?v=1\.4\.44/);
+  assert.match(serviceWorker, /audio-playback\.js\?v=1\.5\.2/);
   assert.doesNotMatch(javascript, /new Audio\(`data:audio\/mpeg;base64/);
 });
 
