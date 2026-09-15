@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.5.3" />
+    <link rel="stylesheet" href="/styles.css?v=1.5.4" />
   </head>
   <body>
     <main class="app-shell">
@@ -697,6 +697,79 @@
       </footer>
     </section>
 
+    <section id="phrase-practice-player" class="phrase-practice-player is-hidden" aria-label="Práctica guiada de frase">
+      <header class="phrase-practice-topbar">
+        <button id="phrase-practice-close" class="phrase-practice-close" type="button" aria-label="Cerrar práctica">×</button>
+        <div class="phrase-practice-progress-wrap">
+          <div class="phrase-practice-progress-copy"><span id="phrase-practice-progress-copy">1 / 1</span><small>APRENDE POR PARTES</small></div>
+          <div class="phrase-practice-progress"><i id="phrase-practice-progress-bar"></i></div>
+        </div>
+        <span id="phrase-practice-language" class="phrase-practice-language">IDIOMA</span>
+      </header>
+
+      <main class="phrase-practice-main">
+        <section class="phrase-practice-context" aria-label="Frase completa">
+          <span>FRASE GUARDADA</span>
+          <p id="phrase-practice-source-full" dir="auto"></p>
+          <strong id="phrase-practice-target-full" dir="auto"></strong>
+        </section>
+
+        <section id="phrase-practice-loading" class="phrase-practice-loading">
+          <span class="phrase-practice-loader" aria-hidden="true">◌</span>
+          <strong>Preparando una lección corta…</strong>
+          <p>Preparando la frase por partes…</p>
+        </section>
+
+        <section id="phrase-practice-error" class="phrase-practice-error" hidden>
+          <strong>No pudimos preparar la práctica.</strong>
+          <p>Intenta nuevamente.</p>
+          <button id="phrase-practice-retry" type="button">↻ Intentar de nuevo</button>
+        </section>
+
+        <article id="phrase-practice-content" class="phrase-practice-card" hidden>
+          <div class="phrase-practice-step-head">
+            <span id="phrase-practice-step-badge">PARTE 1</span>
+            <small>ESCUCHA · REPITE · AVANZA</small>
+          </div>
+          <p id="phrase-practice-meaning" class="phrase-practice-meaning" dir="auto"></p>
+          <h2 id="phrase-practice-target" dir="auto"></h2>
+          <div class="phrase-practice-pronunciation">
+            <span>PRONUNCIACIÓN FÁCIL</span>
+            <strong id="phrase-practice-pronunciation" dir="auto"></strong>
+            <p id="phrase-practice-tip"></p>
+          </div>
+          <div class="phrase-practice-actions">
+            <button id="phrase-practice-listen" type="button">▶ Escuchar</button>
+            <button id="phrase-practice-slow" type="button">◷ Más lento</button>
+            <button id="phrase-practice-record" class="phrase-practice-record" type="button">● Practicar mi voz</button>
+          </div>
+          <div id="phrase-practice-score" class="phrase-practice-score" hidden>
+            <div><strong id="phrase-practice-score-number">0%</strong><span id="phrase-practice-score-feedback"></span></div>
+            <dl>
+              <div><dt>LO QUE ENTENDÍ</dt><dd id="phrase-practice-heard"></dd></div>
+              <div><dt>ENFÓCATE EN</dt><dd id="phrase-practice-focus"></dd></div>
+            </dl>
+          </div>
+          <div class="phrase-practice-navigation">
+            <button id="phrase-practice-previous" type="button">← ANTERIOR</button>
+            <button id="phrase-practice-next" type="button">SIGUIENTE PARTE →</button>
+          </div>
+        </article>
+
+        <section id="phrase-practice-complete" class="phrase-practice-complete" hidden>
+          <span class="phrase-practice-complete-mark">✓</span>
+          <small>PRÁCTICA COMPLETADA</small>
+          <h2>Ya practicaste la frase por partes.</h2>
+          <p>Vuelve otro día y repítela. La meta es pasar de reconocer cada parte a decir la frase completa con seguridad.</p>
+          <div class="phrase-practice-stats">
+            <div><span>PROMEDIO</span><strong id="phrase-practice-complete-average">—</strong></div>
+            <div><span>PARTES CON VOZ</span><strong id="phrase-practice-complete-parts">0 de 0</strong></div>
+          </div>
+          <button id="phrase-practice-done" type="button">VOLVER A MIS FRASES</button>
+        </section>
+      </main>
+    </section>
+
     <dialog id="settings-dialog" class="settings-dialog">
       <form method="dialog">
         <div class="dialog-head"><div><p class="section-label">PREFERENCIAS</p><h2>Hazlo tuyo</h2></div><button class="icon-button" value="close" aria-label="Cerrar preferencias">×</button></div>
@@ -803,7 +876,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.5.3"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.5.3"></script>
+    <script src="/play-billing.js?v=1.5.4"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.5.4"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.5.3';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.5.4';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -22,7 +22,10 @@ const safePhrase = (item = {}) => ({
   targetLanguage: item.targetLanguage || null,
   category: PHRASE_CATEGORIES[item.category] ? item.category : categoryForSituation(item.situation),
   situation: item.situation || 'everyday',
-  createdAt: item.createdAt || new Date().toISOString()
+  createdAt: item.createdAt || new Date().toISOString(),
+  practiceCount: Math.max(0, Number(item.practiceCount) || 0),
+  bestScore: Math.max(0, Math.min(100, Number(item.bestScore) || 0)),
+  lastPracticedAt: item.lastPracticedAt ? String(item.lastPracticedAt).slice(0, 40) : null
 });
 
 function read() {
@@ -86,9 +89,10 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
         <div class="phrase-card-top"><span>${PHRASE_CATEGORIES[item.category] || 'General'}</span><small>${item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-US', { month: 'short', day: 'numeric' }) : ''}</small></div>
         <p class="phrase-source">${escapeHtml(item.sourceText)}</p>
         <p class="phrase-translation">${escapeHtml(item.translatedText)}</p>
+        ${item.practiceCount ? `<span class="phrase-card-progress">✓ ${item.practiceCount} ${item.practiceCount === 1 ? 'práctica' : 'prácticas'}${item.bestScore ? ` · mejor ${item.bestScore}%` : ''}</span>` : ''}
         <div class="phrase-actions">
           <button type="button" data-action="listen">▶ Escuchar</button>
-          <button type="button" data-action="practice">✦ Practicar</button>
+          <button type="button" data-action="practice">✦ Practicar por partes</button>
           <button type="button" data-action="copy">Copiar</button>
           <button type="button" data-action="share">Compartir</button>
           <button type="button" data-action="delete" class="danger">Eliminar</button>
@@ -102,12 +106,32 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
     const items = read();
     const duplicate = items.find((item) => item.sourceText.toLowerCase() === phrase.sourceText.toLowerCase() && item.translatedText.toLowerCase() === phrase.translatedText.toLowerCase());
     const id = duplicate?.id || phrase.id;
-    const stored = { ...phrase, id, createdAt: duplicate?.createdAt || phrase.createdAt };
+    const stored = {
+      ...phrase,
+      id,
+      createdAt: duplicate?.createdAt || phrase.createdAt,
+      practiceCount: duplicate?.practiceCount || phrase.practiceCount || 0,
+      bestScore: Math.max(duplicate?.bestScore || 0, phrase.bestScore || 0),
+      lastPracticedAt: duplicate?.lastPracticedAt || phrase.lastPracticedAt || null
+    };
     write([stored, ...items.filter((item) => item.id !== id)]);
     if (audioBase64) await cacheAudio(id, audioBase64, stored.targetLanguage);
     render();
     notify?.(duplicate ? 'La frase ya estaba guardada.' : 'Frase guardada para acceso rápido y offline.');
     return stored;
+  }
+
+  function recordPractice(id, { averageScore = 0 } = {}) {
+    const items = read();
+    const now = new Date().toISOString();
+    const updated = items.map((item) => item.id === id ? {
+      ...item,
+      practiceCount: (Number(item.practiceCount) || 0) + 1,
+      bestScore: Math.max(Number(item.bestScore) || 0, Math.max(0, Math.min(100, Number(averageScore) || 0))),
+      lastPracticedAt: now
+    } : item);
+    write(updated);
+    render();
   }
 
   async function saveInterpretation(result, category = null) {
@@ -174,7 +198,7 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
   saveCurrent?.addEventListener('click', () => notify?.('Guarda una traducción desde Hablar usando “Guardar frase”.'));
 
   render();
-  return { render, read, savePhrase, saveInterpretation, cacheAudio };
+  return { render, read, savePhrase, saveInterpretation, cacheAudio, recordPractice };
 }
 
 function escapeHtml(value = '') {

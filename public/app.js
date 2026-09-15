@@ -1,12 +1,13 @@
-import { initLearning } from './learn.js?v=1.5.3';
-import { initSounds } from './sounds.js?v=1.5.3';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.5.3';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.5.3';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.5.3';
-import { initAIStage } from './ai-stage.js?v=1.5.3';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.5.3';
-import { initPhrasebook } from './phrasebook.js?v=1.5.3';
-import { initQrConversation } from './qr-conversation.js?v=1.5.3';
+import { initLearning } from './learn.js?v=1.5.4';
+import { initSounds } from './sounds.js?v=1.5.4';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.5.4';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.5.4';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.5.4';
+import { initAIStage } from './ai-stage.js?v=1.5.4';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.5.4';
+import { initPhrasebook } from './phrasebook.js?v=1.5.4';
+import { initPhrasePractice } from './phrase-practice.js?v=1.5.4';
+import { initQrConversation } from './qr-conversation.js?v=1.5.4';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -81,6 +82,7 @@ let learning = null;
 let sounds = null;
 let aiStageController = null;
 let phrasebook = null;
+let phrasePractice = null;
 let qrConversation = null;
 
 const languageName = (language) => (LANGUAGES[language] || language || 'Idioma').toUpperCase();
@@ -669,6 +671,13 @@ async function speakText(text, language, { speed = 1 } = {}) {
 
 function getPracticePoints() { return Number(localStorage.getItem(PRACTICE_POINTS_KEY) || 0); }
 function renderPracticePoints() { if (ui.totalPoints) ui.totalPoints.textContent = `${getPracticePoints()} puntos`; }
+function addPracticePoints(points = 0) {
+  const safePoints = Math.max(0, Number(points) || 0);
+  if (!safePoints) return;
+  localStorage.setItem(PRACTICE_POINTS_KEY, String(getPracticePoints() + safePoints));
+  window.SinBarrerasCloud?.queueSync?.();
+  renderPracticePoints();
+}
 
 async function preparePractice(event) {
   event.preventDefault();
@@ -739,11 +748,7 @@ async function scorePracticeAudio(audio) {
     if (ui.focusText) ui.focusText.textContent = result.focus || 'Repite la frase con calma.';
     ui.practiceScore?.classList.remove('is-hidden');
     guidedScroll(ui.practiceScore, { block: 'center', delay: 90 });
-    if (result.points) {
-      localStorage.setItem(PRACTICE_POINTS_KEY, String(getPracticePoints() + result.points));
-      window.SinBarrerasCloud?.queueSync?.();
-      renderPracticePoints();
-    }
+    addPracticePoints(result.points);
   } catch (error) {
     notify(error.message || 'No pudimos revisar tu práctica.');
   } finally {
@@ -1414,15 +1419,24 @@ sounds = initSounds({
   getNativeLanguage: () => state.settings.detectedUserLanguage || state.userLanguage || 'es'
 });
 
+phrasePractice = initPhrasePractice({
+  request,
+  notify,
+  createAutoVoiceTurn,
+  speakText,
+  languageName,
+  onPoints: addPracticePoints,
+  onComplete: (item, result) => {
+    phrasebook?.recordPractice?.(item?.id, result);
+    if (result?.averageScore) notify(`Práctica completada · promedio ${result.averageScore}%.`);
+    else notify('Práctica completada. Repite la frase cuando quieras.');
+  }
+});
+
 phrasebook = initPhrasebook({
   notify,
   request,
-  onPractice: (item) => preparePhraseForPractice({
-    englishText: item.sourceLanguage === 'en' ? item.sourceText : item.targetLanguage === 'en' ? item.translatedText : '',
-    meaning: item.sourceLanguage === 'en' ? item.translatedText : item.sourceText,
-    nativeLanguage: item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage,
-    situation: item.situation
-  })
+  onPractice: (item) => phrasePractice?.start(item)
 });
 
 qrConversation = initQrConversation({

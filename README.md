@@ -1,4 +1,8 @@
-# Sin Barreras v1.5.3
+# Sin Barreras v1.5.4
+
+### Nuevo en 1.5.4
+
+`Mis frases` incluye práctica multilenguaje por segmentos: escucha, repite y recibe evaluación parte por parte antes de decir la frase completa. El progreso de cada frase se sincroniza con la cuenta.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
 

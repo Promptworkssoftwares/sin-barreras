@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.4 · Frases multilenguaje por partes
+
+- `Mis frases` ahora practica el idioma real guardado; ya no fuerza inglés.
+- Nueva lección guiada que divide cada frase en 1–6 segmentos cortos y termina practicando la frase completa.
+- Cada segmento incluye significado, pronunciación legible, consejo, audio normal/lento y evaluación de voz.
+- La división conserva exactamente el texto de la traducción guardada y valida que no se omitan ni cambien palabras.
+- El progreso por frase guarda cantidad de prácticas, mejor puntuación y última práctica, sincronizado con la cuenta.
+- Las lecciones preparadas se cachean localmente para abrir más rápido al repetirlas.
+- Android actualizado a `1.5.4` (`versionCode 1504`).
+
 ## 1.5.3 · Cloudflare Remote QR Portal
 
 - Conversaciones QR locales ahora crean automáticamente un portal HTTPS público mediante el binario oficial `cloudflared`.

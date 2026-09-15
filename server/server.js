@@ -157,7 +157,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.5.3' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.5.4' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({
@@ -368,11 +368,11 @@ const normalizePronunciationGuide = (value = '') => String(value)
   .trim();
 const hasUnfriendlyPronunciationSymbols = (value = '') => IPA_SYMBOLS.test(value) || /[\/\[\]{}]/u.test(value);
 
-const repairPronunciationGuide = async (english, pronunciation, nativeName) => {
+const repairPronunciationGuide = async (targetText, pronunciation, nativeName, targetName = 'the target language') => {
   const result = await chatJson({
     maxTokens: 120,
-    system: `Rewrite the pronunciation guide so a ${nativeName} speaker can read it easily. Return JSON only: {"pronunciation":"..."}. NEVER use IPA, dictionary phonetic notation, stress symbols, phonetic alphabet characters, slashes, or brackets. Use only ordinary everyday letters or the normal writing system familiar to a ${nativeName} speaker, plus simple punctuation and accents when natural. Keep the same English pronunciation and stay under 220 characters.`,
-    user: JSON.stringify({ english, pronunciation })
+    system: `Rewrite the pronunciation guide so a ${nativeName} speaker can read it easily while preserving the same ${targetName} pronunciation. Return JSON only: {"pronunciation":"..."}. NEVER use IPA, dictionary phonetic notation, stress symbols, phonetic alphabet characters, slashes, or brackets. Use only ordinary everyday letters or the normal writing system familiar to a ${nativeName} speaker, plus simple punctuation and accents when natural. Stay under 220 characters.`,
+    user: JSON.stringify({ targetText, pronunciation })
   });
   const parsed = parseJsonContent(result, 'No pudimos reparar la pronunciación.');
   return normalizePronunciationGuide(parsed.pronunciation);
@@ -409,7 +409,7 @@ Rules:
 
   parsed.pronunciation = normalizePronunciationGuide(parsed.pronunciation);
   if (hasUnfriendlyPronunciationSymbols(parsed.pronunciation)) {
-    const repaired = await repairPronunciationGuide(targetText, parsed.pronunciation, nativeName);
+    const repaired = await repairPronunciationGuide(targetText, parsed.pronunciation, nativeName, targetName);
     if (repaired && !hasUnfriendlyPronunciationSymbols(repaired)) parsed.pronunciation = repaired;
   }
   if (!parsed.pronunciation || hasUnfriendlyPronunciationSymbols(parsed.pronunciation)) {
@@ -424,6 +424,151 @@ Rules:
     alternative: String(parsed.alternative).trim(),
     usage: String(parsed.usage).trim(),
     targetLanguage
+  };
+};
+
+const phraseLessonComparable = (text = '') => String(text || '')
+  .normalize('NFKC')
+  .toLowerCase()
+  .replace(/[\p{P}\p{S}\s]+/gu, '')
+  .trim();
+
+const fallbackPhraseSegments = (text = '') => {
+  const source = String(text || '').trim();
+  if (!source) return [];
+  const punctuationParts = source.match(/[^.!?。！？,，;；:：]+[.!?。！？,，;；:：]*/gu)?.map((part) => part.trim()).filter(Boolean) || [source];
+  const segments = [];
+  for (const part of punctuationParts) {
+    const words = part.split(/\s+/u).filter(Boolean);
+    if (words.length <= 7 || !/\s/u.test(part)) {
+      segments.push(part);
+      continue;
+    }
+    for (let index = 0; index < words.length; index += 5) segments.push(words.slice(index, index + 5).join(' '));
+  }
+  if (segments.length <= 6) return segments;
+  const grouped = [];
+  const size = Math.ceil(segments.length / 6);
+  for (let index = 0; index < segments.length; index += size) grouped.push(segments.slice(index, index + size).join(' '));
+  return grouped.slice(0, 6);
+};
+
+const validSequentialPhraseSegments = (segments = [], targetText = '') => {
+  if (!Array.isArray(segments) || !segments.length || segments.length > 6) return false;
+  const joined = segments.map((segment) => String(segment?.targetText || '')).join(' ');
+  return phraseLessonComparable(joined) === phraseLessonComparable(targetText);
+};
+
+const annotatePhraseSegments = async ({ sourceText, targetText, segments, nativeName, targetName }) => {
+  const result = await chatJson({
+    maxTokens: 900,
+    system: `You are building a serious speaking lesson for a ${nativeName} speaker learning ${targetName}. The target phrase is already translated correctly. Do not rewrite, paraphrase, simplify, omit, or add any target-language words.
+
+You will receive sourceText, targetText, and a fixed ordered list of exact target-language segments. Return JSON only:
+{"segments":[{"targetText":"exact supplied segment","meaning":"short meaning in ${nativeName}","pronunciation":"simple learner-friendly reading for a ${nativeName} speaker","tip":"one short pronunciation tip in ${nativeName}"}],"fullPronunciation":"simple readable pronunciation of the complete targetText","fullTip":"one short tip in ${nativeName} for saying the complete phrase naturally"}.
+
+Rules:
+- Return exactly one object for every supplied segment, in the same order.
+- targetText MUST be copied exactly from the supplied segment. Never translate it back or replace it.
+- meaning, tip, and fullTip MUST be in ${nativeName}.
+- pronunciation and fullPronunciation must NEVER use IPA, dictionary phonetic notation, stress marks, slashes, or brackets.
+- Use ordinary letters or a standard learner romanization that a ${nativeName} speaker can read.
+- Keep each meaning and tip short enough for a phone screen.
+- Preserve names, numbers, and intent.`,
+    user: JSON.stringify({ sourceText, targetText, segments })
+  });
+  return parseJsonContent(result, 'No pudimos preparar las partes de esta frase.');
+};
+
+const phrasePracticeLesson = async ({ sourceText, targetText, nativeLanguage, targetLanguage }) => {
+  const nativeName = SUPPORTED_LANGUAGES[nativeLanguage] || 'Spanish';
+  const targetName = SUPPORTED_LANGUAGES[targetLanguage] || 'English';
+  const segmentation = await chatJson({
+    maxTokens: 420,
+    system: `Split an existing ${targetName} phrase into short sequential speaking chunks for a ${nativeName} learner. Return JSON only: {"segments":["..."]}.
+
+STRICT RULES:
+- Every segment MUST copy an exact consecutive span from targetText; do not translate, paraphrase, correct, or change any word.
+- Preserve the complete phrase in the original order with nothing omitted or duplicated.
+- Use 1 to 6 segments total.
+- Prefer natural meaning boundaries: greeting, short clause, request, question, or punctuation boundary.
+- Prefer roughly 1-6 words per segment when the language uses spaces.
+- A very short phrase can remain one segment.
+- Keep punctuation with the segment it belongs to.`,
+    user: JSON.stringify({ targetText })
+  });
+  const proposed = parseJsonContent(segmentation, 'No pudimos dividir esta frase.');
+  let fixedSegments = Array.isArray(proposed.segments)
+    ? proposed.segments.map((value) => String(value || '').trim()).filter(Boolean).map((targetText) => ({ targetText }))
+    : [];
+  if (!validSequentialPhraseSegments(fixedSegments, targetText)) {
+    fixedSegments = fallbackPhraseSegments(targetText).map((segment) => ({ targetText: segment }));
+  }
+  if (!fixedSegments.length) throw new Error('No pudimos dividir esta frase para practicarla.');
+
+  let annotated = await annotatePhraseSegments({
+    sourceText,
+    targetText,
+    segments: fixedSegments.map((segment) => segment.targetText),
+    nativeName,
+    targetName
+  });
+  let resultSegments = Array.isArray(annotated.segments) ? annotated.segments : [];
+  if (!validSequentialPhraseSegments(resultSegments, targetText) || resultSegments.length !== fixedSegments.length) {
+    annotated = await annotatePhraseSegments({
+      sourceText,
+      targetText,
+      segments: fixedSegments.map((segment) => segment.targetText),
+      nativeName,
+      targetName
+    });
+    resultSegments = Array.isArray(annotated.segments) ? annotated.segments : [];
+  }
+  if (resultSegments.length !== fixedSegments.length || !validSequentialPhraseSegments(resultSegments, targetText)) {
+    throw new Error('No pudimos preparar las partes de esta frase.');
+  }
+
+  const safeSegments = [];
+  for (let index = 0; index < fixedSegments.length; index += 1) {
+    const expected = fixedSegments[index].targetText;
+    const candidate = resultSegments[index] || {};
+    if (phraseLessonComparable(candidate.targetText) !== phraseLessonComparable(expected)) {
+      throw new Error('No pudimos mantener la frase original durante la práctica.');
+    }
+    const exactTarget = expected;
+    let pronunciation = normalizePronunciationGuide(candidate.pronunciation);
+    if (!pronunciation || hasUnfriendlyPronunciationSymbols(pronunciation)) {
+      pronunciation = await repairPronunciationGuide(exactTarget, pronunciation, nativeName, targetName);
+    }
+    if (!pronunciation || hasUnfriendlyPronunciationSymbols(pronunciation)) throw new Error('No pudimos generar una pronunciación legible para una parte de la frase.');
+    safeSegments.push({
+      id: `segment-${index + 1}`,
+      targetText: exactTarget,
+      meaning: String(candidate.meaning || '').trim().slice(0, 240),
+      pronunciation,
+      tip: String(candidate.tip || '').trim().slice(0, 240)
+    });
+  }
+
+  let fullPronunciation = normalizePronunciationGuide(annotated.fullPronunciation);
+  if (!fullPronunciation || hasUnfriendlyPronunciationSymbols(fullPronunciation)) {
+    fullPronunciation = await repairPronunciationGuide(targetText, fullPronunciation, nativeName, targetName);
+  }
+  if (!fullPronunciation || hasUnfriendlyPronunciationSymbols(fullPronunciation)) throw new Error('No pudimos generar la pronunciación completa.');
+
+  return {
+    sourceText,
+    targetText,
+    nativeLanguage,
+    targetLanguage,
+    segments: safeSegments,
+    fullPractice: {
+      id: 'full-phrase',
+      targetText,
+      meaning: sourceText,
+      pronunciation: fullPronunciation,
+      tip: String(annotated.fullTip || '').trim().slice(0, 260)
+    }
   };
 };
 
@@ -980,6 +1125,29 @@ app.post('/api/practice', aiLimiter, async (request, response, next) => {
     }
     if (nativeLanguage === targetLanguage) return response.status(400).json({ error: 'Elige un idioma diferente para practicar.' });
     return response.json(await practicePhrase(phrase.trim(), nativeLanguage, targetLanguage, situation));
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/practice/phrase-lesson', aiLimiter, async (request, response, next) => {
+  try {
+    if (!process.env.OPENAI_API_KEY) return response.status(503).json({ error: 'El servidor todavía no tiene configurada la clave de IA.' });
+    const { sourceText, targetText, nativeLanguage = 'es', targetLanguage = 'en' } = request.body || {};
+    if (
+      typeof sourceText !== 'string' || !sourceText.trim() || sourceText.length > 1200
+      || typeof targetText !== 'string' || !targetText.trim() || targetText.length > 1200
+      || !SUPPORTED_LANGUAGES[nativeLanguage] || !SUPPORTED_LANGUAGES[targetLanguage]
+      || nativeLanguage === targetLanguage
+    ) {
+      return response.status(400).json({ error: 'Necesitamos una frase guardada y dos idiomas diferentes para preparar la práctica.' });
+    }
+    return response.json(await phrasePracticeLesson({
+      sourceText: sourceText.trim(),
+      targetText: targetText.trim(),
+      nativeLanguage,
+      targetLanguage
+    }));
   } catch (error) {
     next(error);
   }

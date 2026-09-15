@@ -61,7 +61,10 @@ function sanitizePhrasebook(value) {
     targetLanguage: item?.targetLanguage || null,
     category: String(item?.category || 'general').slice(0, 40),
     situation: String(item?.situation || 'everyday').slice(0, 40),
-    createdAt: item?.createdAt || null
+    createdAt: item?.createdAt || null,
+    practiceCount: Math.max(0, Math.min(10000, Number(item?.practiceCount) || 0)),
+    bestScore: Math.max(0, Math.min(100, Number(item?.bestScore) || 0)),
+    lastPracticedAt: item?.lastPracticedAt ? String(item.lastPracticedAt).slice(0, 40) : null
   })).filter((item) => item.id && item.sourceText && item.translatedText);
 }
 
