@@ -76,9 +76,11 @@ test('v1.5 QR conversation uses expiring hashed invitation tokens and a public g
   assert.match(roomRoutes, /joinUrl/);
   assert.match(server, /app\.get\('\/join\/:code'/);
   assert.match(roomGuestHtml, /id="room-talk"/);
-  assert.match(roomGuestJs, /EventSource/);
+  assert.match(roomGuestJs, /\/sync\?role=guest/);
+  assert.match(roomGuestJs, /setInterval\(syncRoom, 1200\)/);
   assert.match(roomGuestJs, /createAutoVoiceTurn/);
-  assert.match(roomHostJs, /new EventSource/);
+  assert.match(roomHostJs, /\/sync\?role=host/);
+  assert.match(roomHostJs, /setInterval\(syncRoom, 1200\)/);
   assert.match(roomHostJs, /new window\.QRCode/);
 });
 
@@ -89,6 +91,7 @@ test('QR audio access is constrained by room token and the host subscriber entit
   assert.match(server, /!host\.hasAppAccess\(\)/);
   assert.match(server, /runWithAiUsage\(host\._id, 'qr_conversation'/);
   assert.match(server, /emitRoomEvent\(room\.code, 'turn', result\)/);
-  assert.match(server, /Content-Type': 'text\/event-stream'/);
+  assert.match(server, /app\.get\('\/api\/public\/conversations\/:code\/sync'/);
+  assert.match(server, /getRoomEvents\(room\.code, request\.query\.after\)/);
   assert.match(sw, /'\/join\/'/);
 });

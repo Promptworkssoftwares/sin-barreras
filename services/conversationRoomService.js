@@ -1,8 +1,10 @@
 import crypto from 'node:crypto';
 import ConversationRoom from '../models/ConversationRoom.js';
 
-const streams = new Map();
+const eventLogs = new Map();
 const ROOM_MINUTES = 90;
+const MAX_EVENT_LOG = 80;
+const EVENT_LOG_TTL_MS = ROOM_MINUTES * 60_000 + 5 * 60_000;
 
 const hashToken = (value = '') => crypto.createHash('sha256').update(String(value)).digest('hex');
 const rawToken = () => crypto.randomBytes(24).toString('base64url');
@@ -35,7 +37,7 @@ export async function createConversationRoom({ hostUser, hostLanguage, guestLang
     expiresAt,
     lastActivityAt: new Date()
   });
-  const joinUrl = `${String(baseUrl).replace(/\/$/, '')}/join/${code}?token=${encodeURIComponent(guestToken)}`;
+  const joinUrl = `${String(baseUrl).replace(/\/$/, '')}/join/${code}#token=${encodeURIComponent(guestToken)}`;
   return { room, hostToken, guestToken, joinUrl };
 }
 
@@ -65,41 +67,42 @@ export async function markRoomActivity(room, { guestConnected = false } = {}) {
   await ConversationRoom.updateOne({ _id: room._id }, { $set: update });
 }
 
-export function addRoomStream(code, response) {
-  const key = safeCode(code);
-  if (!streams.has(key)) streams.set(key, new Set());
-  streams.get(key).add(response);
-  return () => {
-    const set = streams.get(key);
-    if (!set) return;
-    set.delete(response);
-    if (!set.size) streams.delete(key);
-  };
-}
 
 export function emitRoomEvent(code, event, payload = {}) {
   const key = safeCode(code);
-  const clients = streams.get(key);
-  if (!clients?.size) return;
-  const body = `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
-  for (const response of [...clients]) {
-    try { response.write(body); }
-    catch { clients.delete(response); }
+  if (!key) return null;
+
+  const now = Date.now();
+  const state = eventLogs.get(key) || { cursor: 0, events: [], touchedAt: now };
+  state.cursor += 1;
+  state.touchedAt = now;
+  state.events.push({ id: state.cursor, event, payload, createdAt: new Date(now).toISOString() });
+  if (state.events.length > MAX_EVENT_LOG) state.events.splice(0, state.events.length - MAX_EVENT_LOG);
+  eventLogs.set(key, state);
+
+
+  // Opportunistic cleanup keeps the in-memory log bounded without another timer.
+  for (const [roomCode, log] of eventLogs) {
+    if (now - Number(log.touchedAt || now) > EVENT_LOG_TTL_MS) eventLogs.delete(roomCode);
   }
-  if (!clients.size) streams.delete(key);
+  return state.cursor;
+}
+
+export function getRoomEvents(code, after = 0) {
+  const key = safeCode(code);
+  const state = eventLogs.get(key);
+  const cursor = state?.cursor || 0;
+  const from = Math.max(0, Number.parseInt(after, 10) || 0);
+  const events = state?.events?.filter((item) => item.id > from) || [];
+  return { cursor, events };
 }
 
 export async function closeConversationRoom(room) {
   if (!room) return;
   await ConversationRoom.updateOne({ _id: room._id }, { $set: { status: 'closed', lastActivityAt: new Date() } });
   emitRoomEvent(room.code, 'room-closed', { code: room.code });
-  const clients = streams.get(room.code);
-  if (clients) {
-    for (const response of clients) {
-      try { response.end(); } catch { /* noop */ }
-    }
-    streams.delete(room.code);
-  }
+  const key = safeCode(room.code);
+  setTimeout(() => eventLogs.delete(key), 60_000).unref?.();
 }
 
 export function publicRoom(room) {

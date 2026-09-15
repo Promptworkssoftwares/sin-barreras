@@ -21,7 +21,7 @@ import User from '../models/User.js';
 import { stripe, stripeEnabled, syncCheckoutSession, syncSubscription } from '../services/stripeService.js';
 import { ensureOwnerAccount } from '../services/ownerService.js';
 import { aiUsageContextMiddleware, recordChatUsage, recordFeatureRequest, recordTranscriptionUsage, recordTtsUsage, runWithAiUsage } from '../services/aiUsageService.js';
-import { addRoomStream, authorizeConversationRoom, emitRoomEvent, markRoomActivity, publicRoom } from '../services/conversationRoomService.js';
+import { authorizeConversationRoom, emitRoomEvent, getRoomEvents, markRoomActivity, publicRoom } from '../services/conversationRoomService.js';
 
 import { API_LANGUAGE_NAMES, LANGUAGE_ALIASES } from '../public/languages.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,15 +46,15 @@ if (process.env.NODE_ENV === 'production' && (!configuredOrigins.length || confi
   throw new Error('ALLOWED_ORIGINS must explicitly list the production app origin; wildcard * is not allowed in production.');
 }
 
-const corsOptions = {
-  origin(origin, callback) {
-    if (!origin || configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-    callback(new Error('Origin not allowed'));
-  }
-};
+function corsOptionsForRequest(request, callback) {
+  const origin = String(request.get('Origin') || '').trim();
+  const sameOrigin = `${request.protocol}://${request.get('host')}`;
+  const allowed = !origin || origin === sameOrigin || configuredOrigins.includes('*') || configuredOrigins.includes(origin);
+  callback(null, {
+    origin: allowed ? (origin || true) : false,
+    credentials: true
+  });
+}
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
@@ -82,7 +82,27 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
-app.use(cors({ ...corsOptions, credentials: true }));
+app.use(cors(corsOptionsForRequest));
+
+// A temporary trycloudflare.com hostname is a guest portal, not a second public
+// copy of the entire SaaS. Only the QR join page, its static assets, and the
+// token-protected public conversation API are reachable through that hostname.
+app.use((request, response, next) => {
+  const hostname = String(request.hostname || '').toLowerCase();
+  if (!hostname.endsWith('.trycloudflare.com')) return next();
+  const pathname = request.path || '/';
+  const allowed = pathname.startsWith('/join/')
+    || pathname.startsWith('/api/public/conversations/')
+    || pathname === '/css/room.css'
+    || pathname === '/js/join-conversation.js'
+    || pathname === '/voice-turn.js'
+    || pathname === '/audio-playback.js'
+    || pathname === '/languages.js'
+    || pathname === '/assets/sin-barreras-logo-full.png';
+  if (allowed) return next();
+  response.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  return response.status(404).send('Portal de conversación no disponible en esta ruta.');
+});
 
 // Stripe requires the exact raw request body for webhook signature verification.
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json', limit: '1mb' }), async (request, response) => {
@@ -137,7 +157,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.5.2' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.5.3' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({
@@ -834,38 +854,23 @@ const qrConversationLimiter = rateLimit({
   message: { error: 'Demasiados turnos en esta conversación. Espera un momento e intenta otra vez.' }
 });
 
-app.get('/api/public/conversations/:code/events', async (request, response, next) => {
+app.get('/api/public/conversations/:code/sync', async (request, response, next) => {
   try {
     const role = request.query.role === 'host' ? 'host' : 'guest';
-    const room = await authorizeConversationRoom({ code: request.params.code, role, token: request.query.token });
-    if (!room) return response.status(404).json({ error: 'Esta conversación expiró o el enlace no es válido.' });
-    response.set({
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-transform',
-      Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no'
-    });
-    response.flushHeaders?.();
-    response.write(`event: room-ready\ndata: ${JSON.stringify(publicRoom(room))}\n\n`);
-    const remove = addRoomStream(room.code, response);
-    if (role === 'guest') {
-      await markRoomActivity(room, { guestConnected: true });
+    const token = request.get('X-SB-Conversation-Token') || request.query.token;
+    const room = await authorizeConversationRoom({ code: request.params.code, role, token });
+    if (!room) return response.status(404).json({ error: 'Esta conversación expiró o terminó.' });
+
+    const guestWasConnected = Boolean(room.guestConnectedAt);
+    await markRoomActivity(room, { guestConnected: role === 'guest' });
+    if (role === 'guest' && !guestWasConnected) {
       emitRoomEvent(room.code, 'participant', { role: 'guest', connected: true });
+      room.guestConnectedAt = new Date();
     }
-    const heartbeat = setInterval(() => {
-      try { response.write(': keep-alive\n\n'); } catch { /* noop */ }
-    }, 20_000);
-    const expiresInMs = Math.max(1_000, new Date(room.expiresAt).getTime() - Date.now());
-    const expiryTimer = setTimeout(() => {
-      try { response.write(`event: room-closed\ndata: ${JSON.stringify({ code: room.code, reason: 'expired' })}\n\n`); } catch { /* noop */ }
-      response.end();
-    }, expiresInMs);
-    request.on('close', () => {
-      clearInterval(heartbeat);
-      clearTimeout(expiryTimer);
-      remove();
-      if (role === 'guest') emitRoomEvent(room.code, 'participant', { role: 'guest', connected: false });
-    });
+
+    const sync = getRoomEvents(room.code, request.query.after);
+    response.set('Cache-Control', 'no-store');
+    response.json({ room: publicRoom(room), cursor: sync.cursor, events: sync.events });
   } catch (error) { next(error); }
 });
 

@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ==========================================
-echo   Sin Barreras SaaS v1.5.2 - Instalacion
+echo   Sin Barreras SaaS v1.5.3 - Instalacion
 echo ==========================================
 
 where node >nul 2>nul
@@ -43,7 +43,17 @@ if errorlevel 1 (
 )
 
 echo.
-echo [OK] Dependencias instaladas.
+echo Instalando portal publico Cloudflare para conversaciones QR...
+call npm run cloudflare:install
+if errorlevel 1 (
+  echo [ERROR] No fue posible instalar cloudflared.
+  echo [INFO] La app puede iniciar, pero el QR entre redes no funcionara hasta instalarlo.
+  pause
+  exit /b 1
+)
+
+echo.
+echo [OK] Dependencias y cloudflared instalados.
 echo [SIGUIENTE] Abre .env, configura MONGODB_URI, Google, Stripe, OpenAI y Owner.
 echo [SIGUIENTE] Luego ejecuta start.bat.
 echo.

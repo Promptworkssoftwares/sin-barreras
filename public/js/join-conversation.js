@@ -1,9 +1,9 @@
-import { createAutoVoiceTurn } from '../voice-turn.js?v=1.5.2';
-import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.5.2';
-import { LANGUAGES } from '../languages.js?v=1.5.2';
+import { createAutoVoiceTurn } from '../voice-turn.js?v=1.5.3';
+import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.5.3';
+import { LANGUAGES } from '../languages.js?v=1.5.3';
 
 const code = location.pathname.split('/').filter(Boolean).pop()?.toUpperCase() || '';
-const token = new URLSearchParams(location.search).get('token') || '';
+const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('token') || new URLSearchParams(location.search).get('token') || '';
 const loading = document.querySelector('#room-loading');
 const app = document.querySelector('#room-app');
 const errorBox = document.querySelector('#room-error');
@@ -12,7 +12,9 @@ const talk = document.querySelector('#room-talk');
 const status = document.querySelector('#room-status');
 const transcript = document.querySelector('#room-transcript');
 let room = null;
-let events = null;
+let syncTimer = null;
+let syncBusy = false;
+let cursor = 0;
 let capture = null;
 let busy = false;
 
@@ -49,12 +51,47 @@ function addTurn(turn) {
   }
 }
 
+function stopSync() {
+  if (syncTimer) window.clearInterval(syncTimer);
+  syncTimer = null;
+  syncBusy = false;
+}
+
+async function syncRoom() {
+  if (!room || syncBusy || talk.disabled && status?.dataset?.state === 'closed') return;
+  syncBusy = true;
+  try {
+    const payload = await request(`/api/public/conversations/${encodeURIComponent(code)}/sync?role=guest&after=${cursor}`, { headers: { 'X-SB-Conversation-Token': token } });
+    cursor = Math.max(cursor, Number(payload.cursor || 0));
+    status.textContent = 'Conectado · ya puedes hablar';
+    status.dataset.state = 'connected';
+    for (const item of payload.events || []) {
+      if (item.event === 'turn') addTurn(item.payload);
+      if (item.event === 'room-closed') {
+        status.textContent = 'La conversación terminó';
+        status.dataset.state = 'closed';
+        talk.disabled = true;
+        stopSync();
+      }
+    }
+  } catch (error) {
+    if (/expiró|terminó|no es válido/i.test(String(error?.message || ''))) {
+      status.textContent = 'La conversación terminó o expiró';
+      status.dataset.state = 'closed';
+      talk.disabled = true;
+      stopSync();
+    } else {
+      status.textContent = 'Reconectando portal público…';
+      status.dataset.state = 'waiting';
+    }
+  } finally { syncBusy = false; }
+}
+
 function connectEvents() {
-  events = new EventSource(`/api/public/conversations/${encodeURIComponent(code)}/events?role=guest&token=${encodeURIComponent(token)}`);
-  events.addEventListener('room-ready', () => { status.textContent = 'Conectado · ya puedes hablar'; status.dataset.state = 'connected'; });
-  events.addEventListener('turn', (event) => { try { addTurn(JSON.parse(event.data || '{}')); } catch { /* noop */ } });
-  events.addEventListener('room-closed', () => { status.textContent = 'La conversación terminó'; talk.disabled = true; events.close(); });
-  events.onerror = () => { if (!talk.disabled) { status.textContent = 'Reconectando…'; status.dataset.state = 'waiting'; } };
+  stopSync();
+  cursor = 0;
+  syncRoom();
+  syncTimer = window.setInterval(syncRoom, 1200);
 }
 
 async function recordTurn() {
@@ -86,7 +123,7 @@ async function recordTurn() {
 
 try {
   if (!code || !token) throw new Error('El enlace está incompleto. Pide un QR nuevo.');
-  room = await request(`/api/public/conversations/${encodeURIComponent(code)}?role=guest&token=${encodeURIComponent(token)}`);
+  room = await request(`/api/public/conversations/${encodeURIComponent(code)}?role=guest`, { headers: { 'X-SB-Conversation-Token': token } });
   document.querySelector('#room-code').textContent = `CÓDIGO ${room.code}`;
   document.querySelector('#room-my-language').textContent = LANGUAGES[room.guestLanguage] || room.guestLanguage;
   document.querySelector('#room-other-language').textContent = LANGUAGES[room.hostLanguage] || room.hostLanguage;

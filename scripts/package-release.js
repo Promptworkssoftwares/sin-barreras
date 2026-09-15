@@ -20,7 +20,8 @@ const forbiddenPatterns = [
   /\.(?:jks|keystore|p12|pfx|pem|key)$/i,
   /^service-account.*\.json$/i,
   /^credentials.*\.json$/i,
-  /^secrets.*\.json$/i
+  /^secrets.*\.json$/i,
+  /^cloudflared(?:\.exe)?$/i
 ];
 
 function excluded(source) {
@@ -72,4 +73,4 @@ if (process.platform === 'win32') {
 
 fs.rmSync(tempRoot, { recursive: true, force: true });
 console.log(`[RELEASE] OK: ${path.relative(root, zipPath)}`);
-console.log('[RELEASE] Verified exclusions: .env, .git, node_modules, keystores, private keys, service-account files.');
+console.log('[RELEASE] Verified exclusions: .env, .git, node_modules, cloudflared binary, keystores, private keys, service-account files.');

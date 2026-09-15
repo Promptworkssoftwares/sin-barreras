@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ==========================================
-echo   Sin Barreras SaaS v1.5.2 - Inicio
+echo   Sin Barreras SaaS v1.5.3 - Inicio
 echo ==========================================
 
 where node >nul 2>nul
@@ -21,6 +21,22 @@ if not exist "node_modules" (
     pause
     exit /b 1
   )
+)
+
+echo.
+echo Verificando portal Cloudflare para QR remoto...
+call npm run cloudflare:check >nul 2>nul
+if errorlevel 1 (
+  echo [INFO] cloudflared no esta instalado. Instalando...
+  call npm run cloudflare:install
+  if errorlevel 1 (
+    echo [ERROR] No fue posible instalar cloudflared.
+    echo [INFO] Ejecuta install.bat con Internet disponible y vuelve a intentar.
+    pause
+    exit /b 1
+  )
+) else (
+  echo [OK] cloudflared disponible.
 )
 
 if not exist ".env" (

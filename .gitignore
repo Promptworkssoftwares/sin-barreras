@@ -15,3 +15,5 @@ credentials*.json
 secrets*.json
 dist/
 .release-tmp/
+
+bin/cloudflared.exe

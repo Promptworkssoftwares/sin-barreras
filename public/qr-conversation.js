@@ -1,4 +1,4 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.5.2';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.5.3';
 
 export function initQrConversation({ notify, request, languages, createAutoVoiceTurn, getDefaults } = {}) {
   const dialog = document.querySelector('#qr-conversation-dialog');
@@ -18,7 +18,9 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   const copyLink = document.querySelector('#qr-copy-link');
   const shareLink = document.querySelector('#qr-share-link');
   let room = null;
-  let events = null;
+  let syncTimer = null;
+  let syncBusy = false;
+  let cursor = 0;
   let capture = null;
   let busy = false;
 
@@ -42,8 +44,10 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   function resetRoom() {
     capture?.cancel?.();
     capture = null;
-    events?.close?.();
-    events = null;
+    if (syncTimer) window.clearInterval(syncTimer);
+    syncTimer = null;
+    syncBusy = false;
+    cursor = 0;
     room = null;
     busy = false;
     setup?.classList.remove('is-hidden');
@@ -66,21 +70,41 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
     }
   }
 
+  function stopSync() {
+    if (syncTimer) window.clearInterval(syncTimer);
+    syncTimer = null;
+    syncBusy = false;
+  }
+
+  async function syncRoom() {
+    if (!room || syncBusy) return;
+    syncBusy = true;
+    try {
+      const payload = await request(`/api/public/conversations/${encodeURIComponent(room.code)}/sync?role=host&after=${cursor}`, { headers: { 'X-SB-Conversation-Token': room.hostToken } });
+      cursor = Math.max(cursor, Number(payload.cursor || 0));
+      if (payload.room?.guestConnected) setStatus('La otra persona está conectada.', 'connected');
+      else setStatus('Sala pública activa · comparte el QR.', 'ready');
+      for (const item of payload.events || []) {
+        if (item.event === 'turn') renderTurn(item.payload);
+        if (item.event === 'room-closed') {
+          setStatus('Conversación terminada.', 'closed');
+          stopSync();
+        }
+      }
+    } catch (error) {
+      if (/expiró|terminó|no es válido/i.test(String(error?.message || ''))) {
+        setStatus('Conversación terminada o expirada.', 'closed');
+        stopSync();
+        if (talkButton) talkButton.disabled = true;
+      } else if (room) setStatus('Reconectando portal público…', 'waiting');
+    } finally { syncBusy = false; }
+  }
+
   function connectEvents() {
-    events?.close?.();
-    events = new EventSource(`/api/public/conversations/${encodeURIComponent(room.code)}/events?role=host&token=${encodeURIComponent(room.hostToken)}`);
-    events.addEventListener('room-ready', () => setStatus('Sala activa · comparte el QR.', 'ready'));
-    events.addEventListener('participant', (event) => {
-      try {
-        const data = JSON.parse(event.data || '{}');
-        setStatus(data.connected ? 'La otra persona está conectada.' : 'La otra persona se desconectó.', data.connected ? 'connected' : 'ready');
-      } catch { /* noop */ }
-    });
-    events.addEventListener('turn', (event) => {
-      try { renderTurn(JSON.parse(event.data || '{}')); } catch { /* noop */ }
-    });
-    events.addEventListener('room-closed', () => { setStatus('Conversación terminada.', 'closed'); events?.close?.(); });
-    events.onerror = () => { if (room) setStatus('Reconectando conversación…', 'waiting'); };
+    stopSync();
+    cursor = 0;
+    syncRoom();
+    syncTimer = window.setInterval(syncRoom, 1200);
   }
 
   function drawQr(url) {

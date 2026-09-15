@@ -1,4 +1,4 @@
-# Google Play release checklist · Sin Barreras v1.5.2
+# Google Play release checklist · Sin Barreras v1.5.3
 
 ## 1. Play Console
 

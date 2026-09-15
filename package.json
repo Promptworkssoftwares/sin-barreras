@@ -1,6 +1,6 @@
 {
   "name": "sin-barreras",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
   "description": "SaaS de interpretación, aprendizaje adaptativo, AI Coach y traducción con cámara.",
   "type": "module",
@@ -12,7 +12,9 @@
     "check:env": "node scripts/check-env.js",
     "mongo:test": "node scripts/check-mongodb.js",
     "security:audit": "node scripts/security-audit.js",
-    "package:release": "npm test && node scripts/package-release.js"
+    "package:release": "npm test && node scripts/package-release.js",
+    "cloudflare:install": "node scripts/install-cloudflared.js",
+    "cloudflare:check": "node scripts/check-cloudflared.js"
   },
   "engines": {
     "node": ">=20.0.0"

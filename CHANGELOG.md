@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.3 · Cloudflare Remote QR Portal
+
+- Conversaciones QR locales ahora crean automáticamente un portal HTTPS público mediante el binario oficial `cloudflared`.
+- El segundo teléfono puede conectarse desde datos móviles, otra Wi‑Fi o cualquier red con Internet; ya no necesita compartir la red local del host.
+- `install.bat` instala/verifica `cloudflared`; también disponible con `npm run cloudflare:install`.
+- El QR usa automáticamente la URL `https://*.trycloudflare.com` cuando Sin Barreras corre en `localhost`.
+- Nuevo `QR_PUBLIC_URL` para usar Render, dominio propio o un Cloudflare Named Tunnel estable sin abrir un Quick Tunnel.
+- El transporte QR cambió de SSE a sincronización HTTP ligera cada ~1.2 s porque Cloudflare Quick Tunnels no soportan Server-Sent Events.
+- CORS actualizado para aceptar correctamente solicitudes same-origin a través del hostname público del túnel sin abrir los APIs autenticados a orígenes arbitrarios.
+- El token de invitación viaja en el fragmento `#token=` del QR (no en la petición inicial) y los syncs usan un header dedicado para reducir exposición en URLs/logs.
+- El binario `cloudflared` queda excluido del ZIP de release; se instala localmente al ejecutar el instalador.
+- Android actualizado a `1.5.3` (`versionCode 1503`).
+
 ## 1.5.2 · Mis palabras accesibles
 
 - El botón de la traducción ahora dice **Guardar en Mis palabras** para dejar claro el destino.

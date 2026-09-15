@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.5.2" />
+    <link rel="stylesheet" href="/styles.css?v=1.5.3" />
   </head>
   <body>
     <main class="app-shell">
@@ -724,7 +724,7 @@
       <div class="qr-dialog-body">
         <div class="dialog-head"><div><p class="section-label">CONVERSACIÓN ENTRE TELÉFONOS</p><h2>Conectar por QR</h2></div><form method="dialog"><button class="icon-button" value="close" aria-label="Cerrar">×</button></form></div>
         <section id="qr-room-setup" class="qr-room-setup">
-          <p>El otro teléfono no necesita instalar Sin Barreras ni crear una cuenta. Escanea el QR y cada persona habla desde su propio dispositivo.</p>
+          <p>El otro teléfono no necesita instalar Sin Barreras ni crear una cuenta. El QR usa un portal HTTPS público de Cloudflare, así que puede estar en otra Wi‑Fi o usando datos móviles.</p>
           <div class="qr-language-grid">
             <label>Mi idioma<select id="qr-host-language"><option value="">Selecciona…</option></select></label>
             <label>Idioma de la otra persona<select id="qr-guest-language"><option value="">Selecciona…</option></select></label>
@@ -803,7 +803,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.5.2"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.5.2"></script>
+    <script src="/play-billing.js?v=1.5.3"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.5.3"></script>
   </body>
 </html>
