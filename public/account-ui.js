@@ -36,7 +36,12 @@ export function initAccountUI() {
   if (plan) {
     if (user.role === 'owner') plan.textContent = 'OWNER · ACCESO TOTAL';
     else if (user.freeAccess) plan.textContent = 'ACCESO GRATUITO OTORGADO';
-    else if (['active', 'trialing'].includes(user.subscriptionStatus)) plan.textContent = 'PLAN SIN BARRERAS · $5.99/MES';
+    else if (user.subscriptionStatus === 'trialing') {
+      const end = user.currentPeriodEnd ? new Date(user.currentPeriodEnd) : null;
+      const when = end && !Number.isNaN(end.getTime()) ? end.toLocaleDateString('es-US', { month:'short', day:'numeric', year:'numeric' }) : '';
+      plan.textContent = `PRUEBA GRATIS${when ? ` · HASTA ${when.toUpperCase()}` : ''}`;
+    }
+    else if (user.subscriptionStatus === 'active') plan.textContent = 'PLAN SIN BARRERAS · $5.99/MES';
     else plan.textContent = 'SIN SUSCRIPCIÓN ACTIVA';
   }
   if (admin) admin.hidden = user.role !== 'owner';

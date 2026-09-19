@@ -24,7 +24,13 @@ export function googlePlayEnabled() {
 
 export function googlePlayPublicConfig() {
   const { packageName, productId } = googlePlayConfig();
-  return { enabled: googlePlayEnabled(), packageName, productId };
+  return {
+    enabled: googlePlayEnabled(),
+    packageName,
+    productId,
+    trialDays: Math.max(0, Number(process.env.GOOGLE_PLAY_FREE_TRIAL_DAYS || 7)),
+    trialOfferTag: String(process.env.GOOGLE_PLAY_TRIAL_OFFER_TAG || 'sb-7-day-trial')
+  };
 }
 
 async function getAccessToken() {
@@ -84,11 +90,11 @@ async function playRequest(path, { method = 'GET', body } = {}) {
   return data;
 }
 
-function mapSubscriptionState(state, expiryTime) {
+function mapSubscriptionState(state, expiryTime, { isFreeTrial = false } = {}) {
   const expiry = expiryTime ? new Date(expiryTime) : null;
   const future = Boolean(expiry && Number.isFinite(expiry.getTime()) && expiry.getTime() > Date.now());
   switch (state) {
-    case 'SUBSCRIPTION_STATE_ACTIVE': return 'active';
+    case 'SUBSCRIPTION_STATE_ACTIVE': return isFreeTrial ? 'trialing' : 'active';
     // Google documents grace period as entitled access while payment is retried.
     case 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD': return future ? 'active' : 'past_due';
     case 'SUBSCRIPTION_STATE_CANCELED': return future ? 'active' : 'canceled';
@@ -123,7 +129,8 @@ export async function verifyGooglePlaySubscription({ purchaseToken, requestedPro
   if (!matchingItem) throw new Error('La compra no corresponde al plan de Sin Barreras.');
 
   const expiryTime = matchingItem.expiryTime || null;
-  const subscriptionStatus = mapSubscriptionState(data.subscriptionState, expiryTime);
+  const isFreeTrial = Boolean(matchingItem?.offerPhase && Object.prototype.hasOwnProperty.call(matchingItem.offerPhase, 'freeTrial'));
+  const subscriptionStatus = mapSubscriptionState(data.subscriptionState, expiryTime, { isFreeTrial });
   const expiryMs = expiryTime ? new Date(expiryTime).getTime() : 0;
   const entitlementState = ['SUBSCRIPTION_STATE_ACTIVE', 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD', 'SUBSCRIPTION_STATE_CANCELED'].includes(data.subscriptionState);
   const hasEntitlement = Boolean(entitlementState && expiryMs > Date.now());
@@ -136,6 +143,9 @@ export async function verifyGooglePlaySubscription({ purchaseToken, requestedPro
     subscriptionState: data.subscriptionState || '',
     acknowledgementState: data.acknowledgementState || '',
     subscriptionStatus,
+    isFreeTrial,
+    basePlanId: matchingItem?.offerDetails?.basePlanId || '',
+    offerId: matchingItem?.offerDetails?.offerId || '',
     currentPeriodEnd: expiryTime ? new Date(expiryTime) : null,
     cancelAtPeriodEnd: data.subscriptionState === 'SUBSCRIPTION_STATE_CANCELED',
     hasEntitlement,

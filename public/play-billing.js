@@ -23,6 +23,10 @@
 
   const api = {
     isNativeAndroid: isAndroid(),
+    offer: null,
+    refreshOffer() {
+      if (isAndroid() && window.SinBarrerasNative?.refreshSubscriptionOffer) window.SinBarrerasNative.refreshSubscriptionOffer();
+    },
     subscribe(accountId = '') {
       if (!isAndroid() || !window.SinBarrerasNative?.startSubscriptionPurchase) throw new Error('Google Play Billing no está disponible en este dispositivo.');
       window.SinBarrerasNative.startSubscriptionPurchase(String(accountId || ''));
@@ -51,6 +55,13 @@
         window.dispatchEvent(new CustomEvent('sinbarreras:billing-error', { detail: { message: error.message } }));
       }
     },
+    onOffer(payloadJson) {
+      try {
+        const payload = typeof payloadJson === 'string' ? JSON.parse(payloadJson) : (payloadJson || {});
+        api.offer = payload;
+        window.dispatchEvent(new CustomEvent('sinbarreras:billing-offer', { detail: payload }));
+      } catch {}
+    },
     onBillingError(message) {
       window.dispatchEvent(new CustomEvent('sinbarreras:billing-error', { detail: { message: String(message || 'Google Play Billing no pudo completar la operación.') } }));
     }
@@ -58,5 +69,5 @@
 
   window.SinBarrerasPlay = api;
   if (api.isNativeAndroid) document.documentElement.classList.add('android-app');
-  window.addEventListener('load', () => { if (api.isNativeAndroid) setTimeout(() => api.restorePurchases(), 700); }, { once: true });
+  window.addEventListener('load', () => { if (api.isNativeAndroid) setTimeout(() => { api.refreshOffer(); api.restorePurchases(); }, 700); }, { once: true });
 })();

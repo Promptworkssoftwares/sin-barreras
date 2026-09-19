@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.5.4" />
+    <link rel="stylesheet" href="/styles.css?v=1.6.1" />
   </head>
   <body>
     <main class="app-shell">
@@ -453,6 +453,7 @@
           <div class="practice-actions">
             <button id="listen-practice" class="outline-button" type="button">◖ Escuchar ejemplo</button>
             <button id="record-practice" class="record-button" type="button">● Practicar mi voz</button>
+            <button id="report-practice-content" class="outline-button report-ai-button" type="button">⚑ Reportar</button>
           </div>
 
           <div id="practice-score" class="practice-score is-hidden">
@@ -546,7 +547,7 @@
           <div id="coach-success-criteria" class="coach-success-criteria" aria-label="Metas de esta sesión"></div>
           <div class="coach-toolbar">
             <span class="status-pill light" id="coach-status">LISTO PARA PRACTICAR</span>
-            <div class="coach-toolbar-actions"><span id="coach-current-focus">Escucha y responde naturalmente</span><button id="end-coach" class="text-button" type="button">Finalizar sesión</button></div>
+            <div class="coach-toolbar-actions"><span id="coach-current-focus">Escucha y responde naturalmente</span><button id="report-coach-content" class="text-button" type="button">⚑ Reportar</button><button id="end-coach" class="text-button" type="button">Finalizar sesión</button></div>
           </div>
           <div id="coach-thread" class="coach-thread" aria-live="polite"></div>
           <div id="coach-summary" class="coach-summary is-hidden"></div>
@@ -614,6 +615,7 @@
           <div class="camera-actions">
             <button id="listen-camera-translation" class="outline-button" type="button">◖ Escuchar traducción</button>
             <button id="explain-camera-text" class="primary-button inline" type="button">✦ Explícame esto</button>
+            <button id="report-camera-content" class="outline-button report-ai-button" type="button">⚑ Reportar respuesta</button>
           </div>
           <div id="explanation-box" class="explanation-box is-hidden">
             <span class="section-label">EXPLICADO EN PALABRAS SIMPLES</span>
@@ -802,6 +804,7 @@
             <label>Mi idioma<select id="qr-host-language"><option value="">Selecciona…</option></select></label>
             <label>Idioma de la otra persona<select id="qr-guest-language"><option value="">Selecciona…</option></select></label>
           </div>
+          <label class="qr-terms-consent"><input id="qr-host-terms" type="checkbox"><span>Acepto los <a href="/terms" target="_blank" rel="noopener">Términos</a> y las reglas de conversación. No usaré este portal para amenazas, acoso, odio, contenido sexual abusivo, fraude ni actividades ilegales.</span></label>
           <button id="create-qr-room" class="primary-button" type="button">Crear conversación por QR</button>
         </section>
         <section id="qr-room-active" class="qr-room-active is-hidden">
@@ -812,6 +815,11 @@
           <div id="qr-room-status" class="qr-room-status">Esperando conexión…</div>
           <div id="qr-room-transcript" class="qr-room-transcript"></div>
           <button id="qr-room-talk" class="qr-room-talk" type="button">● Hablar desde este teléfono</button>
+          <div class="qr-moderation-tools" aria-label="Seguridad de conversación">
+            <select id="qr-report-reason" aria-label="Motivo del reporte"><option value="other">Otro</option><option value="harassment">Acoso</option><option value="threats">Amenazas</option><option value="hate">Odio</option><option value="sexual">Contenido sexual abusivo</option><option value="scam">Fraude o estafa</option></select>
+            <button id="qr-report-participant" type="button">⚑ Reportar participante</button>
+            <button id="qr-block-participant" class="danger" type="button">Bloquear participante</button>
+          </div>
           <button id="end-qr-room" class="qr-room-end" type="button">Terminar conversación</button>
         </section>
       </div>
@@ -827,6 +835,9 @@
         <div class="account-actions">
           <button id="manage-subscription" type="button"><span>◫</span><div><strong>Administrar suscripción</strong><small>Pago, tarjeta o cancelación</small></div><b>→</b></button>
           <button id="open-admin" type="button" hidden><span>⌘</span><div><strong>Admin Dashboard</strong><small>Usuarios, accesos y suscripciones</small></div><b>→</b></button>
+          <button id="account-report-ai" type="button"><span>⚑</span><div><strong>Reportar contenido de IA</strong><small>Contenido ofensivo, inseguro o incorrecto</small></div><b>→</b></button>
+          <a class="account-link-action" href="/privacy" target="_blank" rel="noopener"><span>◌</span><div><strong>Privacidad</strong><small>Cómo usamos voz, cámara y datos</small></div><b>→</b></a>
+          <a class="account-link-action" href="/terms" target="_blank" rel="noopener"><span>§</span><div><strong>Términos de uso</strong><small>Condiciones y limitaciones de la IA</small></div><b>→</b></a>
           <button id="account-delete" type="button" class="danger-lite"><span>×</span><div><strong>Eliminar cuenta</strong><small>Borrar permanentemente cuenta y datos</small></div><b>→</b></button>
           <button id="account-logout" type="button" class="danger-lite"><span>↗</span><div><strong>Cerrar sesión</strong><small>Salir de esta cuenta</small></div><b>→</b></button>
         </div>
@@ -843,6 +854,36 @@
           <div id="delete-account-status" class="delete-account-status" role="status"></div>
           <button id="delete-account-confirm" class="primary-button delete-account-confirm" type="submit">ELIMINAR MI CUENTA Y DATOS</button>
         </form>
+      </div>
+    </dialog>
+
+
+    <dialog id="ai-report-dialog" class="account-dialog">
+      <div class="account-dialog-body">
+        <div class="dialog-head"><div><p class="section-label">SEGURIDAD DE IA</p><h2>Reportar contenido</h2></div><form method="dialog"><button class="icon-button" value="close" aria-label="Cerrar reporte">×</button></form></div>
+        <p class="dialog-note">Reporta una respuesta ofensiva, insegura, dañina o incorrecta. No necesitas salir de la app.</p>
+        <form id="ai-report-form" class="delete-account-form">
+          <label>Motivo<select id="ai-report-reason" required><option value="">Selecciona…</option><option value="offensive">Ofensivo o discriminatorio</option><option value="unsafe">Inseguro o dañino</option><option value="incorrect">Incorrecto o engañoso</option><option value="other">Otro</option></select></label>
+          <label>Contenido a reportar<textarea id="ai-report-content" maxlength="4000" rows="4" placeholder="La respuesta de IA aparecerá aquí cuando reportes desde Coach o Cámara."></textarea></label>
+          <label>Detalles <small>Opcional</small><textarea id="ai-report-details" maxlength="1000" rows="3" placeholder="Cuéntanos qué ocurrió."></textarea></label>
+          <div id="ai-report-status" class="delete-account-status" role="status"></div>
+          <button class="primary-button" type="submit">ENVIAR REPORTE</button>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog id="data-use-dialog" class="onboarding-dialog data-use-dialog">
+      <div class="onboarding-content">
+        <span class="onboarding-mark" aria-hidden="true">◌</span>
+        <p class="eyebrow">PRIVACIDAD · ANTES DE USAR VOZ O CÁMARA</p>
+        <h2>Tu voz y tus imágenes se procesan para ayudarte.</h2>
+        <ul class="data-use-list">
+          <li><strong>Micrófono:</strong> cuando grabas, el audio se envía de forma cifrada al servidor y a un proveedor de IA para transcribir, traducir o evaluar pronunciación. Sin Barreras no guarda el audio crudo en tu historial.</li>
+          <li><strong>Cámara:</strong> solo se envía la imagen que tú eliges analizar para leer, traducir o explicar el contenido. La imagen cruda no se guarda en tu cuenta.</li>
+          <li><strong>Texto y progreso:</strong> traducciones, frases, práctica e historial pueden sincronizarse con tu cuenta para que puedas continuar en otros dispositivos.</li>
+        </ul>
+        <p class="dialog-note">Puedes negar permisos y seguir usando funciones que no necesiten micrófono o cámara. <a href="/privacy" target="_blank" rel="noopener">Política de privacidad</a> · <a href="/terms" target="_blank" rel="noopener">Términos</a></p>
+        <button id="data-use-accept" class="primary-button" type="button">ENTIENDO Y CONTINUAR</button>
       </div>
     </dialog>
 
@@ -876,7 +917,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.5.4"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.5.4"></script>
+    <script src="/play-billing.js?v=1.6.1"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.6.1"></script>
   </body>
 </html>

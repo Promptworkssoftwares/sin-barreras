@@ -1,13 +1,13 @@
-import { initLearning } from './learn.js?v=1.5.4';
-import { initSounds } from './sounds.js?v=1.5.4';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.5.4';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.5.4';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.5.4';
-import { initAIStage } from './ai-stage.js?v=1.5.4';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.5.4';
-import { initPhrasebook } from './phrasebook.js?v=1.5.4';
-import { initPhrasePractice } from './phrase-practice.js?v=1.5.4';
-import { initQrConversation } from './qr-conversation.js?v=1.5.4';
+import { initLearning } from './learn.js?v=1.6.1';
+import { initSounds } from './sounds.js?v=1.6.1';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.1';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.1';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.1';
+import { initAIStage } from './ai-stage.js?v=1.6.1';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.1';
+import { initPhrasebook } from './phrasebook.js?v=1.6.1';
+import { initPhrasePractice } from './phrase-practice.js?v=1.6.1';
+import { initQrConversation } from './qr-conversation.js?v=1.6.1';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];

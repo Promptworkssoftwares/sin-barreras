@@ -24,7 +24,7 @@ function messageFromQuery() {
   if (params.get('auth') === 'chatgpt-unavailable') return 'Sign in with ChatGPT todavía no está habilitado. Usa tu cuenta de Sin Barreras o Google.';
   if (params.get('auth') === 'google-not-configured') return 'Google todavía no está configurado. Puedes entrar con tu cuenta de Sin Barreras.';
   if (params.get('auth') === 'failed') return 'No fue posible completar el inicio de sesión.';
-  if (params.get('pay') === 'required') return 'Tu cuenta está lista. Activa el plan de $5.99/mes para entrar.';
+  if (params.get('pay') === 'required') return 'Tu cuenta está lista. Activa el plan para entrar.';
   if (params.get('billing') === 'cancelled') return 'El pago fue cancelado. No se hizo ningún cargo nuevo.';
   if (params.get('billing') === 'pending') return 'Estamos confirmando tu suscripción. Intenta abrir la app nuevamente en unos segundos.';
   if (params.get('session') === 'expired') return 'Tu sesión expiró. Inicia sesión nuevamente.';
@@ -132,6 +132,37 @@ async function submitAccountForm(endpoint, payload, submitButton) {
   }
 }
 
+
+function renderGooglePlayOffer(offer = null) {
+  if (!window.SinBarrerasPlay?.isNativeAndroid) return;
+  const configuredDays = Math.max(0, Number(config?.googlePlayTrialDays || 7));
+  const hasFreeTrial = Boolean(offer?.hasFreeTrial);
+  const days = Number(offer?.freeTrialDays || configuredDays || 7);
+  const displayPrice = String(offer?.formattedPrice || '').trim();
+  const currency = String(config?.currency || 'USD');
+  const fallbackPrice = `${currency} ${Number(config?.price || 5.99).toFixed(2)}`;
+  const priceText = displayPrice || fallbackPrice;
+
+  $('#hero-trial-note')?.classList.toggle('is-hidden', !hasFreeTrial);
+  $('#play-trial-badge')?.classList.toggle('is-hidden', !hasFreeTrial);
+  $('#pricing-renewal-note')?.classList.toggle('is-hidden', !hasFreeTrial);
+  $('#member-trial-note')?.classList.toggle('is-hidden', !hasFreeTrial);
+
+  if ($('#hero-plan-note')) $('#hero-plan-note').textContent = hasFreeTrial
+    ? `${days} días gratis · luego ${priceText}/mes · cancela cuando quieras`
+    : `${priceText}/mes · cancela cuando quieras`;
+  if ($('#hero-trial-note') && hasFreeTrial) $('#hero-trial-note').textContent = `${days} días gratis para nuevos suscriptores elegibles en Google Play.`;
+  if ($('#play-trial-badge') && hasFreeTrial) $('#play-trial-badge').innerHTML = `<strong>${days} DÍAS GRATIS</strong><span>para nuevos suscriptores elegibles en Google Play</span>`;
+  if ($('#pricing-price') && displayPrice) $('#pricing-price').innerHTML = `<strong>${displayPrice}</strong><small>/ mes después de la prueba</small>`;
+  const button = $('#subscribe-button');
+  if (button && !me?.user?.hasAccess) button.innerHTML = hasFreeTrial
+    ? `COMENZAR ${days} DÍAS GRATIS <span>→</span>`
+    : `SUSCRIBIRME POR ${priceText}/MES <span>→</span>`;
+  const pricingButton = $('#pricing-login');
+  if (pricingButton && !me?.user?.hasAccess && hasFreeTrial) pricingButton.innerHTML = `CREAR CUENTA · ${days} DÍAS GRATIS <span>→</span>`;
+  if ($('#pricing-payment-note')) $('#pricing-payment-note').textContent = 'Pago y renovación administrados por Google Play.';
+}
+
 async function subscribe() {
   const button = $('#subscribe-button');
   try {
@@ -147,7 +178,7 @@ async function subscribe() {
   } catch (error) {
     setStatus(error.message, 'error');
     button.disabled = false;
-    button.innerHTML = 'SUSCRIBIRME POR $5.99/MES <span>→</span>';
+    button.innerHTML = `SUSCRIBIRME POR ${config?.currency || 'USD'} ${Number(config?.price || 5.99).toFixed(2)}/MES <span>→</span>`;
   }
 }
 
@@ -157,6 +188,16 @@ async function init() {
     jsonRequest('/api/public/config').catch(() => ({})),
     jsonRequest('/api/auth/me').catch(() => ({ authenticated:false }))
   ]);
+  const price = Number(config?.price || 5.99);
+  const currency = String(config?.currency || 'USD');
+  if ($('#hero-plan-price')) $('#hero-plan-price').textContent = `${currency} ${price.toFixed(2)}`;
+  if ($('#pricing-price')) $('#pricing-price').innerHTML = `<sup>${currency === 'USD' ? '$' : ''}</sup><strong>${price.toFixed(2)}</strong><small>/ mes</small>`;
+  if ($('#subscribe-button')) $('#subscribe-button').innerHTML = `SUSCRIBIRME POR ${currency} ${price.toFixed(2)}/MES <span>→</span>`;
+  if (window.SinBarrerasPlay?.isNativeAndroid) {
+    if ($('#pricing-payment-note')) $('#pricing-payment-note').textContent = 'Pago y renovación administrados por Google Play.';
+    renderGooglePlayOffer(window.SinBarrerasPlay?.offer || null);
+    window.SinBarrerasPlay?.refreshOffer?.();
+  }
   if (me?.user?.hasAccess) {
     ['#hero-login','#pricing-login','#nav-login'].forEach((selector) => {
       const el = $(selector);
@@ -191,7 +232,9 @@ $('#login-form')?.addEventListener('submit', async (event) => {
 $('#register-form')?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const button = event.currentTarget.querySelector('button[type="submit"]');
-  await submitAccountForm('/auth/register', { name: $('#register-name').value, email: $('#register-email').value, password: $('#register-password').value }, button);
+  const accepted = Boolean($('#register-terms')?.checked);
+  if (!accepted) { setStatus('Debes confirmar que tienes 18 años o más y aceptar los Términos y la Política de Privacidad.', 'error'); return; }
+  await submitAccountForm('/auth/register', { name: $('#register-name').value, email: $('#register-email').value, password: $('#register-password').value, termsAccepted: accepted, ageConfirmed: accepted }, button);
 });
 
 $('#forgot-password-link')?.addEventListener('click', () => {
@@ -222,6 +265,7 @@ $('#subscribe-button')?.addEventListener('click', subscribe);
 $('#open-app')?.addEventListener('click', () => window.location.assign(me?.user?.role === 'owner' ? '/admin' : '/app'));
 $('#landing-logout')?.addEventListener('click', async () => { await jsonRequest('/auth/logout',{method:'POST'}).catch(()=>{}); location.assign('/'); });
 window.addEventListener('sinbarreras:billing-success', () => { setStatus('Suscripción de Google Play confirmada. Abriendo Sin Barreras…'); setTimeout(() => location.assign('/app?welcome=1'), 350); });
-window.addEventListener('sinbarreras:billing-error', (event) => { const button=$('#subscribe-button'); if(button){button.disabled=false;button.innerHTML='SUSCRIBIRME POR $5.99/MES <span>→</span>';} setStatus(event.detail?.message || 'No se pudo completar el pago.', 'error'); });
+window.addEventListener('sinbarreras:billing-error', (event) => { const button=$('#subscribe-button'); if(button) button.disabled=false; if(window.SinBarrerasPlay?.isNativeAndroid) renderGooglePlayOffer(window.SinBarrerasPlay?.offer || null); else if(button) button.innerHTML=`SUSCRIBIRME POR ${config?.currency || 'USD'} ${Number(config?.price || 5.99).toFixed(2)}/MES <span>→</span>`; setStatus(event.detail?.message || 'No se pudo completar el pago.', 'error'); });
+window.addEventListener('sinbarreras:billing-offer', (event) => renderGooglePlayOffer(event.detail || null));
 
 init();

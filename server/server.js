@@ -21,7 +21,7 @@ import User from '../models/User.js';
 import { stripe, stripeEnabled, syncCheckoutSession, syncSubscription } from '../services/stripeService.js';
 import { ensureOwnerAccount } from '../services/ownerService.js';
 import { aiUsageContextMiddleware, recordChatUsage, recordFeatureRequest, recordTranscriptionUsage, recordTtsUsage, runWithAiUsage } from '../services/aiUsageService.js';
-import { authorizeConversationRoom, emitRoomEvent, getRoomEvents, markRoomActivity, publicRoom } from '../services/conversationRoomService.js';
+import { authorizeConversationRoom, emitRoomEvent, getRoomEvents, markRoomActivity, participantAcceptedTerms, publicRoom } from '../services/conversationRoomService.js';
 
 import { API_LANGUAGE_NAMES, LANGUAGE_ALIASES } from '../public/languages.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -157,7 +157,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.5.4' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.1' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({
@@ -166,7 +166,9 @@ app.get('/api/public/config', (_request, response) => response.json({
   localLoginEnabled: true,
   googleLoginEnabled: authProviders.googleEnabled,
   chatgptLoginEnabled: authProviders.chatgptEnabled,
-  stripeEnabled: stripeEnabled()
+  stripeEnabled: stripeEnabled(),
+  googlePlayTrialDays: Math.max(0, Number(process.env.GOOGLE_PLAY_FREE_TRIAL_DAYS || 7)),
+  googlePlayTrialOfferTag: String(process.env.GOOGLE_PLAY_TRIAL_OFFER_TAG || 'sb-7-day-trial')
 }));
 
 app.use('/auth', createAuthRouter(authProviders));
@@ -1005,6 +1007,7 @@ app.get('/api/public/conversations/:code/sync', async (request, response, next) 
     const token = request.get('X-SB-Conversation-Token') || request.query.token;
     const room = await authorizeConversationRoom({ code: request.params.code, role, token });
     if (!room) return response.status(404).json({ error: 'Esta conversación expiró o terminó.' });
+    if (!participantAcceptedTerms(room, role)) return response.status(403).json({ error: 'Acepta los Términos y las reglas de conversación antes de participar.', code: 'TERMS_REQUIRED' });
 
     const guestWasConnected = Boolean(room.guestConnectedAt);
     await markRoomActivity(room, { guestConnected: role === 'guest' });
@@ -1026,6 +1029,7 @@ app.post('/api/public/conversations/:code/interpret', qrConversationLimiter, aud
     const role = request.body?.role === 'host' ? 'host' : 'guest';
     const room = await authorizeConversationRoom({ code: request.params.code, role, token: request.body?.token });
     if (!room) return response.status(404).json({ error: 'Esta conversación expiró o el enlace no es válido.' });
+    if (!participantAcceptedTerms(room, role)) return response.status(403).json({ error: 'Acepta los Términos y las reglas de conversación antes de participar.', code: 'TERMS_REQUIRED' });
     const host = await User.findById(room.hostUser);
     if (!host || !host.hasAppAccess()) return response.status(402).json({ error: 'La conversación ya no tiene acceso activo.' });
 

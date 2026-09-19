@@ -12,12 +12,13 @@ android {
         applicationId = 'com.promptworks.sinbarreras'
         minSdk = 26
         targetSdk = 36
-        versionCode = 1504
-        versionName = '1.5.4'
+        versionCode = 1601
+        versionName = '1.6.1'
 
         buildConfigField 'String', 'WEB_APP_URL', '"https://sin-barreras.onrender.com/"'
         buildConfigField 'String', 'WEB_APP_HOST', '"sin-barreras.onrender.com"'
         buildConfigField 'String', 'PLAY_SUBSCRIPTION_PRODUCT_ID', '"sin_barreras_monthly"'
+        buildConfigField 'String', 'PLAY_TRIAL_OFFER_TAG', '"sb-7-day-trial"'
     }
 
     buildFeatures {

@@ -1,6 +1,25 @@
 # Changelog
 
-## 1.5.4 · Frases multilenguaje por partes
+## 1.6.1 · Google Play 7-day free trial + AAB final prep
+
+- Android now selects the eligible 7-day Google Play free-trial offer instead of blindly using the first offer returned.
+- Ineligible users automatically fall back to the normal monthly base plan.
+- Google Play purchase verification detects `offerPhase.freeTrial` and stores `subscriptionStatus=trialing`.
+- Landing/account UI clearly explains trial, renewal, monthly price and cancellation.
+- Admin separates active trials from paid subscriptions and excludes free trials from realized MRR.
+- Added exact Play Console subscription/offer setup guide.
+- Added upload-key helper and AAB readiness checker.
+- Android bumped to versionCode 1601 / versionName 1.6.1.
+
+## 1.6.0
+- Google Play compliance pass: public Privacy/Terms pages, explicit adult/terms consent on local registration, Data Safety and submission docs.
+- Added AI content reporting with Owner review queue.
+- Added QR conversation terms acceptance, participant/message reporting and blocking.
+- Hardened Android manifest for large screens and removed an unnecessary audio-settings permission.
+- Added Google Play reviewer account seeding and release documentation.
+- Versioned all web/PWA/Android assets to 1.6.0.
+
+## 1.6.0 · Frases multilenguaje por partes
 
 - `Mis frases` ahora practica el idioma real guardado; ya no fuerza inglés.
 - Nueva lección guiada que divide cada frase en 1–6 segmentos cortos y termina practicando la frase completa.
@@ -8,7 +27,7 @@
 - La división conserva exactamente el texto de la traducción guardada y valida que no se omitan ni cambien palabras.
 - El progreso por frase guarda cantidad de prácticas, mejor puntuación y última práctica, sincronizado con la cuenta.
 - Las lecciones preparadas se cachean localmente para abrir más rápido al repetirlas.
-- Android actualizado a `1.5.4` (`versionCode 1504`).
+- Android actualizado a `1.6.0` (`versionCode 1504`).
 
 ## 1.5.3 · Cloudflare Remote QR Portal
 

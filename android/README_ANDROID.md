@@ -1,4 +1,4 @@
-# Sin Barreras Android · v1.5.4
+# Sin Barreras Android · v1.6.1
 
 Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Google Play.
 
@@ -6,7 +6,7 @@ Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Goo
 
 - Application ID: `com.promptworks.sinbarreras`
 - Version code: `1431`
-- Version name: `1.5.4`
+- Version name: `1.6.1`
 - Web app: `https://sin-barreras.onrender.com/`
 - `compileSdk = 36`
 - `targetSdk = 36`
@@ -55,3 +55,24 @@ El resultado queda en:
 La compra se inicia con Play Billing desde Android. El cliente nunca decide si una compra es válida. El purchase token se envía al backend y se verifica con Google Play Developer API antes de otorgar acceso. Después de una verificación correcta, Android reconoce (`acknowledge`) la compra.
 
 Las suscripciones web continúan usando Stripe. La app Android usa Google Play Billing para el plan digital.
+
+## Google Play · oferta de 7 días gratis
+
+La app Android está preparada para `sin_barreras_monthly` con un plan base mensual y una oferta de prueba gratis. Google Play decide la elegibilidad; la app nunca concede la prueba por su cuenta.
+
+Configura en Play Console:
+
+- Subscription product ID: `sin_barreras_monthly`
+- Base plan ID recomendado: `monthly`
+- Tipo: auto-renewing
+- Periodo: 1 mes
+- Precio EE. UU.: USD 5.99
+- Offer ID recomendado: `trial-7-days`
+- Eligibility: New customer acquisition → nunca tuvo una suscripción de esta app
+- Pricing phase: Free trial → 7 days
+- Offer tag recomendado: `sb-7-day-trial`
+- Regiones: las mismas donde esté disponible el base plan
+
+Android consulta en tiempo real las ofertas elegibles que devuelve Google Play. Si existe una prueba gratis de 7 días para esa cuenta, la prioriza; si Google determina que el usuario no es elegible, se muestra y compra el plan mensual normal.
+
+Durante la prueba el backend confirma `lineItems.offerPhase.freeTrial` con `purchases.subscriptionsv2.get` y guarda el estado como `trialing`. El acceso termina o continúa según el estado y `expiryTime` devueltos por Google.

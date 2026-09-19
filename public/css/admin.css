@@ -61,3 +61,7 @@
   letter-spacing: .08em;
 }
 .usage-stats{margin-bottom:13px}.usage-stats strong{font-size:27px}@media(min-width:1201px){.stats-grid{grid-template-columns:repeat(3,1fr)}}
+
+.report-content{max-width:420px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4}
+
+.badge.trial{border-color:rgba(111,221,193,.4);background:rgba(111,221,193,.1);color:#9cebd8}

@@ -2,6 +2,9 @@
 setlocal
 cd /d "%~dp0"
 
+call check-aab-ready.bat
+if errorlevel 1 exit /b %errorlevel%
+
 if not exist "keystore.properties" (
   echo.
   echo ERROR: Falta android\keystore.properties.

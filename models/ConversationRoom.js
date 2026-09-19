@@ -9,7 +9,10 @@ const conversationRoomSchema = new mongoose.Schema({
   voice: { type: String, default: 'coral', trim: true, maxlength: 40 },
   hostTokenHash: { type: String, required: true, select: false },
   guestTokenHash: { type: String, required: true, select: false },
-  status: { type: String, enum: ['active', 'closed'], default: 'active', index: true },
+  status: { type: String, enum: ['active', 'closed', 'blocked'], default: 'active', index: true },
+  hostTermsAcceptedAt: { type: Date, default: null },
+  guestTermsAcceptedAt: { type: Date, default: null },
+  blockedBy: { type: String, enum: ['host','guest',null], default: null },
   guestConnectedAt: { type: Date, default: null },
   lastActivityAt: { type: Date, default: Date.now },
   expiresAt: { type: Date, required: true }

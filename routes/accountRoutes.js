@@ -6,6 +6,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { publicUser } from '../services/accessService.js';
 import { refreshGooglePlayEntitlement } from '../services/googlePlayService.js';
 import { deleteUserAccount } from '../services/accountService.js';
+import AiContentReport from '../models/AiContentReport.js';
 
 const router = express.Router();
 const MAX_STATE_BYTES = 750_000;
@@ -111,6 +112,19 @@ router.put('/account/state', requireAuth, async (request, response, next) => {
   }
 });
 
+
+
+router.post('/reports/ai', requireAuth, async (request, response, next) => {
+  try {
+    const area = ['practice','coach','camera','explain','account','other'].includes(String(request.body?.area || '')) ? String(request.body.area) : 'other';
+    const reason = ['offensive','unsafe','incorrect','other'].includes(String(request.body?.reason || '')) ? String(request.body.reason) : 'other';
+    const content = String(request.body?.content || '').trim().slice(0, 4000);
+    const details = String(request.body?.details || '').trim().slice(0, 1000);
+    if (!content && !details) return response.status(400).json({ error: 'Describe o incluye el contenido que deseas reportar.' });
+    await AiContentReport.create({ user: request.user._id, area, reason, content, details });
+    response.status(201).json({ ok: true, message: 'Reporte enviado. Gracias por ayudarnos a mantener Sin Barreras seguro.' });
+  } catch (error) { next(error); }
+});
 
 router.delete('/account', requireAuth, async (request, response, next) => {
   try {

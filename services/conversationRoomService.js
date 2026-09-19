@@ -35,6 +35,7 @@ export async function createConversationRoom({ hostUser, hostLanguage, guestLang
     hostTokenHash: hashToken(hostToken),
     guestTokenHash: hashToken(guestToken),
     expiresAt,
+    hostTermsAcceptedAt: new Date(),
     lastActivityAt: new Date()
   });
   const joinUrl = `${String(baseUrl).replace(/\/$/, '')}/join/${code}#token=${encodeURIComponent(guestToken)}`;
@@ -97,6 +98,28 @@ export function getRoomEvents(code, after = 0) {
   return { cursor, events };
 }
 
+
+export function participantAcceptedTerms(room, role) {
+  if (!room) return false;
+  return role === 'host' ? Boolean(room.hostTermsAcceptedAt) : Boolean(room.guestTermsAcceptedAt);
+}
+
+export async function acceptConversationTerms(room, role) {
+  if (!room || !['host','guest'].includes(role)) return null;
+  const field = role === 'host' ? 'hostTermsAcceptedAt' : 'guestTermsAcceptedAt';
+  const acceptedAt = new Date();
+  await ConversationRoom.updateOne({ _id: room._id, status: 'active' }, { $set: { [field]: acceptedAt, lastActivityAt: acceptedAt } });
+  room[field] = acceptedAt;
+  return room;
+}
+
+export async function blockConversationRoom(room, role) {
+  if (!room || !['host','guest'].includes(role)) return;
+  await ConversationRoom.updateOne({ _id: room._id }, { $set: { status: 'blocked', blockedBy: role, lastActivityAt: new Date() } });
+  emitRoomEvent(room.code, 'room-blocked', { code: room.code, blockedBy: role });
+  emitRoomEvent(room.code, 'room-closed', { code: room.code, reason: 'blocked' });
+}
+
 export async function closeConversationRoom(room) {
   if (!room) return;
   await ConversationRoom.updateOne({ _id: room._id }, { $set: { status: 'closed', lastActivityAt: new Date() } });
@@ -113,6 +136,8 @@ export function publicRoom(room) {
     situation: room.situation,
     status: room.status,
     guestConnected: Boolean(room.guestConnectedAt),
+    hostTermsAccepted: Boolean(room.hostTermsAcceptedAt),
+    guestTermsAccepted: Boolean(room.guestTermsAcceptedAt),
     expiresAt: room.expiresAt
   };
 }

@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0f1d20">
-  <meta name="description" content="Sin Barreras: traducción en tiempo real, aprendizaje práctico, AI Coach y cámara por $5.99 al mes.">
+  <meta name="description" content="Sin Barreras: traducción de voz, práctica multilenguaje, AI Coach, cámara y frases para situaciones reales.">
   <title>Sin Barreras · Comunícate sin límites</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/css/landing.css?v=1.5.4">
+  <link rel="stylesheet" href="/css/landing.css?v=1.6.1">
 </head>
 <body>
   <header class="landing-nav">
@@ -29,7 +29,7 @@
         <p>Traduce conversaciones en tiempo real, aprende inglés para situaciones reales, practica con IA y entiende documentos desde la cámara.</p>
         <div id="hero-actions" class="hero-actions">
           <button id="hero-login" class="cta-primary" type="button">COMENZAR AHORA <span>→</span></button>
-          <span class="price-note"><strong>$5.99</strong><small>USD / mes · cancela cuando quieras</small></span>
+          <span class="price-note"><strong id="hero-plan-price">$5.99</strong><small id="hero-plan-note">USD / mes · cancela cuando quieras</small><small id="hero-trial-note" class="trial-inline is-hidden">7 días gratis para nuevos suscriptores elegibles en Google Play.</small></span>
         </div>
         <div class="trust-row"><span>✓ Cuenta personal</span><span>✓ Progreso privado</span><span>✓ Acceso completo</span></div>
       </div>
@@ -58,15 +58,17 @@
       <div class="pricing-copy"><span>UN SOLO PLAN</span><h2>Todo Sin Barreras.<br>Sin funciones escondidas.</h2><p>Una cuenta individual con traducción, aprendizaje, práctica, coach y cámara.</p></div>
       <article class="price-card">
         <div class="price-card-head"><span>PLAN SIN BARRERAS</span><b>POPULAR</b></div>
-        <div class="big-price"><sup>$</sup><strong>5.99</strong><small>/ mes</small></div>
+        <div id="play-trial-badge" class="trial-badge is-hidden"><strong>7 DÍAS GRATIS</strong><span>para nuevos suscriptores elegibles en Google Play</span></div>
+        <div class="big-price" id="pricing-price"><sup>$</sup><strong>5.99</strong><small>/ mes</small></div>
         <ul><li>Traducción de voz en dos direcciones</li><li>Learning Lab completo</li><li>AI Conversation Coach</li><li>Práctica y pronunciación</li><li>Traducción con cámara</li><li>Progreso sincronizado por cuenta</li></ul>
         <button id="pricing-login" type="button">CREAR MI CUENTA <span>→</span></button>
-        <p>Pago seguro procesado por Stripe.</p>
+        <p id="pricing-renewal-note" class="renewal-note is-hidden">Después de la prueba, se renueva automáticamente al precio mensual mostrado. Puedes cancelar en Google Play antes de que termine la prueba para evitar el cargo.</p>
+        <p id="pricing-payment-note">Pago seguro procesado por Stripe.</p>
       </article>
     </section>
   </main>
 
-  <footer class="landing-footer"><img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><div class="landing-footer-copy"><span>Comunícate hoy. Aprende para mañana.</span><small>(c) by Jorge Ramos &amp; Prompt Works</small></div></footer>
+  <footer class="landing-footer"><img src="/assets/sin-barreras-logo-full.png" alt="Sin Barreras"><div class="landing-footer-copy"><span>Comunícate hoy. Aprende para mañana.</span><small>(c) by Jorge Ramos &amp; Prompt Works</small><nav class="footer-legal" aria-label="Legal"><a href="/privacy">Privacidad</a><a href="/terms">Términos</a><a href="/account-deletion">Eliminar cuenta</a></nav></div></footer>
 
   <dialog id="auth-dialog" class="auth-dialog">
     <div class="auth-shell">
@@ -95,6 +97,7 @@
           <label>Email<input id="register-email" name="email" type="email" autocomplete="email" required></label>
           <label>Contraseña<input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required></label>
           <small class="password-note">Mínimo 10 caracteres.</small>
+          <label class="legal-consent"><input id="register-terms" name="termsAccepted" type="checkbox" required><span>Confirmo que tengo 18 años o más y acepto los <a href="/terms" target="_blank" rel="noopener">Términos</a> y la <a href="/privacy" target="_blank" rel="noopener">Política de Privacidad</a>.</span></label>
           <button class="cta-primary" type="submit">CREAR MI CUENTA <span>→</span></button>
         </form>
 
@@ -117,13 +120,14 @@
         <div class="member-card"><span id="member-avatar">SB</span><div><strong id="member-name">Usuario</strong><small id="member-email"></small></div></div>
         <button id="open-app" class="cta-primary is-hidden" type="button">ABRIR SIN BARRERAS <span>→</span></button>
         <button id="subscribe-button" class="cta-primary is-hidden" type="button">SUSCRIBIRME POR $5.99/MES <span>→</span></button>
+        <small id="member-trial-note" class="member-trial-note is-hidden">7 días gratis si Google Play confirma que eres elegible. Luego se cobra el plan mensual y se renueva automáticamente hasta que canceles.</small>
         <button id="landing-logout" class="text-action" type="button">Cerrar sesión</button>
       </div>
-      <p class="auth-legal"><a href="/account-deletion">Eliminar cuenta y datos</a> · El acceso requiere una suscripción activa de $5.99/mes o un acceso gratuito otorgado por el owner. La cuenta owner tiene acceso total sin suscripción.</p>
+      <p class="auth-legal"><span class="auth-age-note">Al continuar confirmas que tienes 18 años o más y aceptas nuestros Términos y Privacidad.</span><br><a href="/privacy">Privacidad</a> · <a href="/terms">Términos</a> · <a href="/account-deletion">Eliminar cuenta y datos</a><br><span id="auth-access-copy">El acceso requiere una suscripción activa o un acceso gratuito otorgado por el owner. La cuenta owner tiene acceso total sin suscripción.</span></p>
     </div>
   </dialog>
 
-  <script src="/play-billing.js?v=1.5.4"></script>
-  <script type="module" src="/js/landing.js?v=1.5.4"></script>
+  <script src="/play-billing.js?v=1.6.1"></script>
+  <script type="module" src="/js/landing.js?v=1.6.1"></script>
 </body>
 </html>

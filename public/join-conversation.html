@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#132427" />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <title>Conversación · Sin Barreras</title>
-  <link rel="stylesheet" href="/css/room.css?v=1.5.4" />
+  <link rel="stylesheet" href="/css/room.css?v=1.6.1" />
 </head>
 <body>
   <main class="room-shell">
@@ -15,15 +15,27 @@
       <span id="room-code">CONVERSACIÓN</span>
     </header>
     <section id="room-loading" class="room-card"><div class="room-pulse"></div><h1>Conectando…</h1><p>Validando el enlace seguro.</p></section>
+    <section id="room-consent" class="room-card room-consent is-hidden">
+      <span class="room-kicker">ANTES DE ENTRAR</span>
+      <h1>Conversación segura</h1>
+      <p>Esta es una conversación 1 a 1. Antes de participar, acepta las reglas. Puedes reportar un mensaje y bloquear a la otra persona en cualquier momento.</p>
+      <label class="room-consent-check"><input id="room-terms" type="checkbox"><span>Tengo 18 años o más y acepto los <a href="/terms" target="_blank" rel="noopener">Términos</a>. No enviaré amenazas, acoso, odio, contenido sexual abusivo, fraude ni contenido ilegal.</span></label>
+      <button id="room-accept" class="room-accept" type="button">Aceptar y entrar</button>
+    </section>
     <section id="room-app" class="is-hidden">
       <div class="room-language-line"><span id="room-my-language">MI IDIOMA</span><b>↔</b><span id="room-other-language">OTRO IDIOMA</span></div>
       <div id="room-status" class="room-status">Conectado</div>
       <div id="room-transcript" class="room-transcript" aria-live="polite"></div>
       <button id="room-talk" class="room-talk" type="button"><span>●</span><strong>Hablar</strong><small>Toca una vez y habla normalmente</small></button>
-      <p class="room-privacy">Tu audio se procesa para traducir este turno y no se guarda en esta página.</p>
+      <div class="room-moderation" aria-label="Seguridad de conversación">
+        <select id="room-report-reason" aria-label="Motivo del reporte"><option value="other">Otro</option><option value="harassment">Acoso</option><option value="threats">Amenazas</option><option value="hate">Odio</option><option value="sexual">Contenido sexual abusivo</option><option value="scam">Fraude o estafa</option></select>
+        <button id="room-report-user" type="button">⚑ Reportar participante</button>
+        <button id="room-block-user" class="danger" type="button">Bloquear y salir</button>
+      </div>
+      <p class="room-privacy">Tu audio se procesa para traducir este turno y no se guarda en esta página. Puedes reportar mensajes o bloquear a la otra persona.</p>
     </section>
     <section id="room-error" class="room-card is-hidden"><h1>Enlace no disponible</h1><p id="room-error-copy">Esta conversación terminó o el enlace expiró.</p></section>
   </main>
-  <script type="module" src="/js/join-conversation.js?v=1.5.4"></script>
+  <script type="module" src="/js/join-conversation.js?v=1.6.1"></script>
 </body>
 </html>

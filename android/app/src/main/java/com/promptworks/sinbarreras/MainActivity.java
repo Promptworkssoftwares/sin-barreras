@@ -50,6 +50,7 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
     private static final int WEB_PERMISSION_REQUEST = 1201;
     private static final int FILE_CHOOSER_REQUEST = 1202;
     private static final String PRODUCT_ID = BuildConfig.PLAY_SUBSCRIPTION_PRODUCT_ID;
+    private static final String TRIAL_OFFER_TAG = BuildConfig.PLAY_TRIAL_OFFER_TAG;
     private static final String TRUSTED_HOST = BuildConfig.WEB_APP_HOST;
 
     private WebView webView;
@@ -298,6 +299,34 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
     }
 
     private void querySubscriptionAndLaunch(String accountId) {
+        querySubscriptionDetails((details, selectedOffer) -> {
+            BillingFlowParams.ProductDetailsParams productParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(details)
+                    .setOfferToken(selectedOffer.getOfferToken())
+                    .build();
+            BillingFlowParams.Builder flowBuilder = BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(Collections.singletonList(productParams));
+
+            String obfuscatedAccountId = sha256(accountId);
+            if (!obfuscatedAccountId.isEmpty()) flowBuilder.setObfuscatedAccountId(obfuscatedAccountId);
+
+            notifyWebOffer(details, selectedOffer);
+            BillingResult launchResult = billingClient.launchBillingFlow(MainActivity.this, flowBuilder.build());
+            if (launchResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                notifyWebError("Google Play no pudo abrir el pago: " + launchResult.getDebugMessage());
+            }
+        });
+    }
+
+    private void refreshSubscriptionOffer() {
+        runOnUiThread(() -> connectBilling(() -> querySubscriptionDetails(this::notifyWebOffer)));
+    }
+
+    private interface SubscriptionOfferCallback {
+        void onReady(ProductDetails details, ProductDetails.SubscriptionOfferDetails selectedOffer);
+    }
+
+    private void querySubscriptionDetails(SubscriptionOfferCallback callback) {
         QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
@@ -326,22 +355,72 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
                     return;
                 }
 
-                BillingFlowParams.ProductDetailsParams productParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(details)
-                        .setOfferToken(offers.get(0).getOfferToken())
-                        .build();
-                BillingFlowParams.Builder flowBuilder = BillingFlowParams.newBuilder()
-                        .setProductDetailsParamsList(Collections.singletonList(productParams));
-
-                String obfuscatedAccountId = sha256(accountId);
-                if (!obfuscatedAccountId.isEmpty()) flowBuilder.setObfuscatedAccountId(obfuscatedAccountId);
-
-                BillingResult launchResult = billingClient.launchBillingFlow(MainActivity.this, flowBuilder.build());
-                if (launchResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-                    notifyWebError("Google Play no pudo abrir el pago: " + launchResult.getDebugMessage());
+                ProductDetails.SubscriptionOfferDetails selectedOffer = selectPreferredOffer(offers);
+                if (selectedOffer == null) {
+                    notifyWebError("Google Play no devolvió un plan elegible para esta cuenta.");
+                    return;
                 }
+                callback.onReady(details, selectedOffer);
             }
         });
+    }
+
+    private ProductDetails.SubscriptionOfferDetails selectPreferredOffer(List<ProductDetails.SubscriptionOfferDetails> offers) {
+        ProductDetails.SubscriptionOfferDetails anySevenDayTrial = null;
+        ProductDetails.SubscriptionOfferDetails regularBasePlan = null;
+
+        for (ProductDetails.SubscriptionOfferDetails offer : offers) {
+            if (offer == null) continue;
+            boolean sevenDayTrial = hasSevenDayFreeTrial(offer);
+            List<String> tags = offer.getOfferTags();
+            boolean preferredTag = tags != null && tags.contains(TRIAL_OFFER_TAG);
+            if (sevenDayTrial && preferredTag) return offer;
+            if (sevenDayTrial && anySevenDayTrial == null) anySevenDayTrial = offer;
+            if (offer.getOfferId() == null && regularBasePlan == null) regularBasePlan = offer;
+        }
+
+        if (anySevenDayTrial != null) return anySevenDayTrial;
+        if (regularBasePlan != null) return regularBasePlan;
+        return offers.get(0);
+    }
+
+    private boolean hasSevenDayFreeTrial(ProductDetails.SubscriptionOfferDetails offer) {
+        if (offer == null || offer.getPricingPhases() == null) return false;
+        List<ProductDetails.PricingPhase> phases = offer.getPricingPhases().getPricingPhaseList();
+        if (phases == null) return false;
+        for (ProductDetails.PricingPhase phase : phases) {
+            if (phase != null
+                    && phase.getPriceAmountMicros() == 0L
+                    && "P7D".equalsIgnoreCase(phase.getBillingPeriod())) return true;
+        }
+        return false;
+    }
+
+    private String paidFormattedPrice(ProductDetails.SubscriptionOfferDetails offer) {
+        if (offer == null || offer.getPricingPhases() == null) return "";
+        List<ProductDetails.PricingPhase> phases = offer.getPricingPhases().getPricingPhaseList();
+        if (phases == null) return "";
+        for (int index = phases.size() - 1; index >= 0; index--) {
+            ProductDetails.PricingPhase phase = phases.get(index);
+            if (phase != null && phase.getPriceAmountMicros() > 0L) return phase.getFormattedPrice();
+        }
+        return "";
+    }
+
+    private void notifyWebOffer(ProductDetails details, ProductDetails.SubscriptionOfferDetails offer) {
+        if (webView == null || details == null || offer == null) return;
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("productId", details.getProductId());
+            payload.put("basePlanId", offer.getBasePlanId());
+            payload.put("offerId", offer.getOfferId() == null ? "" : offer.getOfferId());
+            payload.put("hasFreeTrial", hasSevenDayFreeTrial(offer));
+            payload.put("freeTrialDays", hasSevenDayFreeTrial(offer) ? 7 : 0);
+            payload.put("formattedPrice", paidFormattedPrice(offer));
+            payload.put("preferredTrialTag", TRIAL_OFFER_TAG);
+            String script = "window.SinBarrerasPlay&&window.SinBarrerasPlay.onOffer(" + JSONObject.quote(payload.toString()) + ");";
+            runOnUiThread(() -> webView.evaluateJavascript(script, null));
+        } catch (Exception ignored) {}
     }
 
     private void restorePurchases() {
@@ -447,6 +526,11 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
         @JavascriptInterface
         public void startSubscriptionPurchase(String accountId) {
             MainActivity.this.startSubscriptionPurchase(accountId);
+        }
+
+        @JavascriptInterface
+        public void refreshSubscriptionOffer() {
+            MainActivity.this.refreshSubscriptionOffer();
         }
 
         @JavascriptInterface

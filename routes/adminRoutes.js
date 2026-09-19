@@ -7,6 +7,8 @@ import { calculateStripeMrr, scheduleUserSubscriptionCancellation } from '../ser
 import { cancelGooglePlaySubscription } from '../services/googlePlayService.js';
 import { deleteUserAccount } from '../services/accountService.js';
 import { getAiUsageSummary, getCurrentMonthAiCostUsd } from '../services/aiUsageService.js';
+import AiContentReport from '../models/AiContentReport.js';
+import ConversationReport from '../models/ConversationReport.js';
 
 const router = express.Router();
 router.use(requireOwner);
@@ -46,8 +48,10 @@ router.get('/stats', async (_request, response, next) => {
       getCurrentMonthAiCostUsd()
     ]);
 
-    const stripeUsers = paidUsers.filter((user) => user.billingProvider === 'stripe');
-    const googleUsers = paidUsers.filter((user) => user.billingProvider === 'google_play');
+    const trialUsers = paidUsers.filter((user) => user.subscriptionStatus === 'trialing');
+    const billedUsers = paidUsers.filter((user) => user.subscriptionStatus === 'active');
+    const stripeUsers = billedUsers.filter((user) => user.billingProvider === 'stripe');
+    const googleUsers = billedUsers.filter((user) => user.billingProvider === 'google_play');
     const stripeMrr = await calculateStripeMrr(stripeUsers);
     const googleCurrency = String(process.env.GOOGLE_PLAY_CURRENCY || process.env.STRIPE_CURRENCY || 'usd').toUpperCase();
     const configuredGoogleCents = Math.max(0, Number(process.env.GOOGLE_PLAY_MONTHLY_AMOUNT || process.env.STRIPE_MONTHLY_AMOUNT || 599));
@@ -64,7 +68,8 @@ router.get('/stats', async (_request, response, next) => {
     const grossMrrUsd = comparableCurrency ? stripeMrr.amountUsd + googlePlayMrrUsd : stripeMrr.amountUsd;
     response.json({
       totalUsers,
-      activePaid: paidUsers.length,
+      activePaid: billedUsers.length,
+      activeTrials: trialUsers.length,
       freeUsers,
       revoked,
       grants,
@@ -77,7 +82,7 @@ router.get('/stats', async (_request, response, next) => {
         stripeExactUsers: stripeMrr.exactUsers,
         stripeMissingUsers: stripeMrr.missingUsers,
         googlePlayEstimatedUsers,
-        basis: 'Stripe usa el precio recurrente sincronizado. Google Play usa el precio mensual configurado cuando la compra no expone un precio regional.'
+        basis: 'MRR excluye pruebas gratis. Stripe usa el precio recurrente sincronizado. Google Play usa el precio mensual configurado cuando la compra no expone un precio regional.'
       },
       aiCostMonthUsd,
       estimatedGrossMarginUsd: grossMrrUsd - aiCostMonthUsd
@@ -90,6 +95,45 @@ router.get('/usage', async (request, response, next) => {
   try {
     const days = Math.max(1, Math.min(365, Number(request.query.days || 30)));
     response.json(await getAiUsageSummary({ days }));
+  } catch (error) { next(error); }
+});
+
+
+router.get('/reports/ai', async (request, response, next) => {
+  try {
+    const status = ['open','reviewed','dismissed','all'].includes(String(request.query.status || '')) ? String(request.query.status) : 'open';
+    const filter = status === 'all' ? {} : { status };
+    const items = await AiContentReport.find(filter).sort({ createdAt: -1 }).limit(200).populate('user', 'email name').lean();
+    response.json({ items });
+  } catch (error) { next(error); }
+});
+
+router.patch('/reports/ai/:id', async (request, response, next) => {
+  try {
+    const status = ['reviewed','dismissed'].includes(String(request.body?.status || '')) ? String(request.body.status) : null;
+    if (!status) return response.status(400).json({ error: 'Estado inválido.' });
+    const item = await AiContentReport.findByIdAndUpdate(request.params.id, { $set: { status, reviewedAt: new Date(), reviewedBy: request.user._id } }, { new: true });
+    if (!item) return response.status(404).json({ error: 'Reporte no encontrado.' });
+    response.json({ ok: true, item });
+  } catch (error) { next(error); }
+});
+
+router.get('/reports/conversations', async (request, response, next) => {
+  try {
+    const status = ['open','reviewed','dismissed','all'].includes(String(request.query.status || '')) ? String(request.query.status) : 'open';
+    const filter = status === 'all' ? {} : { status };
+    const items = await ConversationReport.find(filter).sort({ createdAt: -1 }).limit(200).populate('hostUser', 'email name').lean();
+    response.json({ items });
+  } catch (error) { next(error); }
+});
+
+router.patch('/reports/conversations/:id', async (request, response, next) => {
+  try {
+    const status = ['reviewed','dismissed'].includes(String(request.body?.status || '')) ? String(request.body.status) : null;
+    if (!status) return response.status(400).json({ error: 'Estado inválido.' });
+    const item = await ConversationReport.findByIdAndUpdate(request.params.id, { $set: { status, reviewedAt: new Date(), reviewedBy: request.user._id } }, { new: true });
+    if (!item) return response.status(404).json({ error: 'Reporte no encontrado.' });
+    response.json({ ok: true, item });
   } catch (error) { next(error); }
 });
 

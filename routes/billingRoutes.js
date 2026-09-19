@@ -26,7 +26,10 @@ router.post('/google/verify', requireAuth, async (request, response, next) => {
       subscriptionStatus: request.user.subscriptionStatus,
       currentPeriodEnd: request.user.currentPeriodEnd,
       cancelAtPeriodEnd: request.user.cancelAtPeriodEnd,
-      acknowledgementState: verification.acknowledgementState
+      acknowledgementState: verification.acknowledgementState,
+      isFreeTrial: Boolean(verification.isFreeTrial),
+      offerId: verification.offerId || '',
+      basePlanId: verification.basePlanId || ''
     });
   } catch (error) { next(error); }
 });

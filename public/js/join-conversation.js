@@ -1,16 +1,22 @@
-import { createAutoVoiceTurn } from '../voice-turn.js?v=1.5.4';
-import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.5.4';
-import { LANGUAGES } from '../languages.js?v=1.5.4';
+import { createAutoVoiceTurn } from '../voice-turn.js?v=1.6.1';
+import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.6.1';
+import { LANGUAGES } from '../languages.js?v=1.6.1';
 
 const code = location.pathname.split('/').filter(Boolean).pop()?.toUpperCase() || '';
 const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('token') || new URLSearchParams(location.search).get('token') || '';
 const loading = document.querySelector('#room-loading');
+const consent = document.querySelector('#room-consent');
 const app = document.querySelector('#room-app');
 const errorBox = document.querySelector('#room-error');
 const errorCopy = document.querySelector('#room-error-copy');
 const talk = document.querySelector('#room-talk');
 const status = document.querySelector('#room-status');
 const transcript = document.querySelector('#room-transcript');
+const terms = document.querySelector('#room-terms');
+const accept = document.querySelector('#room-accept');
+const reportReason = document.querySelector('#room-report-reason');
+const reportUser = document.querySelector('#room-report-user');
+const blockUser = document.querySelector('#room-block-user');
 let room = null;
 let syncTimer = null;
 let syncBusy = false;
@@ -21,15 +27,30 @@ let busy = false;
 async function request(url, options = {}) {
   const response = await fetch(url, options);
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || 'No fue posible completar la solicitud.');
+  if (!response.ok) {
+    const error = new Error(payload.error || 'No fue posible completar la solicitud.');
+    error.code = payload.code || '';
+    throw error;
+  }
   return payload;
 }
 
 function showError(message) {
   loading?.classList.add('is-hidden');
+  consent?.classList.add('is-hidden');
   app?.classList.add('is-hidden');
   errorBox?.classList.remove('is-hidden');
   if (errorCopy) errorCopy.textContent = message;
+}
+
+async function reportContent(content = '') {
+  if (!room) return;
+  await request(`/api/public/conversations/${encodeURIComponent(code)}/report`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-SB-Conversation-Token': token },
+    body: JSON.stringify({ role: 'guest', reason: reportReason?.value || 'other', content })
+  });
+  if (status) status.textContent = 'Reporte enviado. Gracias.';
 }
 
 function addTurn(turn) {
@@ -44,6 +65,14 @@ function addTurn(turn) {
   const translated = document.createElement('strong');
   translated.textContent = turn.translatedText;
   item.append(label, original, translated);
+  if (!mine) {
+    const report = document.createElement('button');
+    report.type = 'button';
+    report.className = 'room-report-message';
+    report.textContent = '⚑ Reportar mensaje';
+    report.addEventListener('click', () => reportContent(`${turn.originalText}\n${turn.translatedText}`).catch((error) => { if (status) status.textContent = error.message; }));
+    item.append(report);
+  }
   transcript.appendChild(item);
   transcript.scrollTop = transcript.scrollHeight;
   if (turn.targetLanguage === room?.guestLanguage && turn.audioBase64) {
@@ -58,7 +87,7 @@ function stopSync() {
 }
 
 async function syncRoom() {
-  if (!room || syncBusy || talk.disabled && status?.dataset?.state === 'closed') return;
+  if (!room || syncBusy || (talk?.disabled && status?.dataset?.state === 'closed')) return;
   syncBusy = true;
   try {
     const payload = await request(`/api/public/conversations/${encodeURIComponent(code)}/sync?role=guest&after=${cursor}`, { headers: { 'X-SB-Conversation-Token': token } });
@@ -67,20 +96,20 @@ async function syncRoom() {
     status.dataset.state = 'connected';
     for (const item of payload.events || []) {
       if (item.event === 'turn') addTurn(item.payload);
-      if (item.event === 'room-closed') {
-        status.textContent = 'La conversación terminó';
+      if (item.event === 'room-closed' || item.event === 'room-blocked') {
+        status.textContent = item.event === 'room-blocked' ? 'La conversación fue bloqueada' : 'La conversación terminó';
         status.dataset.state = 'closed';
         talk.disabled = true;
         stopSync();
       }
     }
   } catch (error) {
-    if (/expiró|terminó|no es válido/i.test(String(error?.message || ''))) {
+    if (/expiró|terminó|no es válido|bloquead/i.test(String(error?.message || ''))) {
       status.textContent = 'La conversación terminó o expiró';
       status.dataset.state = 'closed';
       talk.disabled = true;
       stopSync();
-    } else {
+    } else if (error.code !== 'TERMS_REQUIRED') {
       status.textContent = 'Reconectando portal público…';
       status.dataset.state = 'waiting';
     }
@@ -121,6 +150,25 @@ async function recordTurn() {
   }
 }
 
+async function acceptTerms() {
+  if (!terms?.checked) {
+    if (status) status.textContent = 'Debes aceptar los términos para participar.';
+    return;
+  }
+  accept.disabled = true;
+  try {
+    await request(`/api/public/conversations/${encodeURIComponent(code)}/accept`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-SB-Conversation-Token': token },
+      body: JSON.stringify({ role: 'guest' })
+    });
+    consent.classList.add('is-hidden');
+    app.classList.remove('is-hidden');
+    talk.addEventListener('click', recordTurn);
+    connectEvents();
+  } catch (error) { showError(error.message); }
+  finally { accept.disabled = false; }
+}
+
 try {
   if (!code || !token) throw new Error('El enlace está incompleto. Pide un QR nuevo.');
   room = await request(`/api/public/conversations/${encodeURIComponent(code)}?role=guest`, { headers: { 'X-SB-Conversation-Token': token } });
@@ -128,7 +176,26 @@ try {
   document.querySelector('#room-my-language').textContent = LANGUAGES[room.guestLanguage] || room.guestLanguage;
   document.querySelector('#room-other-language').textContent = LANGUAGES[room.hostLanguage] || room.hostLanguage;
   loading.classList.add('is-hidden');
-  app.classList.remove('is-hidden');
-  talk.addEventListener('click', recordTurn);
-  connectEvents();
+  if (room.guestTermsAccepted) {
+    app.classList.remove('is-hidden');
+    talk.addEventListener('click', recordTurn);
+    connectEvents();
+  } else {
+    consent.classList.remove('is-hidden');
+  }
+  accept?.addEventListener('click', acceptTerms);
+  reportUser?.addEventListener('click', () => reportContent('').catch((error) => { if (status) status.textContent = error.message; }));
+  blockUser?.addEventListener('click', async () => {
+    if (!confirm('¿Bloquear a la otra persona y terminar esta conversación?')) return;
+    try {
+      await request(`/api/public/conversations/${encodeURIComponent(code)}/block`, {
+        method:'POST', headers:{'Content-Type':'application/json','X-SB-Conversation-Token':token},
+        body:JSON.stringify({ role:'guest', reason:reportReason?.value || 'other' })
+      });
+      status.textContent = 'Participante bloqueado. Conversación terminada.';
+      status.dataset.state = 'closed';
+      talk.disabled = true;
+      stopSync();
+    } catch (error) { status.textContent = error.message; }
+  });
 } catch (error) { showError(error.message); }

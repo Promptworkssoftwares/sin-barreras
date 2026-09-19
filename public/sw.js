@@ -1,15 +1,15 @@
-const CACHE = 'sin-barreras-v1.5.4';
+const CACHE = 'sin-barreras-v1.6.1';
 const ASSETS = [
-  '/', '/manifest.webmanifest', '/css/landing.css?v=1.5.4', '/js/landing.js?v=1.5.4',
-  '/styles.css?v=1.5.4', '/app-bootstrap.js?v=1.5.4', '/cloud.js?v=1.5.4', '/account-ui.js?v=1.5.4',
-  '/app.js?v=1.5.4', '/phrasebook.js?v=1.5.4', '/phrase-practice.js?v=1.5.4', '/qr-conversation.js?v=1.5.4', '/ai-stage.js?v=1.5.4', '/audio-playback.js?v=1.5.4', '/navigation-flow.js?v=1.5.4', '/play-billing.js?v=1.5.4', '/languages.js?v=1.5.4', '/learn.js?v=1.5.4', '/sounds.js?v=1.5.4', '/voice-turn.js?v=1.5.4', '/icons/icon-192.png', '/icons/icon-512.png',
+  '/', '/manifest.webmanifest', '/css/landing.css?v=1.6.1', '/js/landing.js?v=1.6.1',
+  '/styles.css?v=1.6.1', '/app-bootstrap.js?v=1.6.1', '/cloud.js?v=1.6.1', '/account-ui.js?v=1.6.1',
+  '/app.js?v=1.6.1', '/phrasebook.js?v=1.6.1', '/phrase-practice.js?v=1.6.1', '/qr-conversation.js?v=1.6.1', '/ai-stage.js?v=1.6.1', '/audio-playback.js?v=1.6.1', '/navigation-flow.js?v=1.6.1', '/play-billing.js?v=1.6.1', '/languages.js?v=1.6.1', '/learn.js?v=1.6.1', '/sounds.js?v=1.6.1', '/voice-turn.js?v=1.6.1', '/icons/icon-192.png', '/icons/icon-512.png',
     '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
   '/assets/learn/everyday.png', '/assets/learn/work.png', '/assets/learn/construction.png', '/assets/learn/medical.png',
   '/assets/learn/shopping.png', '/assets/learn/restaurant.png', '/assets/learn/interview.png', '/assets/learn/school.png',
   '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png', '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',
   '/assets/footer-menu-v1413/practica.png', '/assets/footer-menu-v1413/practica-active.png', '/assets/footer-menu-v1413/coach.png', '/assets/footer-menu-v1413/coach-active.png',
   '/assets/footer-menu-v1413/camara.png', '/assets/footer-menu-v1413/camara-active.png',
-  '/offline-phrases.html', '/css/offline-phrases.css?v=1.5.4', '/js/offline-phrases.js?v=1.5.4', '/css/room.css?v=1.5.4', '/js/join-conversation.js?v=1.5.4'
+  '/offline-phrases.html', '/css/offline-phrases.css?v=1.6.1', '/js/offline-phrases.js?v=1.6.1', '/css/room.css?v=1.6.1', '/js/join-conversation.js?v=1.6.1'
 ];
 const PRIVATE_PREFIXES = ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/join/'];
 

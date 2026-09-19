@@ -45,11 +45,14 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
       const email = normalizeEmail(request.body?.email);
       const name = String(request.body?.name || '').trim().slice(0, 120);
       const password = String(request.body?.password || '');
+      const termsAccepted = request.body?.termsAccepted === true || request.body?.termsAccepted === 'true';
+      const ageConfirmed = request.body?.ageConfirmed === true || request.body?.ageConfirmed === 'true';
       const ownerEmail = normalizeEmail(process.env.OWNER_EMAIL);
 
       if (!EMAIL_RE.test(email)) return response.status(400).json({ error: 'Escribe un email válido.' });
       if (!name || name.length < 2) return response.status(400).json({ error: 'Escribe tu nombre.' });
       if (password.length < 10) return response.status(400).json({ error: 'La contraseña debe tener al menos 10 caracteres.' });
+      if (!termsAccepted || !ageConfirmed) return response.status(400).json({ error: 'Debes confirmar que tienes 18 años o más y aceptar los Términos y la Política de Privacidad.' });
       if (ownerEmail && email === ownerEmail) {
         return response.status(403).json({ error: 'Este email está reservado para la cuenta owner. Usa Iniciar sesión.' });
       }
@@ -65,6 +68,9 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
         passwordHash: await bcrypt.hash(password, 12),
         emailVerificationRequired: true,
         emailVerifiedAt: null,
+        ageConfirmedAt: new Date(),
+        termsAcceptedAt: new Date(),
+        privacyAcceptedAt: new Date(),
         lastLoginAt: null
       });
       const { rawToken } = await createAccountToken(user, 'verify_email', 24 * 60);
@@ -132,6 +138,7 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
       const token = String(request.body?.token || '').trim();
       const password = String(request.body?.password || '');
       if (password.length < 10) return response.status(400).json({ error: 'La contraseña debe tener al menos 10 caracteres.' });
+      if (!termsAccepted || !ageConfirmed) return response.status(400).json({ error: 'Debes confirmar que tienes 18 años o más y aceptar los Términos y la Política de Privacidad.' });
       const record = await consumeAccountToken(token, 'reset_password');
       if (!record) return response.status(400).json({ error: 'Este enlace no es válido o ya venció. Solicita uno nuevo.' });
       const user = await User.findById(record.user).select('+passwordHash');

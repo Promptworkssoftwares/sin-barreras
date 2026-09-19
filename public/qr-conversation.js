@@ -1,4 +1,4 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.5.4';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.1';
 
 export function initQrConversation({ notify, request, languages, createAutoVoiceTurn, getDefaults } = {}) {
   const dialog = document.querySelector('#qr-conversation-dialog');
@@ -7,6 +7,7 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   const endButton = document.querySelector('#end-qr-room');
   const hostLanguage = document.querySelector('#qr-host-language');
   const guestLanguage = document.querySelector('#qr-guest-language');
+  const terms = document.querySelector('#qr-host-terms');
   const setup = document.querySelector('#qr-room-setup');
   const active = document.querySelector('#qr-room-active');
   const code = document.querySelector('#qr-room-code');
@@ -17,6 +18,9 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   const talkButton = document.querySelector('#qr-room-talk');
   const copyLink = document.querySelector('#qr-copy-link');
   const shareLink = document.querySelector('#qr-share-link');
+  const reportReason = document.querySelector('#qr-report-reason');
+  const reportParticipant = document.querySelector('#qr-report-participant');
+  const blockParticipant = document.querySelector('#qr-block-participant');
   let room = null;
   let syncTimer = null;
   let syncBusy = false;
@@ -54,7 +58,17 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
     active?.classList.add('is-hidden');
     if (transcript) transcript.innerHTML = '';
     if (qr) qr.replaceChildren();
+    if (terms) terms.checked = false;
     setStatus('Esperando crear una conversación.');
+  }
+
+  async function reportContent(content = '') {
+    if (!room) return;
+    await request(`/api/public/conversations/${encodeURIComponent(room.code)}/report`, {
+      method:'POST', headers:{'Content-Type':'application/json','X-SB-Conversation-Token':room.hostToken},
+      body:JSON.stringify({ role:'host', reason:reportReason?.value || 'other', content })
+    });
+    notify?.('Reporte enviado.');
   }
 
   function renderTurn(turn) {
@@ -62,7 +76,15 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
     const mine = turn.speaker === 'host';
     const article = document.createElement('article');
     article.className = `qr-turn ${mine ? 'mine' : 'theirs'}`;
-    article.innerHTML = `<span>${mine ? 'TÚ' : 'OTRA PERSONA'}</span><p>${escapeHtml(turn.originalText)}</p><strong>${escapeHtml(turn.translatedText)}</strong>`;
+    const label=document.createElement('span'); label.textContent=mine?'TÚ':'OTRA PERSONA';
+    const original=document.createElement('p'); original.textContent=turn.originalText;
+    const translated=document.createElement('strong'); translated.textContent=turn.translatedText;
+    article.append(label,original,translated);
+    if(!mine){
+      const report=document.createElement('button'); report.type='button'; report.className='qr-report-message'; report.textContent='⚑ Reportar mensaje';
+      report.addEventListener('click',()=>reportContent(`${turn.originalText}\n${turn.translatedText}`).catch(err=>notify?.(err.message)));
+      article.append(report);
+    }
     transcript.appendChild(article);
     transcript.scrollTop = transcript.scrollHeight;
     if (room && turn.targetLanguage === room.hostLanguage && turn.audioBase64) {
@@ -86,13 +108,14 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
       else setStatus('Sala pública activa · comparte el QR.', 'ready');
       for (const item of payload.events || []) {
         if (item.event === 'turn') renderTurn(item.payload);
-        if (item.event === 'room-closed') {
-          setStatus('Conversación terminada.', 'closed');
+        if (item.event === 'room-closed' || item.event === 'room-blocked') {
+          setStatus(item.event === 'room-blocked' ? 'La conversación fue bloqueada.' : 'Conversación terminada.', 'closed');
+          if(talkButton) talkButton.disabled=true;
           stopSync();
         }
       }
     } catch (error) {
-      if (/expiró|terminó|no es válido/i.test(String(error?.message || ''))) {
+      if (/expiró|terminó|no es válido|bloquead/i.test(String(error?.message || ''))) {
         setStatus('Conversación terminada o expirada.', 'closed');
         stopSync();
         if (talkButton) talkButton.disabled = true;
@@ -122,13 +145,17 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
       notify?.('Selecciona dos idiomas distintos.');
       return;
     }
+    if (!terms?.checked) {
+      notify?.('Acepta los Términos y las reglas de conversación antes de crear el QR.');
+      return;
+    }
     try {
       createButton.disabled = true;
       createButton.textContent = 'Creando conversación…';
       const defaults = getDefaults?.() || {};
       room = await request('/api/conversations', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostLanguage: hostLanguage.value, guestLanguage: guestLanguage.value, situation: defaults.situation || 'everyday', voice: defaults.voice || 'coral' })
+        body: JSON.stringify({ hostLanguage: hostLanguage.value, guestLanguage: guestLanguage.value, situation: defaults.situation || 'everyday', voice: defaults.voice || 'coral', termsAccepted:true })
       });
       setup?.classList.add('is-hidden');
       active?.classList.remove('is-hidden');
@@ -187,6 +214,15 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   createButton?.addEventListener('click', createRoom);
   talkButton?.addEventListener('click', recordTurn);
   endButton?.addEventListener('click', endRoom);
+  reportParticipant?.addEventListener('click',()=>reportContent('').catch(err=>notify?.(err.message)));
+  blockParticipant?.addEventListener('click',async()=>{
+    if(!room || !confirm('¿Bloquear a la otra persona y terminar esta conversación?')) return;
+    try{
+      await request(`/api/public/conversations/${encodeURIComponent(room.code)}/block`,{method:'POST',headers:{'Content-Type':'application/json','X-SB-Conversation-Token':room.hostToken},body:JSON.stringify({role:'host',reason:reportReason?.value || 'other'})});
+      notify?.('Participante bloqueado.');
+      resetRoom();
+    }catch(err){notify?.(err.message);}
+  });
   copyLink?.addEventListener('click', async () => {
     if (!room?.joinUrl) return;
     await navigator.clipboard.writeText(room.joinUrl);
@@ -199,8 +235,4 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   });
   dialog?.addEventListener('close', () => { if (!room) resetRoom(); });
   return { resetRoom };
-}
-
-function escapeHtml(value = '') {
-  return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 }

@@ -21,7 +21,8 @@ function formatDate(value) { if (!value) return '—'; const date=new Date(value
 function accessInfo(user) {
   if (user.accountStatus === 'revoked') return ['REVOCADO','revoked'];
   if (user.freeAccess) return ['GRATIS','free'];
-  if (['active','trialing'].includes(user.subscriptionStatus)) return ['PAGADO','paid'];
+  if (user.subscriptionStatus === 'trialing') return ['PRUEBA','trial'];
+  if (user.subscriptionStatus === 'active') return ['PAGADO','paid'];
   return ['SIN ACCESO','pending'];
 }
 function userCell(user){ const initials=(user.name||user.email||'SB').slice(0,2).toUpperCase(); return `<div class="user-cell"><span>${initials}</span><div><strong>${escapeHtml(user.name||'Sin nombre')}</strong><small>${escapeHtml(user.email)}</small></div></div>`; }
@@ -54,6 +55,7 @@ async function loadStats(){
   const s=await api('/api/admin/stats');
   $('#stat-users').textContent=s.totalUsers;
   $('#stat-paid').textContent=s.activePaid;
+  if ($('#stat-trials')) $('#stat-trials').textContent=s.activeTrials || 0;
   $('#stat-free').textContent=s.freeUsers;
   $('#stat-mrr').textContent=`$${Number(s.revenue?.grossMrrUsd ?? s.monthlyRevenue ?? 0).toFixed(2)}`;
   $('#stat-ai-cost').textContent=`$${Number(s.aiCostMonthUsd||0).toFixed(3)}`;
@@ -111,7 +113,23 @@ async function loadUsage(){
   const rows=[...(data.daily||[])].reverse();
   $('#usage-table').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.date)}</td><td>${Number(row.featureRequests||0).toLocaleString()}</td><td>${Number(row.openAiCalls||0).toLocaleString()}</td><td>${Number((row.inputTokens||0)+(row.outputTokens||0)).toLocaleString()}</td><td>${(Number(row.transcriptionSeconds||0)/60).toFixed(1)} min</td><td>${Number(row.ttsCharacters||0).toLocaleString()}</td><td>$${Number(row.estimatedCostUsd||0).toFixed(4)}</td></tr>`).join(''):`<tr><td colspan="7">Todavía no hay consumo de IA registrado.</td></tr>`;
 }
-function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones',usage:'Uso y costo de IA'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); if(name==='usage')loadUsage(); closeMenu(); }
+
+async function loadAiReports(){
+  const filter=$('#report-filter')?.value || 'open';
+  const data=await api(`/api/admin/reports/ai?status=${encodeURIComponent(filter)}`);
+  const body=$('#reports-table');
+  if(!body) return;
+  body.innerHTML=data.items?.length?data.items.map(item=>`<tr><td>${formatDate(item.createdAt)}</td><td>${escapeHtml(item.user?.email||'Usuario eliminado')}</td><td>${escapeHtml(item.area||'other')}</td><td>${escapeHtml(item.reason||'other')}</td><td><div class="report-content">${escapeHtml(item.content||item.details||'—')}</div></td><td><div class="action-menu"><button data-report-ai="${item._id}" data-status="reviewed">Revisado</button><button data-report-ai="${item._id}" data-status="dismissed">Descartar</button></div></td></tr>`).join(''):`<tr><td colspan="6">No hay reportes en este estado.</td></tr>`;
+}
+
+async function loadConversationReports(){
+  const filter=$('#conversation-report-filter')?.value || 'open';
+  const data=await api(`/api/admin/reports/conversations?status=${encodeURIComponent(filter)}`);
+  const body=$('#conversation-reports-table');
+  if(!body) return;
+  body.innerHTML=data.items?.length?data.items.map(item=>`<tr><td>${formatDate(item.createdAt)}</td><td>${escapeHtml(item.roomCode||'—')}</td><td>${escapeHtml(item.hostUser?.email||'Usuario eliminado')}</td><td>${escapeHtml(item.reporterRole)} → ${escapeHtml(item.reportedRole)}</td><td>${escapeHtml(item.reason||'other')}</td><td><div class="report-content">${escapeHtml(item.content||'—')}</div></td><td><div class="action-menu"><button data-report-conversation="${item._id}" data-status="reviewed">Revisado</button><button data-report-conversation="${item._id}" data-status="dismissed">Descartar</button></div></td></tr>`).join(''):`<tr><td colspan="7">No hay reportes en este estado.</td></tr>`;
+}
+function showSection(name){ $$('.admin-section').forEach(section=>section.classList.toggle('is-hidden',section.id!==`${name}-section`)); $$('.side-link').forEach(button=>button.classList.toggle('is-active',button.dataset.section===name)); const titles={overview:'Control del SaaS',users:'Usuarios',grants:'Acceso gratuito',subscriptions:'Suscripciones',usage:'Uso y costo de IA',reports:'Reportes de IA','conversation-reports':'Reportes QR'}; $('#page-title').textContent=titles[name]||'Control del SaaS'; if(name==='users')loadUsers(); if(name==='grants')loadGrants(); if(name==='subscriptions')loadSubscriptions(); if(name==='usage')loadUsage(); if(name==='reports')loadAiReports(); if(name==='conversation-reports')loadConversationReports(); closeMenu(); }
 function askConfirm(title,copy,handler){ $('#confirm-title').textContent=title; $('#confirm-copy').textContent=copy; confirmHandler=handler; $('#confirm-dialog').showModal(); }
 async function createGrant(email,note){ await api('/api/admin/grants',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,note})}); toast(`Acceso gratuito preparado para ${email}`); await Promise.all([loadStats(),loadGrants(),loadUsers().catch(()=>{})]); }
 
@@ -133,6 +151,11 @@ $('#subscriptions-table').addEventListener('click',e=>{
   const provider=b.dataset.provider||'none';
   askConfirm('¿Cancelar esta suscripción?',provider==='google_play'?'Google Play detendrá la próxima renovación y mantendrá acceso hasta la fecha pagada.':'La suscripción de Stripe quedará programada para finalizar al terminar el período pagado.',async()=>{await api(`/api/admin/users/${b.dataset.subCancel}/cancel-subscription`,{method:'POST'});toast('Cancelación programada al final del período.');await Promise.all([loadSubscriptions(),loadStats(),loadUsers().catch(()=>{})]);});
 });
+
+$('#report-filter')?.addEventListener('change',loadAiReports);
+$('#conversation-report-filter')?.addEventListener('change',loadConversationReports);
+$('#reports-table')?.addEventListener('click',async e=>{const b=e.target.closest('[data-report-ai]');if(!b)return;try{await api(`/api/admin/reports/ai/${b.dataset.reportAi}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:b.dataset.status})});toast('Reporte actualizado.');await loadAiReports();}catch(err){toast(err.message);}});
+$('#conversation-reports-table')?.addEventListener('click',async e=>{const b=e.target.closest('[data-report-conversation]');if(!b)return;try{await api(`/api/admin/reports/conversations/${b.dataset.reportConversation}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:b.dataset.status})});toast('Reporte actualizado.');await loadConversationReports();}catch(err){toast(err.message);}});
 $('#confirm-action').addEventListener('click',()=>{const handler=confirmHandler;confirmHandler=null;if(handler)setTimeout(()=>handler().catch(err=>toast(err.message)),0);});
 let searchTimer;$('#user-search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{usersPage=1;loadUsers();},300)});$('#user-filter').addEventListener('change',()=>{usersPage=1;loadUsers();});$('#users-prev').addEventListener('click',()=>{if(usersPage>1){usersPage--;loadUsers();}});$('#users-next').addEventListener('click',()=>{if(usersPage<usersPages){usersPage++;loadUsers();}});
 $('#admin-logout').addEventListener('click',async()=>{await api('/auth/logout',{method:'POST'}).catch(()=>{});location.assign('/');});

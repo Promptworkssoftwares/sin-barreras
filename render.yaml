@@ -36,6 +36,10 @@ services:
         value: com.promptworks.sinbarreras
       - key: GOOGLE_PLAY_PRODUCT_ID
         value: sin_barreras_monthly
+      - key: GOOGLE_PLAY_FREE_TRIAL_DAYS
+        value: 7
+      - key: GOOGLE_PLAY_TRIAL_OFFER_TAG
+        value: sb-7-day-trial
       - key: GOOGLE_PLAY_SERVICE_ACCOUNT_EMAIL
         sync: false
       - key: GOOGLE_PLAY_SERVICE_ACCOUNT_PRIVATE_KEY

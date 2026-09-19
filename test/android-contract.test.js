@@ -16,8 +16,8 @@ test('Android release targets the current Google Play API requirement', () => {
   assert.match(gradle, /compileSdk = 36/);
   assert.match(gradle, /targetSdk = 36/);
   assert.match(gradle, /applicationId = 'com\.promptworks\.sinbarreras'/);
-  assert.match(gradle, /versionName = '1.5.4'/);
-  assert.match(gradle, /versionCode = 1504/);
+  assert.match(gradle, /versionName = '1.6.1'/);
+  assert.match(gradle, /versionCode = 1601/);
 });
 
 test('Android uses Google Play Billing 9.1.0 and the configured subscription product', () => {

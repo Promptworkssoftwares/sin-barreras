@@ -1,0 +1,18 @@
+# Android / Google Play compatibility — v1.6.1
+
+- applicationId: `com.promptworks.sinbarreras`
+- minSdk: 26
+- compileSdk: 36
+- targetSdk: 36
+- versionCode: 1601
+- versionName: 1.6.1
+- BillingClient: 9.1.0
+- Cleartext HTTP disabled
+- Microphone and camera declared as optional hardware features
+- Runtime permission bridge only grants media capture requests coming from the configured trusted HTTPS host
+- Third-party cookies disabled in WebView
+- Mixed content disabled
+- Safe Browsing enabled when supported
+- Portrait orientation is not forced, allowing large-screen/tablet compatibility
+- Release build enables minification/resource shrinking
+- Signing material is loaded only from local `keystore.properties`, which is excluded from releases
