@@ -1,4 +1,4 @@
-# Sin Barreras Android · v1.6.1
+# Sin Barreras Android · v1.6.2
 
 Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Google Play.
 
@@ -6,7 +6,7 @@ Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Goo
 
 - Application ID: `com.promptworks.sinbarreras`
 - Version code: `1431`
-- Version name: `1.6.1`
+- Version name: `1.6.2`
 - Web app: `https://sin-barreras.onrender.com/`
 - `compileSdk = 36`
 - `targetSdk = 36`

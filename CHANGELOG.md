@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.2 · AI cache + study reuse
+
+- Added private per-account MongoDB cache for repeated translations, Practice generation, saved-phrase lessons, pronunciation evaluations and short TTS audio.
+- Added persistent device TTS Cache Storage so repeated Listen/Slow study playback avoids network/OpenAI calls after first generation.
+- Practice scoring now skips chat evaluation only for >=96% deterministic transcript matches; natural alternative wording still uses the AI evaluator.
+- Fixed Service Worker activation so app updates no longer wipe saved phrase/TTS audio caches.
+- Added cache-hit tracking in Owner Dashboard and account-deletion cleanup.
+- Cache retention is configurable and disclosed in Privacy/Data Safety documentation.
+- Android bumped to versionCode 1602 / versionName 1.6.2.
+
 ## 1.6.1 · Google Play 7-day free trial + AAB final prep
 
 - Android now selects the eligible 7-day Google Play free-trial offer instead of blindly using the first offer returned.

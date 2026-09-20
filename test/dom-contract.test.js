@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.6\.1/);
-  assert.match(appHtml, /styles\.css\?v=1\.6\.1/);
-  assert.match(javascript, /learn\.js\?v=1\.6\.1/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.6\.2/);
+  assert.match(appHtml, /styles\.css\?v=1\.6\.2/);
+  assert.match(javascript, /learn\.js\?v=1\.6\.2/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -111,7 +111,7 @@ test('translator voice is user-selectable and validated server-side', () => {
   assert.match(javascript, /form\.append\('voice', state\.settings\.translatorVoice/);
   assert.match(server, /const TTS_VOICES = new Set/);
   assert.match(server, /cleanVoice/);
-  assert.match(server, /speak\(translatedText, targetLanguage, voice\)/);
+  assert.match(server, /speak\(translatedText, targetLanguage, voice, 1, request\.user\?\._id\)/);
 });
 
 test('admin dashboard displays the official Sin Barreras logo in the main header', () => {
@@ -471,7 +471,7 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(voiceTurn, /normalSpeechSilenceMs: 1450/);
   assert.match(voiceTurn, /longSpeechSilenceMs: 1200/);
   assert.match(voiceTurn, /thinkingAfterMs: 420/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.6\.1/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.6\.2/);
 });
 
 
@@ -547,7 +547,7 @@ test('Three.js conversational AI background is bundled and reacts to real conver
   assert.match(javascript, /aiStageController\?\.setVolume/);
   assert.match(aiStageJavascript, /three@0\.179\.1/);
   assert.match(aiStageJavascript, /WebGLRenderer/);
-  assert.match(serviceWorker, /ai-stage\.js\?v=1\.6\.1/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.6\.2/);
 });
 
 
@@ -562,7 +562,7 @@ test('browser audio is unlocked from a user gesture before asynchronous AI playb
   assert.match(audioPlayback, /pointerdown/);
   assert.match(audioPlayback, /playsinline/);
   assert.match(audioPlayback, /decodeAudioData/);
-  assert.match(serviceWorker, /audio-playback\.js\?v=1\.6\.1/);
+  assert.match(serviceWorker, /audio-playback\.js\?v=1\.6\.2/);
   assert.doesNotMatch(javascript, /new Audio\(`data:audio\/mpeg;base64/);
 });
 

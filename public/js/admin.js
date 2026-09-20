@@ -108,10 +108,11 @@ async function loadUsage(){
   const totals=data.totals||{};
   $('#usage-requests').textContent=Number(totals.featureRequests||0).toLocaleString();
   $('#usage-calls').textContent=Number(totals.openAiCalls||0).toLocaleString();
+  $('#usage-cache-hits').textContent=Number(totals.cacheHits||0).toLocaleString();
   $('#usage-minutes').textContent=(Number(totals.transcriptionSeconds||0)/60).toFixed(1);
   $('#usage-cost').textContent=`$${Number(totals.estimatedCostUsd||0).toFixed(3)}`;
   const rows=[...(data.daily||[])].reverse();
-  $('#usage-table').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.date)}</td><td>${Number(row.featureRequests||0).toLocaleString()}</td><td>${Number(row.openAiCalls||0).toLocaleString()}</td><td>${Number((row.inputTokens||0)+(row.outputTokens||0)).toLocaleString()}</td><td>${(Number(row.transcriptionSeconds||0)/60).toFixed(1)} min</td><td>${Number(row.ttsCharacters||0).toLocaleString()}</td><td>$${Number(row.estimatedCostUsd||0).toFixed(4)}</td></tr>`).join(''):`<tr><td colspan="7">Todavía no hay consumo de IA registrado.</td></tr>`;
+  $('#usage-table').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.date)}</td><td>${Number(row.featureRequests||0).toLocaleString()}</td><td>${Number(row.openAiCalls||0).toLocaleString()}</td><td>${Number(row.cacheHits||0).toLocaleString()}</td><td>${Number((row.inputTokens||0)+(row.outputTokens||0)).toLocaleString()}</td><td>${(Number(row.transcriptionSeconds||0)/60).toFixed(1)} min</td><td>${Number(row.ttsCharacters||0).toLocaleString()}</td><td>$${Number(row.estimatedCostUsd||0).toFixed(4)}</td></tr>`).join(''):`<tr><td colspan="8">Todavía no hay consumo de IA registrado.</td></tr>`;
 }
 
 async function loadAiReports(){

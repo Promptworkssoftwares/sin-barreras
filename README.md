@@ -1,6 +1,11 @@
-# Sin Barreras v1.6.1
+# Sin Barreras v1.6.2
 
-### Nuevo en 1.6.1
+### Nuevo en 1.6.2
+
+- Cache inteligente de IA por cuenta para traducciones, TTS, práctica y lecciones repetidas.
+- Cache TTS local persistente para estudiar/repetir audio sin volver a generar la voz.
+- Evaluación híbrida: coincidencias de pronunciación de alta confianza se resuelven localmente; alternativas naturales siguen usando IA.
+- El cache expira automáticamente y se elimina con la cuenta.
 
 `Mis frases` incluye práctica multilenguaje por segmentos: escucha, repite y recibe evaluación parte por parte antes de decir la frase completa. El progreso de cada frase se sincroniza con la cuenta.
 

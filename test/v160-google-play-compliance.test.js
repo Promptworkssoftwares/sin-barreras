@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from 'node:fs';
 
 const text = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('v1.6.1 exposes a public privacy policy and terms page', () => {
+test('v1.6.2 exposes a public privacy policy and terms page', () => {
   assert.ok(existsSync(new URL('../public/privacy.html', import.meta.url)));
   assert.ok(existsSync(new URL('../public/terms.html', import.meta.url)));
 });
@@ -72,9 +72,9 @@ test('Play Console submission and Data Safety guides ship with the release', () 
   assert.ok(existsSync(new URL('../GOOGLE_PLAY_DATA_SAFETY.md', import.meta.url)));
 });
 
-test('v1.6.1 release metadata is aligned across Node, PWA and Android', () => {
-  assert.match(text('package.json'), /"version": "1\.6\.1"/);
-  assert.match(text('public/sw.js'), /sin-barreras-v1\.6\.1/);
-  assert.match(text('android/app/build.gradle'), /versionCode = 1601/);
-  assert.match(text('android/app/build.gradle'), /versionName = '1\.6\.1'/);
+test('v1.6.2 release metadata is aligned across Node, PWA and Android', () => {
+  assert.match(text('package.json'), /"version": "1\.6\.2"/);
+  assert.match(text('public/sw.js'), /sin-barreras-v1\.6\.2/);
+  assert.match(text('android/app/build.gradle'), /versionCode = 1602/);
+  assert.match(text('android/app/build.gradle'), /versionName = '1\.6\.2'/);
 });

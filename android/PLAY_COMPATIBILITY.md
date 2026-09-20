@@ -1,11 +1,11 @@
-# Android / Google Play compatibility — v1.6.1
+# Android / Google Play compatibility — v1.6.2
 
 - applicationId: `com.promptworks.sinbarreras`
 - minSdk: 26
 - compileSdk: 36
 - targetSdk: 36
-- versionCode: 1601
-- versionName: 1.6.1
+- versionCode: 1602
+- versionName: 1.6.2
 - BillingClient: 9.1.0
 - Cleartext HTTP disabled
 - Microphone and camera declared as optional hardware features

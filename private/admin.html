@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#132427">
   <title>Sin Barreras · Admin Dashboard</title>
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/css/admin.css?v=1.6.1">
+  <link rel="stylesheet" href="/css/admin.css?v=1.6.2">
 </head>
 <body>
   <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="admin-sidebar">
@@ -92,10 +92,11 @@
       <div class="stats-grid usage-stats">
         <article><span>SOLICITUDES</span><strong id="usage-requests">—</strong><small>Funciones de IA usadas</small></article>
         <article><span>OPENAI CALLS</span><strong id="usage-calls">—</strong><small>Llamadas reales al API</small></article>
+        <article><span>CACHE HITS</span><strong id="usage-cache-hits">—</strong><small>Reutilizaciones sin volver a llamar IA</small></article>
         <article><span>TRANSCRIPCIÓN</span><strong id="usage-minutes">—</strong><small>Minutos procesados</small></article>
         <article><span>COSTO EST.</span><strong id="usage-cost">—</strong><small>USD · según tarifas configuradas</small></article>
       </div>
-      <article class="table-card"><div class="table-card-head"><div><span>DIARIO</span><h2>Consumo de los últimos 30 días</h2></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Solicitudes</th><th>API calls</th><th>Tokens</th><th>Transcripción</th><th>TTS chars</th><th>Costo est.</th></tr></thead><tbody id="usage-table"></tbody></table></div></article>
+      <article class="table-card"><div class="table-card-head"><div><span>DIARIO</span><h2>Consumo de los últimos 30 días</h2></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Solicitudes</th><th>API calls</th><th>Cache</th><th>Tokens</th><th>Transcripción</th><th>TTS chars</th><th>Costo est.</th></tr></thead><tbody id="usage-table"></tbody></table></div></article>
     </section>
 
     <section id="reports-section" class="admin-section is-hidden">
@@ -111,6 +112,6 @@
 
   <div id="admin-toast" class="admin-toast" role="status"></div>
   <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
-  <script type="module" src="/js/admin.js?v=1.6.1"></script>
+  <script type="module" src="/js/admin.js?v=1.6.2"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-# Google Play Data Safety — Sin Barreras v1.6.1
+# Google Play Data Safety — Sin Barreras v1.6.2
 
 Use this file as the implementation checklist when completing Play Console. Verify every declaration against the production build and current providers before submission.
 
@@ -7,6 +7,7 @@ Use this file as the implementation checklist when completing Play Console. Veri
 - Subscription data: provider, product/subscription identifiers, status and renewal dates. Card numbers are not stored by Sin Barreras.
 - User content: typed text, translations, saved phrases, learning progress, QR conversation turns required to deliver the session.
 - Audio: uploaded only when the user activates a voice feature; processed for transcription/translation/pronunciation. Raw audio is not stored in account history.
+- Derived AI cache: per-account translations, generated TTS audio, prepared phrase lessons, and prior deterministic/evaluated study results may be retained temporarily to reduce repeated AI processing. The cache expires automatically and is deleted with the account; raw microphone recordings are not stored in this cache.
 - Images: uploaded only when the user chooses camera/image analysis; raw images are not stored in account history.
 - Technical/security data: request counters, AI usage metrics, timestamps, rate-limit/security logs and hosting network logs.
 - Safety reports: content/reason attached to AI and QR reports.

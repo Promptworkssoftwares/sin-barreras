@@ -1,4 +1,5 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.1';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.2';
+import { getOrCreateTts } from './tts-cache.js?v=1.6.2';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -152,9 +153,15 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
     let audio = await cachedAudio(item.id);
     if (!audio?.audioBase64) {
       if (!navigator.onLine) throw new Error('Esta frase todavía no tiene audio guardado en este dispositivo. Conéctate una vez y toca Escuchar.');
-      const result = await request('/api/speak', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: item.translatedText, language: item.targetLanguage, voice: 'coral', speed: 1 })
+      const result = await getOrCreateTts({
+        text: item.translatedText,
+        language: item.targetLanguage,
+        voice: 'coral',
+        speed: 1,
+        create: () => request('/api/speak', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: item.translatedText, language: item.targetLanguage, voice: 'coral', speed: 1 })
+        })
       });
       audio = { audioBase64: result.audioBase64, language: item.targetLanguage };
       await cacheAudio(item.id, audio.audioBase64, audio.language);

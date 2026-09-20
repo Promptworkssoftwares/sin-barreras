@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ==========================================
-echo   Sin Barreras SaaS v1.6.1 - Inicio
+echo   Sin Barreras SaaS v1.6.2 - Inicio
 echo ==========================================
 
 where node >nul 2>nul

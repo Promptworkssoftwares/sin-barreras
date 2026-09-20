@@ -1,15 +1,15 @@
-const CACHE = 'sin-barreras-v1.6.1';
+const CACHE = 'sin-barreras-v1.6.2';
 const ASSETS = [
-  '/', '/manifest.webmanifest', '/css/landing.css?v=1.6.1', '/js/landing.js?v=1.6.1',
-  '/styles.css?v=1.6.1', '/app-bootstrap.js?v=1.6.1', '/cloud.js?v=1.6.1', '/account-ui.js?v=1.6.1',
-  '/app.js?v=1.6.1', '/phrasebook.js?v=1.6.1', '/phrase-practice.js?v=1.6.1', '/qr-conversation.js?v=1.6.1', '/ai-stage.js?v=1.6.1', '/audio-playback.js?v=1.6.1', '/navigation-flow.js?v=1.6.1', '/play-billing.js?v=1.6.1', '/languages.js?v=1.6.1', '/learn.js?v=1.6.1', '/sounds.js?v=1.6.1', '/voice-turn.js?v=1.6.1', '/icons/icon-192.png', '/icons/icon-512.png',
+  '/', '/manifest.webmanifest', '/css/landing.css?v=1.6.2', '/js/landing.js?v=1.6.2',
+  '/styles.css?v=1.6.2', '/app-bootstrap.js?v=1.6.2', '/cloud.js?v=1.6.2', '/account-ui.js?v=1.6.2',
+  '/app.js?v=1.6.2', '/phrasebook.js?v=1.6.2', '/phrase-practice.js?v=1.6.2', '/qr-conversation.js?v=1.6.2', '/ai-stage.js?v=1.6.2', '/audio-playback.js?v=1.6.2', '/tts-cache.js?v=1.6.2', '/navigation-flow.js?v=1.6.2', '/play-billing.js?v=1.6.2', '/languages.js?v=1.6.2', '/learn.js?v=1.6.2', '/sounds.js?v=1.6.2', '/voice-turn.js?v=1.6.2', '/icons/icon-192.png', '/icons/icon-512.png',
     '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
   '/assets/learn/everyday.png', '/assets/learn/work.png', '/assets/learn/construction.png', '/assets/learn/medical.png',
   '/assets/learn/shopping.png', '/assets/learn/restaurant.png', '/assets/learn/interview.png', '/assets/learn/school.png',
   '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png', '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',
   '/assets/footer-menu-v1413/practica.png', '/assets/footer-menu-v1413/practica-active.png', '/assets/footer-menu-v1413/coach.png', '/assets/footer-menu-v1413/coach-active.png',
   '/assets/footer-menu-v1413/camara.png', '/assets/footer-menu-v1413/camara-active.png',
-  '/offline-phrases.html', '/css/offline-phrases.css?v=1.6.1', '/js/offline-phrases.js?v=1.6.1', '/css/room.css?v=1.6.1', '/js/join-conversation.js?v=1.6.1'
+  '/offline-phrases.html', '/css/offline-phrases.css?v=1.6.2', '/js/offline-phrases.js?v=1.6.2', '/css/room.css?v=1.6.2', '/js/join-conversation.js?v=1.6.2'
 ];
 const PRIVATE_PREFIXES = ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/join/'];
 
@@ -19,7 +19,11 @@ self.addEventListener('install', (event) => event.waitUntil(
 
 self.addEventListener('activate', (event) => event.waitUntil(
   caches.keys()
-    .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+    // Delete only obsolete application-shell caches. User study caches such as
+    // phrase audio and TTS are intentionally persistent across app updates.
+    .then((keys) => Promise.all(keys
+      .filter((key) => key.startsWith('sin-barreras-v') && key !== CACHE)
+      .map((key) => caches.delete(key))))
     .then(() => self.clients.claim())
     .then(() => self.clients.matchAll({ type: 'window' }))
     .then((clients) => clients.forEach((client) => client.postMessage({ type: 'SIN_BARRERAS_UPDATED' })))

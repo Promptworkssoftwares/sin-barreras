@@ -19,7 +19,7 @@ test('Practice is multilingual from UI through generation, TTS, and scoring', ()
   assert.match(appJs, /speakText\(state\.practice\.targetText \|\| state\.practice\.english, state\.practice\.targetLanguage \|\| 'en'\)/);
   assert.match(server, /practicePhrase = async \(phrase, nativeLanguage, targetLanguage = 'en'/);
   assert.match(server, /targetText and alternative MUST be in \$\{targetName\}/);
-  assert.match(server, /evaluatePractice = async \(\{ targetText, heardText, originalIntent, nativeLanguage, targetLanguage = 'en' \}\)/);
+  assert.match(server, /evaluatePractice = async \(\{ targetText, heardText, originalIntent, nativeLanguage, targetLanguage = 'en', userId = null \}\)/);
   assert.match(server, /You evaluate a learner speaking \$\{targetName\}/);
   assert.match(styles, /\.practice-form-row\.four/);
 });

@@ -17,6 +17,12 @@ const aiUsageDailySchema = new mongoose.Schema({
   ttsCharacters: { type: Number, default: 0, min: 0 },
   estimatedTtsSeconds: { type: Number, default: 0, min: 0 },
   imageCalls: { type: Number, default: 0, min: 0 },
+  cacheHits: { type: Number, default: 0, min: 0 },
+  translationCacheHits: { type: Number, default: 0, min: 0 },
+  ttsCacheHits: { type: Number, default: 0, min: 0 },
+  lessonCacheHits: { type: Number, default: 0, min: 0 },
+  evaluationCacheHits: { type: Number, default: 0, min: 0 },
+  localEvaluationHits: { type: Number, default: 0, min: 0 },
   estimatedCostMicros: { type: Number, default: 0, min: 0 },
   features: { type: mongoose.Schema.Types.Mixed, default: {} }
 }, { timestamps: true, minimize: false });

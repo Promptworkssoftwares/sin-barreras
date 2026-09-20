@@ -1,13 +1,14 @@
-import { initLearning } from './learn.js?v=1.6.1';
-import { initSounds } from './sounds.js?v=1.6.1';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.1';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.1';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.1';
-import { initAIStage } from './ai-stage.js?v=1.6.1';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.1';
-import { initPhrasebook } from './phrasebook.js?v=1.6.1';
-import { initPhrasePractice } from './phrase-practice.js?v=1.6.1';
-import { initQrConversation } from './qr-conversation.js?v=1.6.1';
+import { initLearning } from './learn.js?v=1.6.2';
+import { initSounds } from './sounds.js?v=1.6.2';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.2';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.2';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.2';
+import { initAIStage } from './ai-stage.js?v=1.6.2';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.2';
+import { getOrCreateTts } from './tts-cache.js?v=1.6.2';
+import { initPhrasebook } from './phrasebook.js?v=1.6.2';
+import { initPhrasePractice } from './phrase-practice.js?v=1.6.2';
+import { initQrConversation } from './qr-conversation.js?v=1.6.2';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -662,9 +663,16 @@ function playAudio(base64, language, { resumeConversation = false, sessionId = s
 
 async function speakText(text, language, { speed = 1 } = {}) {
   const safeSpeed = Math.max(0.25, Math.min(4, Number(speed) || 1));
-  const result = await request('/api/speak', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, language, voice: state.settings.translatorVoice || 'coral', speed: safeSpeed })
+  const voice = state.settings.translatorVoice || 'coral';
+  const result = await getOrCreateTts({
+    text,
+    language,
+    voice,
+    speed: safeSpeed,
+    create: () => request('/api/speak', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, language, voice, speed: safeSpeed })
+    })
   });
   await playAudio(result.audioBase64, language, { resumeConversation: false });
 }

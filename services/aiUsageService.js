@@ -33,6 +33,23 @@ export function runWithAiUsage(userId, feature, callback) {
   return usageContext.run({ userId, feature: String(feature || 'other') }, callback);
 }
 
+
+export async function recordCacheHit({ kind = 'other', feature = 'other', local = false } = {}) {
+  const safeFeature = String(feature || 'other').replace(/[^a-z0-9_]/gi, '_').slice(0, 40) || 'other';
+  const safeKind = String(kind || 'other').replace(/[^a-z0-9_]/gi, '_').slice(0, 40) || 'other';
+  const delta = {
+    cacheHits: 1,
+    [`features.${safeFeature}.cacheHits`]: 1,
+    [`cacheKinds.${safeKind}.hits`]: 1
+  };
+  if (kind === 'translation') delta.translationCacheHits = 1;
+  if (kind === 'tts') delta.ttsCacheHits = 1;
+  if (kind === 'phrase_lesson') delta.lessonCacheHits = 1;
+  if (kind === 'practice_evaluation') delta.evaluationCacheHits = 1;
+  if (local) delta.localEvaluationHits = 1;
+  await recordDelta(delta);
+}
+
 export async function recordFeatureRequest(feature = 'other') {
   const safeFeature = String(feature || 'other').replace(/[^a-z0-9_]/gi, '_').slice(0, 40) || 'other';
   await recordDelta({ featureRequests: 1, [`features.${safeFeature}.requests`]: 1 });
@@ -145,14 +162,20 @@ export async function getAiUsageSummary({ days = 30 } = {}) {
       transcriptionSeconds: { $sum: '$transcriptionSeconds' },
       ttsCharacters: { $sum: '$ttsCharacters' },
       imageCalls: { $sum: '$imageCalls' },
+      cacheHits: { $sum: '$cacheHits' },
+      translationCacheHits: { $sum: '$translationCacheHits' },
+      ttsCacheHits: { $sum: '$ttsCacheHits' },
+      lessonCacheHits: { $sum: '$lessonCacheHits' },
+      evaluationCacheHits: { $sum: '$evaluationCacheHits' },
+      localEvaluationHits: { $sum: '$localEvaluationHits' },
       estimatedCostMicros: { $sum: '$estimatedCostMicros' }
     } },
     { $sort: { _id: 1 } }
   ]);
   const totals = rows.reduce((acc, row) => {
-    for (const key of ['featureRequests','openAiCalls','inputTokens','cachedInputTokens','outputTokens','transcriptionSeconds','ttsCharacters','imageCalls','estimatedCostMicros']) acc[key] += Number(row[key] || 0);
+    for (const key of ['featureRequests','openAiCalls','inputTokens','cachedInputTokens','outputTokens','transcriptionSeconds','ttsCharacters','imageCalls','cacheHits','translationCacheHits','ttsCacheHits','lessonCacheHits','evaluationCacheHits','localEvaluationHits','estimatedCostMicros']) acc[key] += Number(row[key] || 0);
     return acc;
-  }, { featureRequests:0, openAiCalls:0, inputTokens:0, cachedInputTokens:0, outputTokens:0, transcriptionSeconds:0, ttsCharacters:0, imageCalls:0, estimatedCostMicros:0 });
+  }, { featureRequests:0, openAiCalls:0, inputTokens:0, cachedInputTokens:0, outputTokens:0, transcriptionSeconds:0, ttsCharacters:0, imageCalls:0, cacheHits:0, translationCacheHits:0, ttsCacheHits:0, lessonCacheHits:0, evaluationCacheHits:0, localEvaluationHits:0, estimatedCostMicros:0 });
   return {
     days: safeDays,
     totals: { ...totals, estimatedCostUsd: totals.estimatedCostMicros / 1_000_000 },
