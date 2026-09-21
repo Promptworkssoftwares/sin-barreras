@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const read = (file) => fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const gradle = read('android/app/build.gradle');
+const gradleProperties = read('android/gradle.properties');
 const manifest = read('android/app/src/main/AndroidManifest.xml');
 const activity = read('android/app/src/main/java/com/promptworks/sinbarreras/MainActivity.java');
 const playBridge = read('public/play-billing.js');
@@ -18,6 +19,13 @@ test('Android release targets the current Google Play API requirement', () => {
   assert.match(gradle, /applicationId = 'com\.promptworks\.sinbarreras'/);
   assert.match(gradle, /versionName = '1.6.2'/);
   assert.match(gradle, /versionCode = 1602/);
+});
+
+
+test('AndroidX is enabled for Google Play Billing and Jetifier stays unnecessary', () => {
+  assert.match(gradleProperties, /^android\.useAndroidX=true$/m);
+  assert.doesNotMatch(gradleProperties, /^android\.useAndroidX=false$/m);
+  assert.doesNotMatch(gradle, /com\.android\.support:/);
 });
 
 test('Android uses Google Play Billing 9.1.0 and the configured subscription product', () => {

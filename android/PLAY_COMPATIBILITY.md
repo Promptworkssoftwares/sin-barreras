@@ -7,6 +7,11 @@
 - versionCode: 1602
 - versionName: 1.6.2
 - BillingClient: 9.1.0
+- AndroidX: enabled (`android.useAndroidX=true`)
+- Jetifier: not required; no legacy Android Support Library dependencies are present
+- Android Gradle Plugin: 9.4.0
+- Gradle: 9.6.1
+- Java source/target compatibility: 17
 - Cleartext HTTP disabled
 - Microphone and camera declared as optional hardware features
 - Runtime permission bridge only grants media capture requests coming from the configured trusted HTTPS host

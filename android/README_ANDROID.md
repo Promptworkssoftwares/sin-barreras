@@ -5,7 +5,7 @@ Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Goo
 ## Configuración incluida
 
 - Application ID: `com.promptworks.sinbarreras`
-- Version code: `1431`
+- Version code: `1602`
 - Version name: `1.6.2`
 - Web app: `https://sin-barreras.onrender.com/`
 - `compileSdk = 36`
@@ -15,6 +15,8 @@ Proyecto Android nativo listo para generar un Android App Bundle (`.aab`) de Goo
 - Gradle `9.6.1`
 - Java 17
 - Google Play Billing Library `9.1.0`
+- AndroidX habilitado mediante `android.useAndroidX=true`.
+- Jetifier no se habilita porque el proyecto no contiene dependencias legacy `com.android.support` ni imports `android.support.*`.
 - Subscription product: `sin_barreras_monthly`
 - Micrófono, cámara y selector de archivos integrados con WebView.
 - Navegación externa fuera del dominio de Sin Barreras se abre fuera del WebView.

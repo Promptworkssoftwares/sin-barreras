@@ -8,6 +8,7 @@ echo ==================================================
 echo.
 
 where java >nul 2>nul || (echo [FALTA] Java/JDK en PATH & exit /b 1)
+findstr /R /C:"^android.useAndroidX=true$" "gradle.properties" >nul || (echo [ERROR] android.useAndroidX debe estar en true en gradle.properties & exit /b 1)
 if not exist "keystore.properties" (echo [FALTA] android\keystore.properties & exit /b 1)
 findstr /C:"CHANGE_ME" "keystore.properties" >nul && (echo [ERROR] keystore.properties aun contiene CHANGE_ME & exit /b 1)
 
@@ -16,6 +17,7 @@ if not defined STORE_FILE (echo [ERROR] Falta storeFile en keystore.properties &
 if not exist "%STORE_FILE%" (echo [ERROR] No existe el keystore: %STORE_FILE% & exit /b 1)
 
 echo [OK] JDK disponible
+echo [OK] AndroidX habilitado
 echo [OK] keystore.properties configurado
 echo [OK] upload key encontrada
 echo [OK] package: com.promptworks.sinbarreras
