@@ -1,5 +1,12 @@
 # Changelog
 
+
+## 1.6.3 · Android microphone / WebView audio fix
+- Added `android.permission.MODIFY_AUDIO_SETTINGS` so Chromium WebView can enumerate/route Android recording devices together with `RECORD_AUDIO`.
+- Added a conservative one-time microphone fallback: advanced audio constraints first, then the default Android input if WebView returns `NotReadableError` / `Could not start audio source`.
+- Improved microphone error messages without changing translation, authentication, billing, camera, backend, or study logic.
+- Android bumped to versionCode 1603 / versionName 1.6.3.
+
 ## 1.6.2 · AI cache + study reuse
 
 - Added private per-account MongoDB cache for repeated translations, Practice generation, saved-phrase lessons, pronunciation evaluations and short TTS audio.

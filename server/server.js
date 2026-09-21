@@ -158,7 +158,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.2' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.3' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({

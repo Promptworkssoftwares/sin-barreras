@@ -1,14 +1,15 @@
-import { initLearning } from './learn.js?v=1.6.2';
-import { initSounds } from './sounds.js?v=1.6.2';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.2';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.2';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.2';
-import { initAIStage } from './ai-stage.js?v=1.6.2';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.2';
-import { getOrCreateTts } from './tts-cache.js?v=1.6.2';
-import { initPhrasebook } from './phrasebook.js?v=1.6.2';
-import { initPhrasePractice } from './phrase-practice.js?v=1.6.2';
-import { initQrConversation } from './qr-conversation.js?v=1.6.2';
+import { initLearning } from './learn.js?v=1.6.3';
+import { initSounds } from './sounds.js?v=1.6.3';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.3';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.3';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.3';
+import { initAIStage } from './ai-stage.js?v=1.6.3';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.3';
+import { getOrCreateTts } from './tts-cache.js?v=1.6.3';
+import { initPhrasebook } from './phrasebook.js?v=1.6.3';
+import { initPhrasePractice } from './phrase-practice.js?v=1.6.3';
+import { initQrConversation } from './qr-conversation.js?v=1.6.3';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.3';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -444,9 +445,7 @@ function updateConversationSettings() {
 async function ensureMicrophone() {
   if (state.stream?.active) return;
   if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) throw new Error('Este navegador no permite grabar audio. Abre la app en Chrome, Safari o Edge actualizado.');
-  state.stream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 }, video: false
-  });
+  state.stream = await getMicrophoneStream();
   state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
   await state.audioContext.resume();
   const source = state.audioContext.createMediaStreamSource(state.stream);
@@ -832,7 +831,7 @@ async function toggleConversation() {
     startRecordingSegment(sessionId);
   } catch (error) {
     cleanConversationResources();
-    notify(error.message || 'Necesitamos permiso para usar el micrófono.');
+    notify(microphoneErrorMessage(error));
     setStatus('idle');
   } finally {
     if (ui.conversationButton) ui.conversationButton.disabled = !state.partnerLanguage;
@@ -1015,7 +1014,7 @@ async function practiceCoachPhrase(article, button) {
   }
 
   try {
-    state.coachPhraseStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    state.coachPhraseStream = await getMicrophoneStream({ constraints: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     state.coachPhraseChunks = [];
     const options = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : undefined;
     const recorder = new MediaRecorder(state.coachPhraseStream, options);
@@ -1049,8 +1048,8 @@ async function practiceCoachPhrase(article, button) {
       }
     }, { once: true });
     recorder.start();
-  } catch {
-    notify('Necesitamos permiso para usar el micrófono.');
+  } catch (error) {
+    notify(microphoneErrorMessage(error));
   }
 }
 

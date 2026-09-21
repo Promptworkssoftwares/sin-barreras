@@ -17,8 +17,8 @@ test('Android release targets the current Google Play API requirement', () => {
   assert.match(gradle, /compileSdk = 36/);
   assert.match(gradle, /targetSdk = 36/);
   assert.match(gradle, /applicationId = 'com\.promptworks\.sinbarreras'/);
-  assert.match(gradle, /versionName = '1.6.2'/);
-  assert.match(gradle, /versionCode = 1602/);
+  assert.match(gradle, /versionName = '1.6.3'/);
+  assert.match(gradle, /versionCode = 1603/);
 });
 
 
@@ -71,6 +71,7 @@ test('WebView only keeps Sin Barreras on the trusted in-app origin and blocks cl
 
 test('microphone and camera are declared and runtime-gated', () => {
   assert.match(manifest, /android\.permission\.RECORD_AUDIO/);
+  assert.match(manifest, /android\.permission\.MODIFY_AUDIO_SETTINGS/);
   assert.match(manifest, /android\.permission\.CAMERA/);
   assert.match(activity, /RESOURCE_AUDIO_CAPTURE/);
   assert.match(activity, /RESOURCE_VIDEO_CAPTURE/);

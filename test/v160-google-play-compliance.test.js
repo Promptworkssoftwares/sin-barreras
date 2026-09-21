@@ -58,7 +58,7 @@ test('Android only declares microphone and camera media permissions that are nee
   const manifest = text('android/app/src/main/AndroidManifest.xml');
   assert.match(manifest, /RECORD_AUDIO/);
   assert.match(manifest, /CAMERA/);
-  assert.doesNotMatch(manifest, /MODIFY_AUDIO_SETTINGS/);
+  assert.match(manifest, /MODIFY_AUDIO_SETTINGS/);
 });
 
 test('reviewer account can be seeded without hardcoded credentials', () => {
@@ -72,9 +72,9 @@ test('Play Console submission and Data Safety guides ship with the release', () 
   assert.ok(existsSync(new URL('../GOOGLE_PLAY_DATA_SAFETY.md', import.meta.url)));
 });
 
-test('v1.6.2 release metadata is aligned across Node, PWA and Android', () => {
-  assert.match(text('package.json'), /"version": "1\.6\.2"/);
-  assert.match(text('public/sw.js'), /sin-barreras-v1\.6\.2/);
-  assert.match(text('android/app/build.gradle'), /versionCode = 1602/);
-  assert.match(text('android/app/build.gradle'), /versionName = '1\.6\.2'/);
+test('v1.6.3 release metadata is aligned across Node, PWA and Android', () => {
+  assert.match(text('package.json'), /"version": "1\.6\.3"/);
+  assert.match(text('public/sw.js'), /sin-barreras-v1\.6\.3/);
+  assert.match(text('android/app/build.gradle'), /versionCode = 1603/);
+  assert.match(text('android/app/build.gradle'), /versionName = '1\.6\.3'/);
 });

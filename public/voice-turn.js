@@ -1,3 +1,5 @@
+import { getMicrophoneStream } from './microphone.js?v=1.6.3';
+
 const DEFAULTS = Object.freeze({
   thinkingAfterMs: 420,
   shortSpeechSilenceMs: 1800,
@@ -23,10 +25,7 @@ export async function createAutoVoiceTurn(options = {}) {
 
   const config = { ...DEFAULTS, ...options };
   const onState = typeof config.onState === 'function' ? config.onState : () => {};
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
-    video: false
-  });
+  const stream = await getMicrophoneStream();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const audioContext = new AudioContextClass();
   await audioContext.resume();
