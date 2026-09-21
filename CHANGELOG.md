@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.4 · Feedback de pronunciación multilenguaje fácil de entender
+- La evaluación de voz ya no usa transcripciones en alfabetos no latinos como explicación principal del error.
+- Añadidos `heardMeaning`, `heardPronunciation` y `difference` para explicar en el idioma de apoyo qué entendió la app, cómo sonó y qué cambiar.
+- Mandarín, ruso, árabe, japonés y otros alfabetos conservan la escritura original solo como frase modelo; el feedback usa pronunciación legible sin IPA.
+- Práctica, Coach al repetir frases y Mis frases por partes comparten la misma capa de feedback amigable.
+- El cache de evaluaciones se versionó para no reutilizar resultados antiguos que carecen del nuevo feedback.
+- Android actualizado a versionCode 1604 / versionName 1.6.4.
+
 
 ## 1.6.3 · Android microphone / WebView audio fix
 - Added `android.permission.MODIFY_AUDIO_SETTINGS` so Chromium WebView can enumerate/route Android recording devices together with `RECORD_AUDIO`.

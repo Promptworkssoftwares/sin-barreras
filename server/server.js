@@ -158,7 +158,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.3' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.4' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({
@@ -654,42 +654,50 @@ const evaluatePractice = async ({ targetText, heardText, originalIntent, nativeL
   const fallbackScore = similarityScore(targetText, heardText);
   const normalizedTarget = normalizeWords(targetText);
   const normalizedHeard = normalizeWords(heardText);
+  const intent = String(originalIntent || '').trim();
 
   // Exact/near-exact repeats are deterministic. Calling a chat model here adds cost
-  // without adding useful feedback, so accept only very high-confidence matches locally.
-  // Lower scores still use the AI evaluator so natural alternative wording is not punished.
+  // without adding useful feedback. Return a learner-friendly explanation in the
+  // support language instead of echoing a non-Latin Whisper transcript to the UI.
   if (normalizedTarget && normalizedHeard && fallbackScore >= 96) {
     await recordCacheHit({ kind: 'practice_evaluation', feature: 'practice_score', local: true });
     return {
       score: fallbackScore,
       correctedEnglish: targetText,
-      feedback: '✓',
-      focus: '✓',
+      feedback: nativeLanguage === 'es' ? 'Se entendió correctamente.' : 'Your message was understood correctly.',
+      focus: nativeLanguage === 'es' ? 'Ahora repítelo una vez más con naturalidad.' : 'Repeat it once more naturally.',
+      heardMeaning: intent,
+      heardPronunciation: '',
+      difference: nativeLanguage === 'es' ? 'No detecté un cambio importante en las palabras.' : 'No important word difference was detected.',
       evaluationMode: 'local_high_confidence'
     };
   }
 
   const model = process.env.TRANSLATION_MODEL || 'gpt-5-nano';
-  const cacheParts = [model, nativeLanguage, targetLanguage, targetText, heardText, originalIntent || ''];
+  const cacheParts = ['learner-feedback-v2', model, nativeLanguage, targetLanguage, targetText, heardText, intent];
   const cached = await getAiCache({ userId, kind: 'practice_evaluation', parts: cacheParts, feature: 'practice_score' });
   if (cached && Number.isFinite(Number(cached.score))) return { ...cached, evaluationMode: 'cache' };
 
   try {
     const result = await chatJson({
       model,
-      maxTokens: 240,
+      maxTokens: 380,
       system: `You evaluate a learner speaking ${targetName} from transcription only. The learner's support language is ${nativeName}. You cannot hear accent quality, so NEVER claim to measure accent or phonetics. Evaluate whether the transcribed answer is understandable, reasonably natural for the learner level, and communicates the intended meaning.
 
 Return JSON only:
-{"score":0-100,"correctedEnglish":"best natural corrected ${targetName} version of what the learner tried to say","feedback":"short helpful feedback in ${nativeName}","focus":"one specific thing to practice in ${nativeName}"}.
+{"score":0-100,"correctedEnglish":"best natural corrected ${targetName} version of what the learner tried to say","feedback":"short encouraging feedback in ${nativeName}","focus":"one specific thing to practice in ${nativeName}","heardMeaning":"plain-language meaning of heardText in ${nativeName}","heardPronunciation":"beginner-friendly Latin-letter reading of heardText","difference":"one short concrete explanation in ${nativeName} of what was different or missing"}.
 
 Rules:
 - correctedEnglish MUST be in ${targetName}; the field name is kept only for API compatibility.
-- feedback and focus MUST be in ${nativeName}.
+- feedback, focus, heardMeaning, and difference MUST be in ${nativeName}.
+- heardMeaning explains what the transcription actually means. It must NOT simply repeat targetText.
+- heardPronunciation is for display only. Use simple Latin letters a beginner can read; NO IPA and NO characters from a non-Latin target script. If the target already uses Latin script, heardPronunciation may be empty.
+- difference must identify the most useful concrete difference: a missing word, changed word, word order issue, or say that the meaning matched. Do not use vague feedback such as "pronunciation needs work".
+- When ${targetName} uses a non-Latin writing system, NEVER place those target-script characters inside feedback, focus, heardMeaning, difference, or heardPronunciation. The learner can already see the correct target text elsewhere in the UI.
 - If the learner used a correct natural alternative to the target, score it fairly even if wording differs.
 - Do not invent words they did not plausibly intend.
 - Do not penalize a correct answer merely because it differs from targetText.`,
-      user: JSON.stringify({ targetText, heardText, originalIntent: originalIntent || '', targetLanguage })
+      user: JSON.stringify({ targetText, heardText, originalIntent: intent, targetLanguage })
     });
     const parsed = parseJsonContent(result, 'No pudimos evaluar la respuesta.');
     const score = Math.max(0, Math.min(100, Number(parsed.score)));
@@ -698,18 +706,27 @@ Rules:
       correctedEnglish: String(parsed.correctedEnglish || targetText).trim(),
       feedback: String(parsed.feedback || '').trim(),
       focus: String(parsed.focus || '').trim(),
+      heardMeaning: String(parsed.heardMeaning || '').trim(),
+      heardPronunciation: String(parsed.heardPronunciation || '').trim(),
+      difference: String(parsed.difference || '').trim(),
       evaluationMode: 'ai'
     };
     await setAiCache({ userId, kind: 'practice_evaluation', parts: cacheParts, payload: evaluation });
     return evaluation;
   } catch {
+    const spanish = nativeLanguage === 'es';
     return {
       score: fallbackScore,
       correctedEnglish: targetText,
-      feedback: nativeLanguage === 'es'
-        ? (fallbackScore >= 75 ? 'La frase se entendió bien. Repite una vez más con calma.' : 'Escucha el ejemplo y vuelve a intentarlo más despacio.')
-        : (fallbackScore >= 75 ? 'Good attempt. Repeat it once more calmly.' : 'Listen to the example and try again more slowly.'),
-      focus: nativeLanguage === 'es' ? 'Busca que cada palabra importante se entienda claramente.' : 'Make each important word clear.',
+      feedback: spanish
+        ? (fallbackScore >= 75 ? 'La idea se entendió. Repite una vez más con calma.' : 'Todavía hay una diferencia con la frase modelo. Escúchala y vuelve a intentarlo.')
+        : (fallbackScore >= 75 ? 'Your message was understood. Repeat it once more calmly.' : 'There is still a difference from the model phrase. Listen and try again.'),
+      focus: spanish ? 'Concéntrate en las palabras importantes de la frase modelo.' : 'Focus on the important words in the model phrase.',
+      heardMeaning: fallbackScore >= 90 ? intent : '',
+      heardPronunciation: '',
+      difference: spanish
+        ? (fallbackScore >= 90 ? 'El significado fue muy parecido al objetivo.' : 'No pude preparar una explicación detallada esta vez; compara con la frase modelo y vuelve a intentarlo.')
+        : (fallbackScore >= 90 ? 'The meaning was very close to the target.' : 'A detailed explanation was unavailable this time; compare with the model phrase and try again.'),
       evaluationMode: 'fallback'
     };
   }

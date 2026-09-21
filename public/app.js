@@ -1,15 +1,16 @@
-import { initLearning } from './learn.js?v=1.6.3';
-import { initSounds } from './sounds.js?v=1.6.3';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.3';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.3';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.3';
-import { initAIStage } from './ai-stage.js?v=1.6.3';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.3';
-import { getOrCreateTts } from './tts-cache.js?v=1.6.3';
-import { initPhrasebook } from './phrasebook.js?v=1.6.3';
-import { initPhrasePractice } from './phrase-practice.js?v=1.6.3';
-import { initQrConversation } from './qr-conversation.js?v=1.6.3';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.3';
+import { initLearning } from './learn.js?v=1.6.4';
+import { initSounds } from './sounds.js?v=1.6.4';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.4';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.4';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.4';
+import { initAIStage } from './ai-stage.js?v=1.6.4';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.4';
+import { getOrCreateTts } from './tts-cache.js?v=1.6.4';
+import { initPhrasebook } from './phrasebook.js?v=1.6.4';
+import { initPhrasePractice } from './phrase-practice.js?v=1.6.4';
+import { initQrConversation } from './qr-conversation.js?v=1.6.4';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.4';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.4';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -749,10 +750,10 @@ async function scorePracticeAudio(audio) {
     form.append('targetLanguage', state.practice.targetLanguage || 'en');
     const result = await request('/api/practice/score', { method: 'POST', body: form });
     if (ui.scoreNumber) ui.scoreNumber.textContent = `${result.score}% claro · +${result.points} puntos`;
-    if (ui.scoreFeedback) ui.scoreFeedback.textContent = result.feedback;
-    if (ui.heardText) ui.heardText.textContent = result.heardText ? `“${result.heardText}”` : 'No logramos reconocer palabras.';
+    if (ui.scoreFeedback) ui.scoreFeedback.textContent = friendlyDifference(result);
+    if (ui.heardText) ui.heardText.textContent = friendlyRecognition(result);
     if (ui.correctedText) ui.correctedText.textContent = result.correctedEnglish || state.practice.targetText || state.practice.english;
-    if (ui.focusText) ui.focusText.textContent = result.focus || 'Repite la frase con calma.';
+    if (ui.focusText) ui.focusText.textContent = friendlyFocus(result);
     ui.practiceScore?.classList.remove('is-hidden');
     guidedScroll(ui.practiceScore, { block: 'center', delay: 90 });
     addPracticePoints(result.points);
@@ -1039,10 +1040,10 @@ async function practiceCoachPhrase(article, button) {
         form.append('nativeLanguage', ui.coachLanguage?.value || 'es');
         const result = await request('/api/practice/score', { method: 'POST', body: form });
         if (resultBox) resultBox.innerHTML = `
-          <div><span>QUÉ TAN BIEN TE ENTENDÍ</span><strong>${Number(result.score || 0)}%</strong></div>
-          <p><b>Escuché:</b> ${escapeHTML(result.heardText || '')}</p>
-          <p>${escapeHTML(result.feedback || '')}</p>
-          ${result.focus ? `<small>${escapeHTML(result.focus)}</small>` : ''}`;
+          <div><span>QUÉ TAN BIEN SE ENTENDIÓ</span><strong>${Number(result.score || 0)}%</strong></div>
+          <p><b>La app entendió:</b> ${escapeHTML(friendlyRecognition(result))}</p>
+          <p><b>Qué cambiar:</b> ${escapeHTML(friendlyDifference(result))}</p>
+          <small><b>Enfócate en:</b> ${escapeHTML(friendlyFocus(result))}</small>`;
       } catch (error) {
         if (resultBox) resultBox.innerHTML = `<span>NO PUDIMOS EVALUAR</span><p>${escapeHTML(error.message || 'Intenta nuevamente.')}</p>`;
       }

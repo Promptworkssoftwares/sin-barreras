@@ -1,3 +1,4 @@
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.4';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -103,9 +104,9 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     if (result) {
       if (ui.score) ui.score.hidden = false;
       if (ui.scoreNumber) ui.scoreNumber.textContent = `${result.score}%`;
-      if (ui.scoreFeedback) ui.scoreFeedback.textContent = result.feedback || '';
-      if (ui.heard) ui.heard.textContent = result.heardText ? `“${result.heardText}”` : 'No logramos reconocer palabras.';
-      if (ui.focus) ui.focus.textContent = result.focus || 'Repítelo con calma.';
+      if (ui.scoreFeedback) ui.scoreFeedback.textContent = friendlyDifference(result);
+      if (ui.heard) ui.heard.textContent = friendlyRecognition(result);
+      if (ui.focus) ui.focus.textContent = friendlyFocus(result);
     } else if (ui.score) ui.score.hidden = true;
 
     if (ui.record) {

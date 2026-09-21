@@ -1,6 +1,6 @@
-# Sin Barreras v1.6.3
+# Sin Barreras v1.6.4
 
-### Nuevo en 1.6.3
+### Nuevo en 1.6.4
 
 - Cache inteligente de IA por cuenta para traducciones, TTS, práctica y lecciones repetidas.
 - Cache TTS local persistente para estudiar/repetir audio sin volver a generar la voz.
