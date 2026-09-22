@@ -20,7 +20,7 @@ const env = read('.env.example');
 const render = read('render.yaml');
 
 
-test('v1.6.5 enforces configurable per-user voice minutes and internal AI budget', () => {
+test('v1.6.6 enforces configurable per-user voice minutes and internal AI budget', () => {
   assert.match(quotaService, /AI_USER_MONTHLY_MINUTES_LIMIT/);
   assert.match(quotaService, /AI_USER_MONTHLY_BUDGET_USD/);
   assert.match(quotaService, /AI_USER_WARNING_PERCENT/);

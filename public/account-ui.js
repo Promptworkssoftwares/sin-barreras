@@ -32,6 +32,14 @@ export function initAccountUI() {
   const usageVoice = $('#account-ai-voice');
   const usageReset = $('#account-ai-reset');
   const usageNote = $('#account-ai-usage-note');
+  const settingsButton = $('#settings-button');
+  const settingsUsageCard = $('#settings-ai-usage');
+  const settingsUsageTitle = $('#settings-ai-usage-title');
+  const settingsUsagePercent = $('#settings-ai-usage-percent');
+  const settingsUsageBar = $('#settings-ai-usage-bar');
+  const settingsUsageRemaining = $('#settings-ai-remaining');
+  const settingsUsageReset = $('#settings-ai-reset');
+  const settingsUsageNote = $('#settings-ai-usage-note');
 
   function formatResetDate(value) {
     const date = value ? new Date(value) : null;
@@ -39,47 +47,89 @@ export function initAccountUI() {
   }
 
   function renderAiUsage(quota = {}) {
-    if (!usageCard) return;
-    if (quota.unlimited) {
-      usageCard.dataset.state = 'normal';
-      if (usageTitle) usageTitle.textContent = 'Acceso owner sin límite';
-      if (usagePercent) usagePercent.textContent = '∞';
-      if (usageBar) usageBar.style.width = '0%';
-      if (usageVoice) usageVoice.textContent = 'Voz: sin límite';
-      if (usageReset) usageReset.textContent = 'Protección owner activa';
-      if (usageNote) usageNote.textContent = 'La cuenta owner no consume el límite mensual de usuarios.';
-      return;
-    }
-
     const used = Number(quota.voiceMinutesUsed || 0);
     const limit = Number(quota.minutesLimit || 0);
     const hasVoiceLimit = Number.isFinite(limit) && limit > 0;
+    const remaining = Math.max(0, Number(quota.voiceMinutesRemaining || 0));
+    const voicePercent = hasVoiceLimit
+      ? Math.max(0, Math.min(100, Number(quota.voicePercent ?? ((used / limit) * 100)) || 0))
+      : 0;
     const effective = Math.max(0, Math.min(100, Number(quota.effectivePercent || 0)));
-    usageCard.dataset.state = quota.exhausted ? 'exhausted' : quota.warning ? 'warning' : 'normal';
-    if (usageTitle) usageTitle.textContent = quota.exhausted ? 'Límite del período alcanzado' : hasVoiceLimit ? `${used.toFixed(1)} de ${limit.toFixed(0)} min de voz` : 'Uso de IA del período';
-    if (usagePercent) usagePercent.textContent = `${effective.toFixed(0)}%`;
-    if (usageBar) usageBar.style.width = `${effective}%`;
-    if (usageVoice) usageVoice.textContent = hasVoiceLimit ? `Voz: ${used.toFixed(1)} / ${limit.toFixed(0)} min` : `Voz procesada: ${used.toFixed(1)} min`;
-    if (usageReset) usageReset.textContent = `Renueva: ${formatResetDate(quota.resetAt)}`;
-    if (usageNote) {
-      if (quota.exhausted) usageNote.textContent = quota.reason === 'voice_minutes'
-        ? 'Usaste los minutos de voz incluidos. Las funciones de IA volverán a estar disponibles al renovarse tu período.'
-        : 'Alcanzaste el uso de IA incluido en tu plan. Las funciones de IA volverán a estar disponibles al renovarse tu período.';
-      else if (quota.warning) usageNote.textContent = 'Estás cerca del límite incluido. Puedes seguir usando la app hasta completar tu período.';
-      else usageNote.textContent = hasVoiceLimit
-        ? `Te quedan ${Number(quota.voiceMinutesRemaining || 0).toFixed(1)} min de voz. El uso general de IA también tiene protección automática.`
-        : 'El uso general de IA tiene protección automática para mantener el servicio disponible.';
+    const stateName = quota.exhausted ? 'exhausted' : quota.warning ? 'warning' : 'normal';
+
+    if (usageCard) {
+      usageCard.dataset.state = stateName;
+      if (quota.unlimited) {
+        if (usageTitle) usageTitle.textContent = 'Acceso owner sin límite';
+        if (usagePercent) usagePercent.textContent = '∞';
+        if (usageBar) usageBar.style.width = '0%';
+        if (usageVoice) usageVoice.textContent = 'Voz: sin límite';
+        if (usageReset) usageReset.textContent = 'Protección owner activa';
+        if (usageNote) usageNote.textContent = 'La cuenta owner no consume el límite mensual de usuarios.';
+      } else {
+        if (usageTitle) usageTitle.textContent = quota.exhausted ? 'Límite del período alcanzado' : hasVoiceLimit ? `${used.toFixed(1)} de ${limit.toFixed(0)} min de voz` : 'Uso de IA del período';
+        if (usagePercent) usagePercent.textContent = `${effective.toFixed(0)}%`;
+        if (usageBar) usageBar.style.width = `${effective}%`;
+        if (usageVoice) usageVoice.textContent = hasVoiceLimit ? `Voz: ${used.toFixed(1)} / ${limit.toFixed(0)} min` : `Voz procesada: ${used.toFixed(1)} min`;
+        if (usageReset) usageReset.textContent = `Renueva: ${formatResetDate(quota.resetAt)}`;
+        if (usageNote) {
+          if (quota.exhausted) usageNote.textContent = quota.reason === 'voice_minutes'
+            ? 'Usaste los minutos de voz incluidos. Las funciones de IA volverán a estar disponibles al renovarse tu período.'
+            : 'Alcanzaste el uso de IA incluido en tu plan. Las funciones de IA volverán a estar disponibles al renovarse tu período.';
+          else if (quota.warning) usageNote.textContent = 'Estás cerca del límite incluido. Puedes seguir usando la app hasta completar tu período.';
+          else usageNote.textContent = hasVoiceLimit
+            ? `Te quedan ${remaining.toFixed(1)} min de voz. El uso general de IA también tiene protección automática.`
+            : 'El uso general de IA tiene protección automática para mantener el servicio disponible.';
+        }
+      }
+    }
+
+    if (settingsUsageCard) {
+      settingsUsageCard.dataset.state = stateName;
+      const meter = settingsUsageBar?.parentElement;
+      if (quota.unlimited) {
+        if (settingsUsageTitle) settingsUsageTitle.textContent = 'Minutos sin límite';
+        if (settingsUsagePercent) settingsUsagePercent.textContent = 'OWNER';
+        if (settingsUsageBar) settingsUsageBar.style.width = '0%';
+        if (settingsUsageRemaining) settingsUsageRemaining.textContent = 'Tu cuenta owner tiene acceso total.';
+        if (settingsUsageReset) settingsUsageReset.textContent = 'Sin límite';
+        if (settingsUsageNote) settingsUsageNote.textContent = 'La protección mensual se aplica a las cuentas de usuarios.';
+        meter?.setAttribute('aria-valuenow', '0');
+      } else {
+        if (settingsUsageTitle) settingsUsageTitle.textContent = hasVoiceLimit ? `${used.toFixed(1)} / ${limit.toFixed(0)} minutos` : `${used.toFixed(1)} minutos usados`;
+        if (settingsUsagePercent) settingsUsagePercent.textContent = hasVoiceLimit ? `${voicePercent.toFixed(0)}% usado` : 'Uso activo';
+        if (settingsUsageBar) settingsUsageBar.style.width = `${voicePercent}%`;
+        if (settingsUsageReset) settingsUsageReset.textContent = `Renueva: ${formatResetDate(quota.resetAt)}`;
+        if (settingsUsageRemaining) {
+          settingsUsageRemaining.textContent = hasVoiceLimit
+            ? quota.exhausted && quota.reason === 'voice_minutes'
+              ? 'Has usado todos los minutos incluidos.'
+              : `Te quedan ${remaining.toFixed(1)} minutos.`
+            : 'Tu plan tiene protección automática de uso.';
+        }
+        if (settingsUsageNote) {
+          if (quota.exhausted) settingsUsageNote.textContent = quota.reason === 'voice_minutes'
+            ? 'La voz con IA vuelve a estar disponible cuando renueve tu período.'
+            : 'El límite general de IA de tu plan se alcanzó; se restablece al renovar.';
+          else if (quota.warning) settingsUsageNote.textContent = `Ya utilizaste al menos ${Number(quota.warningPercent || 80).toFixed(0)}% del límite incluido.`;
+          else settingsUsageNote.textContent = 'Incluye traducción de voz y el uso protegido de funciones con IA.';
+        }
+        meter?.setAttribute('aria-valuenow', String(Math.round(voicePercent)));
+      }
     }
   }
 
   async function loadAiUsage() {
-    if (!usageCard) return;
+    if (!usageCard && !settingsUsageCard) return;
     try {
       const result = await jsonRequest('/api/account/ai-usage');
       renderAiUsage(result.quota || {});
     } catch (error) {
       if (usageTitle) usageTitle.textContent = 'Uso no disponible';
       if (usageNote) usageNote.textContent = error.message;
+      if (settingsUsageTitle) settingsUsageTitle.textContent = 'Uso no disponible';
+      if (settingsUsageRemaining) settingsUsageRemaining.textContent = 'No pudimos consultar tus minutos ahora.';
+      if (settingsUsageNote) settingsUsageNote.textContent = error.message;
     }
   }
 
@@ -106,6 +156,7 @@ export function initAccountUI() {
   if (manage) manage.hidden = user.role === 'owner' || !user.canManageBilling;
 
   button?.addEventListener('click', () => { dialog?.showModal(); void loadAiUsage(); });
+  settingsButton?.addEventListener('click', () => { void loadAiUsage(); });
   window.addEventListener('sinbarreras:ai-quota', (event) => renderAiUsage(event.detail || {}));
   manage?.addEventListener('click', async () => {
     try {

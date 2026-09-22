@@ -26,7 +26,7 @@ function targetInfo() {
 function download(url, destination, redirects = 0) {
   if (redirects > 6) return Promise.reject(new Error('Demasiadas redirecciones al descargar cloudflared.'));
   return new Promise((resolve, reject) => {
-    const request = https.get(url, { headers: { 'User-Agent': 'Sin-Barreras-Installer/1.6.5' } }, (response) => {
+    const request = https.get(url, { headers: { 'User-Agent': 'Sin-Barreras-Installer/1.6.6' } }, (response) => {
       if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
         response.resume();
         const next = new URL(response.headers.location, url).toString();

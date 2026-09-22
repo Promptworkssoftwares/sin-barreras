@@ -5,13 +5,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-import { bootstrapCloudState, startCloudSync } from './cloud.js?v=1.6.5';
-import { initAccountUI } from './account-ui.js?v=1.6.5';
+import { bootstrapCloudState, startCloudSync } from './cloud.js?v=1.6.6';
+import { initAccountUI } from './account-ui.js?v=1.6.6';
 
 try {
   await bootstrapCloudState();
-  await import('./app.js?v=1.6.5');
-  await import('./compliance-ui.js?v=1.6.5');
+  await import('./app.js?v=1.6.6');
+  await import('./compliance-ui.js?v=1.6.6');
   initAccountUI();
   startCloudSync();
 } catch (error) {

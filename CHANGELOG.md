@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.6 · Preferencias modernas + barra visible de minutos
+
+- Rediseño completo del menú de Preferencias con tarjetas modernas, jerarquía visual y mejor comportamiento móvil.
+- Barra de uso visible dentro de Preferencias con minutos usados, límite del período, porcentaje, minutos restantes y fecha de renovación.
+- La barra refleja específicamente el consumo de minutos de voz; el límite general de IA sigue protegido en backend.
+- Estados visuales normal, advertencia y límite alcanzado, sincronizados con el endpoint real de la cuenta.
+- Preferencias conserva todas las funciones existentes: idioma automático, voz, prueba de voz, tamaño de texto, tema, Mis frases e Historial.
+- Android actualizado a versionCode 1606 / versionName 1.6.6.
+
 ## 1.6.5 · Límites mensuales de uso de IA
 
 - Añadido límite backend configurable de 150 minutos de voz por usuario y período.

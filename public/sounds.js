@@ -1,4 +1,4 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.5';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.6';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 

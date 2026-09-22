@@ -1,6 +1,6 @@
-# Sin Barreras v1.6.5
+# Sin Barreras v1.6.6
 
-### Nuevo en 1.6.5
+### Nuevo en 1.6.6
 
 - Límite backend de **150 minutos de voz por usuario y período**.
 - Protección interna de costo para Coach, Cámara, TTS, traducción y otras funciones de IA.

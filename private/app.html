@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.6.5" />
+    <link rel="stylesheet" href="/styles.css?v=1.6.6" />
   </head>
   <body>
     <main class="app-shell">
@@ -773,25 +773,75 @@
     </section>
 
     <dialog id="settings-dialog" class="settings-dialog">
-      <form method="dialog">
-        <div class="dialog-head"><div><p class="section-label">PREFERENCIAS</p><h2>Hazlo tuyo</h2></div><button class="icon-button" value="close" aria-label="Cerrar preferencias">×</button></div>
-        <div class="setting-row auto-setting-summary"><span>Mi idioma</span><div><strong>AUTO</strong><small>Sin Barreras lo detecta automáticamente cuando hablas.</small></div></div>
-        <label class="setting-row voice-setting">Voz del traductor
-          <div class="voice-setting-control">
-            <select id="translator-voice-select">
-              <option value="coral" selected>Coral</option><option value="marin">Marin</option><option value="cedar">Cedar</option><option value="alloy">Alloy</option><option value="ash">Ash</option><option value="ballad">Ballad</option><option value="echo">Echo</option><option value="fable">Fable</option><option value="onyx">Onyx</option><option value="nova">Nova</option><option value="sage">Sage</option><option value="shimmer">Shimmer</option><option value="verse">Verse</option>
-            </select>
-            <button id="preview-voice" type="button" class="voice-preview-button">▶ Probar voz</button>
+      <form method="dialog" class="settings-shell">
+        <div class="settings-dialog-head">
+          <div>
+            <p class="section-label">PREFERENCIAS</p>
+            <h2>Hazlo tuyo</h2>
+            <p>Personaliza Sin Barreras para que se adapte a ti.</p>
           </div>
-          <small>Esta voz se usa para leer tus traducciones, práctica y contenido hablado.</small>
-        </label>
-        <label class="setting-row">Tamaño del texto
-          <select id="font-size-select"><option value="normal">Normal</option><option value="large">Grande</option><option value="xl">Extra grande</option></select>
-        </label>
-        <div class="setting-row stacked"><span>Modo de apariencia</span><div class="segmented compact"><button type="button" class="theme-option" data-theme="light">Claro</button><button type="button" class="theme-option" data-theme="dark">Oscuro</button></div></div>
-        <button id="settings-open-phrasebook" class="settings-history-button" type="button"><span>★</span><span><strong>Mis frases</strong><small>Frases guardadas y disponibles offline</small></span><b>→</b></button>
-        <button id="open-history" class="settings-history-button" type="button"><span>◷</span><span><strong>Historial</strong><small>Ver conversaciones guardadas</small></span><b>→</b></button>
-        <p class="dialog-note">Tu historial, vocabulario, preferencias y progreso se sincronizan con tu cuenta de forma privada.</p>
+          <button class="settings-close" value="close" aria-label="Cerrar preferencias">×</button>
+        </div>
+
+        <section id="settings-ai-usage" class="settings-usage-card" data-state="normal" aria-live="polite">
+          <div class="settings-usage-topline">
+            <div class="settings-usage-label"><span class="settings-feature-icon" aria-hidden="true">⌁</span><strong>Uso de IA</strong><small>este período</small></div>
+            <span id="settings-ai-reset" class="settings-reset-pill">Renueva: —</span>
+          </div>
+          <div class="settings-usage-numbers">
+            <strong id="settings-ai-usage-title">Cargando uso…</strong>
+            <b id="settings-ai-usage-percent">—</b>
+          </div>
+          <div class="settings-usage-meter" role="progressbar" aria-label="Minutos de voz utilizados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="settings-ai-usage-bar"></i></div>
+          <div class="settings-usage-bottom">
+            <span id="settings-ai-remaining">Calculando minutos disponibles…</span>
+            <small id="settings-ai-usage-note">El límite se controla de forma segura en tu cuenta.</small>
+          </div>
+        </section>
+
+        <div class="settings-section-card">
+          <div class="modern-setting-row auto-setting-summary">
+            <span class="settings-feature-icon" aria-hidden="true">◎</span>
+            <div class="modern-setting-copy"><strong>Mi idioma</strong><small>Sin Barreras lo detecta automáticamente cuando hablas.</small></div>
+            <span class="settings-auto-badge">AUTO</span>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <div class="modern-setting-row voice-setting">
+            <span class="settings-feature-icon" aria-hidden="true">◖</span>
+            <div class="modern-setting-copy"><strong>Voz del traductor</strong><small>Se usa para leer tus traducciones, práctica y contenido hablado.</small></div>
+            <div class="voice-setting-control">
+              <select id="translator-voice-select" aria-label="Voz del traductor">
+                <option value="coral" selected>Coral</option><option value="marin">Marin</option><option value="cedar">Cedar</option><option value="alloy">Alloy</option><option value="ash">Ash</option><option value="ballad">Ballad</option><option value="echo">Echo</option><option value="fable">Fable</option><option value="onyx">Onyx</option><option value="nova">Nova</option><option value="sage">Sage</option><option value="shimmer">Shimmer</option><option value="verse">Verse</option>
+              </select>
+              <button id="preview-voice" type="button" class="voice-preview-button">▶ Probar voz</button>
+            </div>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <label class="modern-setting-row text-size-setting" for="font-size-select">
+            <span class="settings-feature-icon settings-text-icon" aria-hidden="true">Aa</span>
+            <div class="modern-setting-copy"><strong>Tamaño del texto</strong><small>Ajusta la lectura sin cambiar el contenido.</small></div>
+            <select id="font-size-select"><option value="normal">Normal</option><option value="large">Grande</option><option value="xl">Extra grande</option></select>
+          </label>
+
+          <div class="settings-divider"></div>
+
+          <div class="modern-setting-row appearance-setting">
+            <span class="settings-feature-icon" aria-hidden="true">☼</span>
+            <div class="modern-setting-copy"><strong>Modo de apariencia</strong><small>Elige el estilo que te resulte más cómodo.</small></div>
+            <div class="settings-theme-control"><button type="button" class="theme-option" data-theme="light"><span>☀</span>Claro</button><button type="button" class="theme-option" data-theme="dark"><span>☾</span>Oscuro</button></div>
+          </div>
+        </div>
+
+        <div class="settings-shortcuts">
+          <button id="settings-open-phrasebook" class="settings-shortcut-card" type="button"><span class="settings-feature-icon" aria-hidden="true">★</span><span><strong>Mis frases</strong><small>Frases guardadas y disponibles offline</small></span><b>→</b></button>
+          <button id="open-history" class="settings-shortcut-card" type="button"><span class="settings-feature-icon" aria-hidden="true">◷</span><span><strong>Historial</strong><small>Ver conversaciones guardadas</small></span><b>→</b></button>
+        </div>
+
+        <p class="settings-privacy-note"><span aria-hidden="true">⌾</span> Tu historial, vocabulario, preferencias y progreso se sincronizan con tu cuenta de forma privada.</p>
       </form>
     </dialog>
 
@@ -926,7 +976,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.6.5"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.6.5"></script>
+    <script src="/play-billing.js?v=1.6.6"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.6.6"></script>
   </body>
 </html>

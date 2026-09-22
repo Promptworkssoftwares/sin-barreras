@@ -1,4 +1,4 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.5';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.6';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
