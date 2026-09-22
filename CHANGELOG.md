@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.5 · Límites mensuales de uso de IA
+
+- Añadido límite backend configurable de 150 minutos de voz por usuario y período.
+- Añadido tope interno configurable de costo estimado para proteger el margen ante uso intensivo de Coach, Cámara, TTS y texto.
+- Mi Cuenta ahora muestra minutos usados, porcentaje del plan, fecha de reinicio y alertas.
+- El intérprete manos libres se detiene al alcanzar el límite para evitar reintentos automáticos.
+- Las conversaciones QR respetan el límite del suscriptor host.
+- Admin Dashboard muestra límite global, presupuesto interno, usuarios en alerta/bloqueados y consumo por usuario.
+- El límite se anuncia en la pantalla de precios y en los Términos de Uso.
+- Android actualizado a versionCode 1605 / versionName 1.6.5.
+
 ## 1.6.4 · Feedback de pronunciación multilenguaje fácil de entender
 - La evaluación de voz ya no usa transcripciones en alfabetos no latinos como explicación principal del error.
 - Añadidos `heardMeaning`, `heardPronunciation` y `difference` para explicar en el idioma de apoyo qué entendió la app, cómo sonó y qué cambiar.

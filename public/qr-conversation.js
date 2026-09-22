@@ -1,4 +1,4 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.4';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.5';
 
 export function initQrConversation({ notify, request, languages, createAutoVoiceTurn, getDefaults } = {}) {
   const dialog = document.querySelector('#qr-conversation-dialog');
@@ -170,6 +170,7 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
 
   async function recordTurn() {
     if (!room || busy) return;
+    let quotaBlocked = false;
     try {
       busy = true;
       talkButton.disabled = true;
@@ -186,12 +187,17 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
       form.append('role', 'host');
       form.append('token', room.hostToken);
       await request(`/api/public/conversations/${encodeURIComponent(room.code)}/interpret`, { method: 'POST', body: form });
-    } catch (error) { if (error.name !== 'AbortError') notify?.(error.message || 'No pudimos enviar tu voz.'); }
-    finally {
+    } catch (error) {
+      if (error.code === 'AI_MONTHLY_LIMIT_REACHED') {
+        quotaBlocked = true;
+        setStatus(error.message, 'closed');
+      }
+      if (error.name !== 'AbortError') notify?.(error.message || 'No pudimos enviar tu voz.');
+    } finally {
       capture = null;
       busy = false;
-      talkButton.disabled = false;
-      talkButton.textContent = '● Hablar desde este teléfono';
+      talkButton.disabled = quotaBlocked;
+      talkButton.textContent = quotaBlocked ? 'Límite de uso alcanzado' : '● Hablar desde este teléfono';
     }
   }
 

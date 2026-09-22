@@ -1,6 +1,6 @@
-import { createAutoVoiceTurn } from '../voice-turn.js?v=1.6.4';
-import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.6.4';
-import { LANGUAGES } from '../languages.js?v=1.6.4';
+import { createAutoVoiceTurn } from '../voice-turn.js?v=1.6.5';
+import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.6.5';
+import { LANGUAGES } from '../languages.js?v=1.6.5';
 
 const code = location.pathname.split('/').filter(Boolean).pop()?.toUpperCase() || '';
 const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('token') || new URLSearchParams(location.search).get('token') || '';
@@ -30,6 +30,7 @@ async function request(url, options = {}) {
   if (!response.ok) {
     const error = new Error(payload.error || 'No fue posible completar la solicitud.');
     error.code = payload.code || '';
+    error.quota = payload.quota || null;
     throw error;
   }
   return payload;
@@ -142,11 +143,16 @@ async function recordTurn() {
     await request(`/api/public/conversations/${encodeURIComponent(code)}/interpret`, { method: 'POST', body: form });
   } catch (error) {
     if (error.name !== 'AbortError') status.textContent = error.message || 'No pudimos traducir este turno.';
+    if (error.code === 'AI_MONTHLY_LIMIT_REACHED') {
+      status.dataset.state = 'closed';
+      talk.disabled = true;
+    }
   } finally {
     capture = null;
     busy = false;
-    talk.disabled = false;
-    talk.querySelector('strong').textContent = 'Hablar';
+    const quotaBlocked = status?.dataset?.state === 'closed' && /límite|uso de ia|minutos/i.test(String(status?.textContent || ''));
+    talk.disabled = quotaBlocked;
+    talk.querySelector('strong').textContent = quotaBlocked ? 'Límite alcanzado' : 'Hablar';
   }
 }
 

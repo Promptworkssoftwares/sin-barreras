@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#132427">
   <title>Sin Barreras · Admin Dashboard</title>
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/css/admin.css?v=1.6.4">
+  <link rel="stylesheet" href="/css/admin.css?v=1.6.5">
 </head>
 <body>
   <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="admin-sidebar">
@@ -96,6 +96,13 @@
         <article><span>TRANSCRIPCIÓN</span><strong id="usage-minutes">—</strong><small>Minutos procesados</small></article>
         <article><span>COSTO EST.</span><strong id="usage-cost">—</strong><small>USD · según tarifas configuradas</small></article>
       </div>
+      <div class="stats-grid usage-stats quota-stats">
+        <article><span>LÍMITE / USUARIO</span><strong id="quota-limit-minutes">—</strong><small>Minutos de voz por período</small></article>
+        <article><span>TOPE INTERNO</span><strong id="quota-budget">—</strong><small>Protección de costo por usuario</small></article>
+        <article><span>EN ALERTA</span><strong id="quota-warning-users">—</strong><small>Usuarios sobre el umbral</small></article>
+        <article><span>BLOQUEADOS</span><strong id="quota-exhausted-users">—</strong><small>Límite del período alcanzado</small></article>
+      </div>
+      <article class="table-card quota-users-card"><div class="table-card-head"><div><span>POR USUARIO</span><h2>Consumo del período activo</h2></div></div><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Acceso</th><th>Voz</th><th>Uso IA</th><th>Costo est.</th><th>Reinicio</th><th>Estado</th></tr></thead><tbody id="quota-users-table"></tbody></table></div></article>
       <article class="table-card"><div class="table-card-head"><div><span>DIARIO</span><h2>Consumo de los últimos 30 días</h2></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Solicitudes</th><th>API calls</th><th>Cache</th><th>Tokens</th><th>Transcripción</th><th>TTS chars</th><th>Costo est.</th></tr></thead><tbody id="usage-table"></tbody></table></div></article>
     </section>
 
@@ -112,6 +119,6 @@
 
   <div id="admin-toast" class="admin-toast" role="status"></div>
   <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
-  <script type="module" src="/js/admin.js?v=1.6.4"></script>
+  <script type="module" src="/js/admin.js?v=1.6.5"></script>
 </body>
 </html>

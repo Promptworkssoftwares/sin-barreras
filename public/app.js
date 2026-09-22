@@ -1,16 +1,16 @@
-import { initLearning } from './learn.js?v=1.6.4';
-import { initSounds } from './sounds.js?v=1.6.4';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.4';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.4';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.4';
-import { initAIStage } from './ai-stage.js?v=1.6.4';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.4';
-import { getOrCreateTts } from './tts-cache.js?v=1.6.4';
-import { initPhrasebook } from './phrasebook.js?v=1.6.4';
-import { initPhrasePractice } from './phrase-practice.js?v=1.6.4';
-import { initQrConversation } from './qr-conversation.js?v=1.6.4';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.4';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.4';
+import { initLearning } from './learn.js?v=1.6.5';
+import { initSounds } from './sounds.js?v=1.6.5';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.5';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.5';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.5';
+import { initAIStage } from './ai-stage.js?v=1.6.5';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.5';
+import { getOrCreateTts } from './tts-cache.js?v=1.6.5';
+import { initPhrasebook } from './phrasebook.js?v=1.6.5';
+import { initPhrasePractice } from './phrase-practice.js?v=1.6.5';
+import { initQrConversation } from './qr-conversation.js?v=1.6.5';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.5';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.5';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -576,6 +576,11 @@ async function request(path, options = {}) {
   if (!response.ok) {
     const error = new Error(result.error || 'No fue posible completar la solicitud.');
     error.status = response.status;
+    error.code = result.code || '';
+    error.quota = result.quota || null;
+    if (error.code === 'AI_MONTHLY_LIMIT_REACHED' && error.quota) {
+      window.dispatchEvent(new CustomEvent('sinbarreras:ai-quota', { detail: error.quota }));
+    }
     throw error;
   }
   return result;
@@ -605,6 +610,15 @@ async function interpretAudio(audio, sessionId) {
   } catch (error) {
     if (error.name === 'AbortError') return;
     notify(error.message || 'No pudimos traducir este mensaje.');
+    if (error.code === 'AI_MONTHLY_LIMIT_REACHED') {
+      state.running = false;
+      state.conversationSession += 1;
+      cleanConversationResources();
+      renderConversationButtonState('idle');
+      setStatus('paused', error.message);
+      updateWaveVisual(0, false);
+      return;
+    }
     if (state.running && sessionId === state.conversationSession) window.setTimeout(() => startRecordingSegment(sessionId), 900);
   } finally {
     if (state.conversationController === controller) state.conversationController = null;

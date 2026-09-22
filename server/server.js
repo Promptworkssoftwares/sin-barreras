@@ -21,6 +21,7 @@ import User from '../models/User.js';
 import { stripe, stripeEnabled, syncCheckoutSession, syncSubscription } from '../services/stripeService.js';
 import { ensureOwnerAccount } from '../services/ownerService.js';
 import { aiUsageContextMiddleware, recordCacheHit, recordChatUsage, recordFeatureRequest, recordTranscriptionUsage, recordTtsUsage, runWithAiUsage } from '../services/aiUsageService.js';
+import { aiQuotaConfig, aiQuotaMiddleware, assertAiQuotaAvailable } from '../services/aiQuotaService.js';
 import { getAiCache, setAiCache } from '../services/aiCacheService.js';
 import { authorizeConversationRoom, emitRoomEvent, getRoomEvents, markRoomActivity, participantAcceptedTerms, publicRoom } from '../services/conversationRoomService.js';
 
@@ -158,11 +159,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 const authProviders = configurePassport();
 
-app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.4' }));
+app.get('/health', (_request, response) => response.json({ status: 'ok', version: '1.6.5' }));
 
 
 app.get('/api/public/config', (_request, response) => response.json({
   price: Number(process.env.STRIPE_MONTHLY_AMOUNT || 599) / 100,
+  aiMonthlyMinutesLimit: aiQuotaConfig().minutesLimit,
   currency: (process.env.STRIPE_CURRENCY || 'usd').toUpperCase(),
   localLoginEnabled: true,
   googleLoginEnabled: authProviders.googleEnabled,
@@ -1100,6 +1102,14 @@ app.post('/api/public/conversations/:code/interpret', qrConversationLimiter, aud
     if (!participantAcceptedTerms(room, role)) return response.status(403).json({ error: 'Acepta los Términos y las reglas de conversación antes de participar.', code: 'TERMS_REQUIRED' });
     const host = await User.findById(room.hostUser);
     if (!host || !host.hasAppAccess()) return response.status(402).json({ error: 'La conversación ya no tiene acceso activo.' });
+    try {
+      await assertAiQuotaAvailable(host);
+    } catch (quotaError) {
+      if (quotaError.code === 'AI_MONTHLY_LIMIT_REACHED') {
+        return response.status(429).json({ error: quotaError.message, code: quotaError.code, quota: quotaError.quota });
+      }
+      throw quotaError;
+    }
 
     const sourceLanguage = role === 'host' ? room.hostLanguage : room.guestLanguage;
     const targetLanguage = role === 'host' ? room.guestLanguage : room.hostLanguage;
@@ -1129,7 +1139,7 @@ app.post('/api/public/conversations/:code/interpret', qrConversationLimiter, aud
 });
 
 // All authenticated AI endpoints below require an account with active entitlement.
-app.use('/api', requireAccess, aiUsageContextMiddleware);
+app.use('/api', requireAccess, aiUsageContextMiddleware, aiQuotaMiddleware);
 
 app.post('/api/interpret', aiLimiter, audioUpload.single('audio'), async (request, response, next) => {
   try {
@@ -1394,7 +1404,11 @@ app.use((error, _request, response, _next) => {
     ? 'Este dominio no está autorizado para usar el servicio.'
     : error.message || 'Ocurrió un problema procesando la solicitud.';
   console.error(error);
-  response.status(500).json({ error: safeMessage });
+  const statusCode = Number.isInteger(Number(error?.statusCode)) ? Number(error.statusCode) : 500;
+  const payload = { error: safeMessage };
+  if (error?.code) payload.code = error.code;
+  if (error?.quota) payload.quota = error.quota;
+  response.status(statusCode).json(payload);
 });
 
 app.listen(port, () => {

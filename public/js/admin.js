@@ -104,13 +104,32 @@ async function loadGrants(){ const data=await api('/api/admin/grants'); $('#gran
 
 
 async function loadUsage(){
-  const data=await api('/api/admin/usage?days=30');
+  const [data,quotaData]=await Promise.all([
+    api('/api/admin/usage?days=30'),
+    api('/api/admin/usage/users?limit=100')
+  ]);
   const totals=data.totals||{};
   $('#usage-requests').textContent=Number(totals.featureRequests||0).toLocaleString();
   $('#usage-calls').textContent=Number(totals.openAiCalls||0).toLocaleString();
   $('#usage-cache-hits').textContent=Number(totals.cacheHits||0).toLocaleString();
   $('#usage-minutes').textContent=(Number(totals.transcriptionSeconds||0)/60).toFixed(1);
   $('#usage-cost').textContent=`$${Number(totals.estimatedCostUsd||0).toFixed(3)}`;
+
+  const config=quotaData.config||{};
+  const quotaSummary=quotaData.summary||{};
+  $('#quota-limit-minutes').textContent=`${Number(config.minutesLimit||0).toFixed(0)} min`;
+  $('#quota-budget').textContent=`$${Number(config.budgetUsd||0).toFixed(2)}`;
+  $('#quota-warning-users').textContent=Number(quotaSummary.warningUsers||0).toLocaleString();
+  $('#quota-exhausted-users').textContent=Number(quotaSummary.exhaustedUsers||0).toLocaleString();
+  const quotaRows=quotaData.items||[];
+  $('#quota-users-table').innerHTML=quotaRows.length?quotaRows.map(item=>{
+    const [label,cls]=accessInfo(item);
+    const pct=Math.max(0,Math.min(100,Number(item.effectivePercent||0)));
+    const state=item.exhausted?'<span class="badge revoked">LÍMITE</span>':item.warning?'<span class="badge trial">ALERTA</span>':'<span class="badge paid">OK</span>';
+    const minutesLimit=Number(item.minutesLimit||0);
+    return `<tr><td>${userCell(item)}</td><td><span class="badge ${cls}">${label}</span></td><td><strong>${Number(item.minutesUsed||0).toFixed(1)} / ${minutesLimit.toFixed(0)} min</strong></td><td><div class="quota-meter"><i style="width:${pct}%"></i></div><small class="provider-note">${pct.toFixed(0)}%</small></td><td>$${Number(item.estimatedCostUsd||0).toFixed(3)}</td><td>${formatDate(item.resetAt)}</td><td>${state}</td></tr>`;
+  }).join(''):`<tr><td colspan="7">Todavía no hay usuarios con consumo de IA en este período.</td></tr>`;
+
   const rows=[...(data.daily||[])].reverse();
   $('#usage-table').innerHTML=rows.length?rows.map(row=>`<tr><td>${escapeHtml(row.date)}</td><td>${Number(row.featureRequests||0).toLocaleString()}</td><td>${Number(row.openAiCalls||0).toLocaleString()}</td><td>${Number(row.cacheHits||0).toLocaleString()}</td><td>${Number((row.inputTokens||0)+(row.outputTokens||0)).toLocaleString()}</td><td>${(Number(row.transcriptionSeconds||0)/60).toFixed(1)} min</td><td>${Number(row.ttsCharacters||0).toLocaleString()}</td><td>$${Number(row.estimatedCostUsd||0).toFixed(4)}</td></tr>`).join(''):`<tr><td colspan="8">Todavía no hay consumo de IA registrado.</td></tr>`;
 }

@@ -25,6 +25,63 @@ export function initAccountUI() {
   const deletePassword = $('#delete-account-password');
   const deleteConfirmation = $('#delete-account-confirmation');
   const deleteStatus = $('#delete-account-status');
+  const usageCard = $('#account-ai-usage');
+  const usageTitle = $('#account-ai-usage-title');
+  const usagePercent = $('#account-ai-usage-percent');
+  const usageBar = $('#account-ai-usage-bar');
+  const usageVoice = $('#account-ai-voice');
+  const usageReset = $('#account-ai-reset');
+  const usageNote = $('#account-ai-usage-note');
+
+  function formatResetDate(value) {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString('es-US', { month:'short', day:'numeric' }) : '—';
+  }
+
+  function renderAiUsage(quota = {}) {
+    if (!usageCard) return;
+    if (quota.unlimited) {
+      usageCard.dataset.state = 'normal';
+      if (usageTitle) usageTitle.textContent = 'Acceso owner sin límite';
+      if (usagePercent) usagePercent.textContent = '∞';
+      if (usageBar) usageBar.style.width = '0%';
+      if (usageVoice) usageVoice.textContent = 'Voz: sin límite';
+      if (usageReset) usageReset.textContent = 'Protección owner activa';
+      if (usageNote) usageNote.textContent = 'La cuenta owner no consume el límite mensual de usuarios.';
+      return;
+    }
+
+    const used = Number(quota.voiceMinutesUsed || 0);
+    const limit = Number(quota.minutesLimit || 0);
+    const hasVoiceLimit = Number.isFinite(limit) && limit > 0;
+    const effective = Math.max(0, Math.min(100, Number(quota.effectivePercent || 0)));
+    usageCard.dataset.state = quota.exhausted ? 'exhausted' : quota.warning ? 'warning' : 'normal';
+    if (usageTitle) usageTitle.textContent = quota.exhausted ? 'Límite del período alcanzado' : hasVoiceLimit ? `${used.toFixed(1)} de ${limit.toFixed(0)} min de voz` : 'Uso de IA del período';
+    if (usagePercent) usagePercent.textContent = `${effective.toFixed(0)}%`;
+    if (usageBar) usageBar.style.width = `${effective}%`;
+    if (usageVoice) usageVoice.textContent = hasVoiceLimit ? `Voz: ${used.toFixed(1)} / ${limit.toFixed(0)} min` : `Voz procesada: ${used.toFixed(1)} min`;
+    if (usageReset) usageReset.textContent = `Renueva: ${formatResetDate(quota.resetAt)}`;
+    if (usageNote) {
+      if (quota.exhausted) usageNote.textContent = quota.reason === 'voice_minutes'
+        ? 'Usaste los minutos de voz incluidos. Las funciones de IA volverán a estar disponibles al renovarse tu período.'
+        : 'Alcanzaste el uso de IA incluido en tu plan. Las funciones de IA volverán a estar disponibles al renovarse tu período.';
+      else if (quota.warning) usageNote.textContent = 'Estás cerca del límite incluido. Puedes seguir usando la app hasta completar tu período.';
+      else usageNote.textContent = hasVoiceLimit
+        ? `Te quedan ${Number(quota.voiceMinutesRemaining || 0).toFixed(1)} min de voz. El uso general de IA también tiene protección automática.`
+        : 'El uso general de IA tiene protección automática para mantener el servicio disponible.';
+    }
+  }
+
+  async function loadAiUsage() {
+    if (!usageCard) return;
+    try {
+      const result = await jsonRequest('/api/account/ai-usage');
+      renderAiUsage(result.quota || {});
+    } catch (error) {
+      if (usageTitle) usageTitle.textContent = 'Uso no disponible';
+      if (usageNote) usageNote.textContent = error.message;
+    }
+  }
 
   if (avatar) {
     if (user.avatarUrl) avatar.innerHTML = `<img src="${user.avatarUrl.replace(/"/g, '&quot;')}" alt="" referrerpolicy="no-referrer">`;
@@ -48,7 +105,8 @@ export function initAccountUI() {
   if (deleteButton) deleteButton.hidden = user.role === 'owner';
   if (manage) manage.hidden = user.role === 'owner' || !user.canManageBilling;
 
-  button?.addEventListener('click', () => dialog?.showModal());
+  button?.addEventListener('click', () => { dialog?.showModal(); void loadAiUsage(); });
+  window.addEventListener('sinbarreras:ai-quota', (event) => renderAiUsage(event.detail || {}));
   manage?.addEventListener('click', async () => {
     try {
       manage.disabled = true;

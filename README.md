@@ -1,13 +1,16 @@
-# Sin Barreras v1.6.4
+# Sin Barreras v1.6.5
 
-### Nuevo en 1.6.4
+### Nuevo en 1.6.5
 
-- Cache inteligente de IA por cuenta para traducciones, TTS, práctica y lecciones repetidas.
-- Cache TTS local persistente para estudiar/repetir audio sin volver a generar la voz.
-- Evaluación híbrida: coincidencias de pronunciación de alta confianza se resuelven localmente; alternativas naturales siguen usando IA.
-- El cache expira automáticamente y se elimina con la cuenta.
+- Límite backend de **150 minutos de voz por usuario y período**.
+- Protección interna de costo para Coach, Cámara, TTS, traducción y otras funciones de IA.
+- Aviso automático al 80 % y bloqueo seguro al llegar al límite.
+- Mi Cuenta muestra consumo, porcentaje utilizado, minutos restantes y fecha de reinicio.
+- Admin Dashboard muestra consumo por usuario, costo estimado, alertas y límites alcanzados.
+- El intérprete manos libres se detiene al alcanzar el límite para evitar ciclos de reintentos.
+- Las conversaciones QR consumen el límite de la cuenta host.
 
-`Mis frases` incluye práctica multilenguaje por segmentos: escucha, repite y recibe evaluación parte por parte antes de decir la frase completa. El progreso de cada frase se sincroniza con la cuenta.
+La versión conserva las mejoras de 1.6.4: feedback de pronunciación amigable y multilenguaje, cache privado de IA y cache local de TTS.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
 
@@ -46,6 +49,28 @@ npm run package:release
 `QR_PUBLIC_URL` permite sustituir el Quick Tunnel por una URL HTTPS estable de Render, un dominio propio o un Cloudflare Named Tunnel.
 
 > Los Quick Tunnels de Cloudflare están pensados para desarrollo/pruebas. En producción, la aplicación desplegada en Render o un Named Tunnel estable debe usar su URL pública normal.
+
+
+## Límite de uso de IA por usuario
+
+Sin Barreras aplica el límite en el backend, no en el navegador. El valor inicial recomendado de esta versión es **150 minutos de voz por período** por usuario. Además existe un tope interno de costo estimado para proteger Coach, Cámara, TTS y otras llamadas que no dependen directamente de minutos de transcripción.
+
+Variables principales:
+
+```env
+AI_USER_MONTHLY_MINUTES_LIMIT=150
+AI_USER_MONTHLY_BUDGET_USD=3.00
+AI_USER_WARNING_PERCENT=80
+AI_TRIAL_PERIOD_DAYS=7
+```
+
+- El usuario ve su consumo desde **Mi Cuenta** y recibe aviso al 80 %.
+- Al alcanzar el límite, el backend devuelve `AI_MONTHLY_LIMIT_REACHED` y bloquea nuevas llamadas de IA hasta el siguiente período.
+- El intérprete manos libres se detiene automáticamente para evitar reintentos continuos.
+- Las conversaciones QR consumen el límite del host que creó la sala.
+- La cuenta owner queda fuera del límite.
+- El Admin Dashboard muestra consumo, costo estimado, usuarios en alerta y usuarios bloqueados.
+- El tope de costo usa las variables `AI_COST_*`; si cambias de modelo o cambian tus tarifas reales, actualízalas en Render para mantener la protección económica alineada.
 
 ## Seguridad del portal QR
 

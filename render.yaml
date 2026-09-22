@@ -48,6 +48,14 @@ services:
         sync: false
       - key: QR_CONVERSATION_RATE_LIMIT
         value: 90
+      - key: AI_USER_MONTHLY_MINUTES_LIMIT
+        value: "150"
+      - key: AI_USER_MONTHLY_BUDGET_USD
+        value: "3.00"
+      - key: AI_USER_WARNING_PERCENT
+        value: "80"
+      - key: AI_TRIAL_PERIOD_DAYS
+        value: "7"
       - key: ALLOWED_ORIGINS
         sync: false
       - key: SMTP_HOST

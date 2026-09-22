@@ -65,3 +65,5 @@
 .report-content{max-width:420px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4}
 
 .badge.trial{border-color:rgba(111,221,193,.4);background:rgba(111,221,193,.1);color:#9cebd8}
+
+.quota-stats{margin-top:0}.quota-users-card{margin-bottom:13px}.quota-meter{width:110px;max-width:100%;height:7px;overflow:hidden;border-radius:999px;background:rgba(127,127,127,.16)}.quota-meter i{display:block;height:100%;border-radius:inherit;background:currentColor}.quota-users-card td:nth-child(4){min-width:130px}

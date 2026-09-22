@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.6.4" />
+    <link rel="stylesheet" href="/styles.css?v=1.6.5" />
   </head>
   <body>
     <main class="app-shell">
@@ -832,6 +832,15 @@
           <div class="account-avatar" id="account-avatar">SB</div>
           <div><strong id="account-name">Usuario</strong><span id="account-email"></span><small id="account-plan">PLAN SIN BARRERAS</small></div>
         </div>
+        <section id="account-ai-usage" class="account-usage-card" aria-live="polite">
+          <div class="account-usage-head"><div><span>USO DE IA · ESTE PERÍODO</span><strong id="account-ai-usage-title">Cargando uso…</strong></div><b id="account-ai-usage-percent">—</b></div>
+          <div class="account-usage-meter" aria-hidden="true"><i id="account-ai-usage-bar"></i></div>
+          <div class="account-usage-details">
+            <span id="account-ai-voice">Voz: —</span>
+            <span id="account-ai-reset">Renueva: —</span>
+          </div>
+          <p id="account-ai-usage-note">Tu uso se controla en el servidor para proteger tu plan y mantener el servicio disponible.</p>
+        </section>
         <div class="account-actions">
           <button id="manage-subscription" type="button"><span>◫</span><div><strong>Administrar suscripción</strong><small>Pago, tarjeta o cancelación</small></div><b>→</b></button>
           <button id="open-admin" type="button" hidden><span>⌘</span><div><strong>Admin Dashboard</strong><small>Usuarios, accesos y suscripciones</small></div><b>→</b></button>
@@ -917,7 +926,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.6.4"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.6.4"></script>
+    <script src="/play-billing.js?v=1.6.5"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.6.5"></script>
   </body>
 </html>

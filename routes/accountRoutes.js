@@ -7,6 +7,7 @@ import { publicUser } from '../services/accessService.js';
 import { refreshGooglePlayEntitlement } from '../services/googlePlayService.js';
 import { deleteUserAccount } from '../services/accountService.js';
 import AiContentReport from '../models/AiContentReport.js';
+import { getAiQuotaStatus, publicAiQuota } from '../services/aiQuotaService.js';
 
 const router = express.Router();
 const MAX_STATE_BYTES = 750_000;
@@ -80,6 +81,14 @@ router.get('/auth/me', async (request, response) => {
     catch (error) { console.warn('Google Play entitlement refresh failed:', error.message); }
   }
   response.json({ authenticated: Boolean(request.user), user: publicUser(request.user) });
+});
+
+router.get('/account/ai-usage', requireAuth, async (request, response, next) => {
+  try {
+    const quota = await getAiQuotaStatus(request.user);
+    response.set('Cache-Control', 'no-store');
+    response.json({ quota: publicAiQuota(quota) });
+  } catch (error) { next(error); }
 });
 
 router.get('/account/state', requireAuth, async (request, response, next) => {

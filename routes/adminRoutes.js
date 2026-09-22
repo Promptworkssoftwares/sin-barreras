@@ -7,6 +7,7 @@ import { calculateStripeMrr, scheduleUserSubscriptionCancellation } from '../ser
 import { cancelGooglePlaySubscription } from '../services/googlePlayService.js';
 import { deleteUserAccount } from '../services/accountService.js';
 import { getAiUsageSummary, getCurrentMonthAiCostUsd } from '../services/aiUsageService.js';
+import { aiQuotaConfig, getAiQuotaStatus } from '../services/aiQuotaService.js';
 import AiContentReport from '../models/AiContentReport.js';
 import ConversationReport from '../models/ConversationReport.js';
 
@@ -98,6 +99,48 @@ router.get('/usage', async (request, response, next) => {
   } catch (error) { next(error); }
 });
 
+
+router.get('/usage/users', async (request, response, next) => {
+  try {
+    const limit = Math.max(10, Math.min(200, Number(request.query.limit || 100)));
+    const users = await User.find({ role: 'user', accountStatus: 'active' })
+      .sort({ lastLoginAt: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+    const activeUsers = users.filter((user) => leanUserHasAccess(user));
+    const rows = await Promise.all(activeUsers.map(async (user) => ({ user, quota: await getAiQuotaStatus(user) })));
+    rows.sort((a, b) => Number(b.quota.effectivePercent || 0) - Number(a.quota.effectivePercent || 0));
+    const items = rows.map(({ user, quota }) => ({
+      id: String(user._id),
+      email: user.email,
+      name: user.name,
+      freeAccess: Boolean(user.freeAccess),
+      subscriptionStatus: user.subscriptionStatus,
+      billingProvider: user.billingProvider,
+      currentPeriodEnd: user.currentPeriodEnd,
+      minutesUsed: quota.voiceMinutesUsed,
+      minutesLimit: quota.minutesLimit,
+      minutesRemaining: quota.voiceMinutesRemaining,
+      voicePercent: quota.voicePercent,
+      generalUsagePercent: quota.generalUsagePercent,
+      effectivePercent: quota.effectivePercent,
+      estimatedCostUsd: quota.estimatedCostUsd,
+      resetAt: quota.resetAt,
+      warning: quota.warning,
+      exhausted: quota.exhausted,
+      reason: quota.reason
+    }));
+    response.json({
+      config: aiQuotaConfig(),
+      summary: {
+        activeUsers: items.length,
+        warningUsers: items.filter((item) => item.warning).length,
+        exhaustedUsers: items.filter((item) => item.exhausted).length
+      },
+      items
+    });
+  } catch (error) { next(error); }
+});
 
 router.get('/reports/ai', async (request, response, next) => {
   try {

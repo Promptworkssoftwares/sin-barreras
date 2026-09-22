@@ -1,6 +1,6 @@
 {
   "name": "sin-barreras",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "description": "SaaS de interpretación, aprendizaje adaptativo, AI Coach y traducción con cámara.",
   "type": "module",

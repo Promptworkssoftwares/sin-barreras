@@ -193,6 +193,8 @@ async function init() {
   if ($('#hero-plan-price')) $('#hero-plan-price').textContent = `${currency} ${price.toFixed(2)}`;
   if ($('#pricing-price')) $('#pricing-price').innerHTML = `<sup>${currency === 'USD' ? '$' : ''}</sup><strong>${price.toFixed(2)}</strong><small>/ mes</small>`;
   if ($('#subscribe-button')) $('#subscribe-button').innerHTML = `SUSCRIBIRME POR ${currency} ${price.toFixed(2)}/MES <span>→</span>`;
+  const minutesLimit = Number(config?.aiMonthlyMinutesLimit || 150);
+  if ($('#pricing-usage-limit')) $('#pricing-usage-limit').textContent = `Hasta ${minutesLimit.toFixed(0)} minutos de voz por período`;
   if (window.SinBarrerasPlay?.isNativeAndroid) {
     if ($('#pricing-payment-note')) $('#pricing-payment-note').textContent = 'Pago y renovación administrados por Google Play.';
     renderGooglePlayOffer(window.SinBarrerasPlay?.offer || null);
