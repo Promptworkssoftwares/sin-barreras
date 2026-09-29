@@ -1,6 +1,6 @@
-# Sin Barreras v1.7.5
+# Sin Barreras v1.7.6
 
-### Nuevo en 1.7.5
+### Nuevo en 1.7.6
 
 - **Aprender → Frases rápidas:** crea una frase nueva, aprende su forma natural y practica pronunciación en cualquier idioma compatible.
 - **Aprender → Frases Guardadas:** biblioteca personal para escuchar y practicar por partes las frases almacenadas.

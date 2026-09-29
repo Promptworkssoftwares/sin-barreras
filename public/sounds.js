@@ -1,5 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.5';
-import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.5';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.6';
+import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.6';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 

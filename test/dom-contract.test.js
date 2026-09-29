@@ -27,9 +27,9 @@ test('every static ID requested by app.js exists in protected app.html', () => a
 test('every static ID requested by learn.js exists in protected app.html', () => assertIdsExist(learnJavascript, appHtml, 'learn.js'));
 
 test('versioned frontend assets are loaded by protected app', () => {
-  assert.match(appHtml, /app-bootstrap\.js\?v=1\.7\.5/);
-  assert.match(appHtml, /styles\.css\?v=1\.7\.5/);
-  assert.match(javascript, /learn\.js\?v=1\.7\.5/);
+  assert.match(appHtml, /app-bootstrap\.js\?v=1\.7\.6/);
+  assert.match(appHtml, /styles\.css\?v=1\.7\.6/);
+  assert.match(javascript, /learn\.js\?v=1\.7\.6/);
 });
 
 test('public landing contains real signup and pricing surfaces', () => {
@@ -224,7 +224,6 @@ test('footer main menu uses the supplied custom icons for each main option', () 
   for (const asset of [
     '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png',
     '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',
-    '/assets/footer-menu-v1413/practica.png', '/assets/footer-menu-v1413/practica-active.png',
     '/assets/footer-menu-v1413/coach.png', '/assets/footer-menu-v1413/coach-active.png',
     '/assets/footer-menu-v1413/camara.png', '/assets/footer-menu-v1413/camara-active.png'
   ]) {
@@ -233,7 +232,6 @@ test('footer main menu uses the supplied custom icons for each main option', () 
   }
   assert.match(appHtml, /aria-label="Abrir Hablar"/);
   assert.match(appHtml, /aria-label="Abrir Aprender"/);
-  assert.match(appHtml, /aria-label="Abrir Práctica"/);
   assert.match(appHtml, /aria-label="Abrir Coach"/);
   assert.match(appHtml, /aria-label="Abrir Cámara"/);
 });
@@ -459,7 +457,7 @@ test('Coach and Camera include the upgraded mobile interaction surfaces', () => 
 });
 
 
-test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice capture', () => {
+test('Aprender, Coach and Sound Lab share automatic silence voice capture', () => {
   const voiceTurn = fs.readFileSync(new URL('../public/voice-turn.js', import.meta.url), 'utf8');
   const sounds = fs.readFileSync(new URL('../public/sounds.js', import.meta.url), 'utf8');
   assert.match(appHtml, /id="lesson-voice"/);
@@ -471,7 +469,7 @@ test('Aprender, Práctica, Coach and Sound Lab share automatic silence voice cap
   assert.match(voiceTurn, /normalSpeechSilenceMs: 1450/);
   assert.match(voiceTurn, /longSpeechSilenceMs: 1200/);
   assert.match(voiceTurn, /thinkingAfterMs: 420/);
-  assert.match(serviceWorker, /voice-turn\.js\?v=1\.7\.5/);
+  assert.match(serviceWorker, /voice-turn\.js\?v=1\.7\.6/);
 });
 
 
@@ -547,7 +545,7 @@ test('Three.js conversational AI background is bundled and reacts to real conver
   assert.match(javascript, /aiStageController\?\.setVolume/);
   assert.match(aiStageJavascript, /three@0\.179\.1/);
   assert.match(aiStageJavascript, /WebGLRenderer/);
-  assert.match(serviceWorker, /ai-stage\.js\?v=1\.7\.5/);
+  assert.match(serviceWorker, /ai-stage\.js\?v=1\.7\.6/);
 });
 
 
@@ -562,7 +560,7 @@ test('browser audio is unlocked from a user gesture before asynchronous AI playb
   assert.match(audioPlayback, /pointerdown/);
   assert.match(audioPlayback, /playsinline/);
   assert.match(audioPlayback, /decodeAudioData/);
-  assert.match(serviceWorker, /audio-playback\.js\?v=1\.7\.5/);
+  assert.match(serviceWorker, /audio-playback\.js\?v=1\.7\.6/);
   assert.doesNotMatch(javascript, /new Audio\(`data:audio\/mpeg;base64/);
 });
 

@@ -1,16 +1,16 @@
-import { initLearning } from './learn.js?v=1.7.5';
-import { initSounds } from './sounds.js?v=1.7.5';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.5';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.5';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.5';
-import { initAIStage } from './ai-stage.js?v=1.7.5';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.5';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.5';
-import { initPhrasebook } from './phrasebook.js?v=1.7.5';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.5';
-import { initQrConversation } from './qr-conversation.js?v=1.7.5';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.5';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.5';
+import { initLearning } from './learn.js?v=1.7.6';
+import { initSounds } from './sounds.js?v=1.7.6';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.6';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.6';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.6';
+import { initAIStage } from './ai-stage.js?v=1.7.6';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.6';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.6';
+import { initPhrasebook } from './phrasebook.js?v=1.7.6';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.6';
+import { initQrConversation } from './qr-conversation.js?v=1.7.6';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.6';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.6';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -317,9 +317,10 @@ function preparePhraseForPractice(item) {
   if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = nativeLanguage === 'en' ? 'es' : 'en';
   keepPracticeLanguagesDistinct('native');
   if (ui.practiceSituation) ui.practiceSituation.value = item.situation || 'everyday';
-  showView('practice');
+  showView('learn');
+  openLearnPath('quick-phrases');
   guidedScroll(ui.practiceForm, { block: 'center', highlight: true, delay: 90, focus: true });
-  notify('Frase cargada desde tu conversación. Toca “Enseñarme” para practicarla.');
+  notify('Frase cargada en Aprender. Toca “Enseñarme” para practicarla.');
 }
 
 function updateFaceLabels() {
@@ -1721,6 +1722,7 @@ function openLearnPath(path) {
 }
 
 function showView(view) {
+  if (view === 'practice') view = 'learn';
   const enteringLearn = view === 'learn' && ui.learnView?.classList.contains('is-hidden');
   if (view !== 'practice') { state.practiceVoiceCapture?.cancel?.(); state.practiceVoiceCapture = null; state.practiceVoiceBusy = false; if (state.practiceConversationActive) resetPracticeConversation({ scroll: false }); }
   const secondary = view !== 'conversation';

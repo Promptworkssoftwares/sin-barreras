@@ -72,9 +72,9 @@ test('Play Console submission and Data Safety guides ship with the release', () 
   assert.ok(existsSync(new URL('../GOOGLE_PLAY_DATA_SAFETY.md', import.meta.url)));
 });
 
-test('v1.7.5 release metadata is aligned across Node, PWA and Android', () => {
-  assert.match(text('package.json'), /"version": "1\.7\.5"/);
-  assert.match(text('public/sw.js'), /sin-barreras-v1\.7\.5/);
-  assert.match(text('android/app/build.gradle'), /versionCode = 1705/);
-  assert.match(text('android/app/build.gradle'), /versionName = '1\.7\.5'/);
+test('v1.7.6 release metadata is aligned across Node, PWA and Android', () => {
+  assert.match(text('package.json'), /"version": "1\.7\.6"/);
+  assert.match(text('public/sw.js'), /sin-barreras-v1\.7\.6/);
+  assert.match(text('android/app/build.gradle'), /versionCode = 1706/);
+  assert.match(text('android/app/build.gradle'), /versionName = '1\.7\.6'/);
 });

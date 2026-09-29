@@ -1,6 +1,16 @@
-# Sin Barreras v1.7.5
+# Sin Barreras v1.7.6
 
-## 1.7.5 · Frases rápidas y Frases Guardadas dentro de Aprender
+## 1.7.6 · Aprender + Práctica unificados
+- Eliminado el tab independiente **Práctica** del menú inferior.
+- El menú principal queda en **Hablar · Aprender · Coach · Cámara**.
+- Aprender concentra rutas, sonidos/pronunciación, Frases rápidas, Frases Guardadas, aprendizaje desde conversaciones y Palabras guardadas.
+- Los accesos antiguos a `practice` redirigen de forma segura a Aprender.
+- Las frases provenientes del historial abren directamente **Aprender → Frases rápidas** para entrenarlas sin una pantalla duplicada.
+- Coach sigue siendo el único espacio de conversaciones completas y role-play.
+- Android actualizado a versionCode 1706 / versionName 1.7.6.
+
+
+## 1.7.6 · Frases rápidas y Frases Guardadas dentro de Aprender
 - **Frases rápidas** se movió de Práctica a **Aprender**, donde ahora funciona como una ruta para crear y aprender una frase nueva en cualquier idioma compatible.
 - Añadida la opción **Frases Guardadas** dentro de Aprender para abrir la biblioteca personal, escuchar frases y practicar por partes.
 - La biblioteca antes titulada “Mis frases” ahora se presenta como **Frases Guardadas** y tiene regreso directo a Aprender.
@@ -8,7 +18,7 @@
 - **Coach** continúa siendo el único lugar visible para conversaciones completas y role-play de situaciones reales.
 - La navegación marca Frases Guardadas como contenido de Aprender y mantiene acceso directo desde Hablar/Settings.
 - Diseño mobile-first para las nuevas tarjetas y accesos, sin duplicar la lógica de pronunciación ni la biblioteca offline.
-- Android actualizado a versionCode 1705 / versionName 1.7.5.
+- Android actualizado a versionCode 1705 / versionName 1.7.6.
 
 
 ## v1.7.3 · Premium practice UI polish

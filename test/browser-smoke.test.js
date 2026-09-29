@@ -24,8 +24,9 @@ test('all production JavaScript passes Node syntax validation', () => {
   }
 });
 
-test('all five primary app views are still wired', () => {
-  for (const view of ['conversation', 'learn', 'practice', 'coach', 'camera']) assert.match(appHtml, new RegExp(`data-view=["']${view}["']`));
+test('the four primary app views are wired with Learn and Practice unified', () => {
+  for (const view of ['conversation', 'learn', 'coach', 'camera']) assert.match(appHtml, new RegExp(`data-view=["']${view}["']`));
+  assert.doesNotMatch(appHtml.match(/<nav class="bottom-nav"[\s\S]*?<\/nav>/)?.[0] || '', /data-view=["']practice["']/);
   assert.match(javascript, /function showView\(view\)/);
 });
 

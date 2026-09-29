@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.7.5" />
+    <link rel="stylesheet" href="/styles.css?v=1.7.6" />
   </head>
   <body>
     <main class="app-shell">
@@ -182,13 +182,6 @@
           </span>
           <small>Aprender</small>
         </button>
-        <button type="button" class="nav-item" data-view="practice" aria-label="Abrir Práctica">
-          <span class="nav-icon-box" aria-hidden="true">
-            <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/practica.png" alt="" />
-            <img class="nav-icon nav-icon-active" src="/assets/footer-menu-v1413/practica-active.png" alt="" />
-          </span>
-          <small>Práctica</small>
-        </button>
         <button type="button" class="nav-item" data-view="coach" aria-label="Abrir Coach">
           <span class="nav-icon-box" aria-hidden="true">
             <img class="nav-icon nav-icon-inactive" src="/assets/footer-menu-v1413/coach.png" alt="" />
@@ -208,9 +201,9 @@
       <section id="learn-view" class="learn-view is-hidden" aria-labelledby="learn-title">
         <section id="learn-home" class="learn-home" aria-label="Elegir forma de aprender">
           <div class="learn-home-copy">
-            <p class="section-label">SIN BARRERAS · APRENDER</p>
-            <h2 id="learn-title">¿Qué quieres aprender <em>hoy?</em></h2>
-            <p>Aquí construyes la base: lecciones, pronunciación, frases, vocabulario y repaso personal.</p>
+            <p class="section-label">SIN BARRERAS · APRENDER Y PRACTICAR</p>
+            <h2 id="learn-title">¿Qué quieres aprender o practicar <em>hoy?</em></h2>
+            <p>Todo vive en un solo lugar: aprende, escucha, repite y practica frases, pronunciación y vocabulario. Cuando quieras una conversación completa, entra a Coach.</p>
             <div class="learn-flow-strip" aria-label="Cómo se organiza Sin Barreras"><span><b>1</b> Aprende</span><i>→</i><span><b>2</b> Practica</span><i>→</i><span><b>3</b> Conversa en Coach</span></div>
           </div>
 
@@ -291,7 +284,7 @@
             </button>
           </div>
 
-          <p class="learn-home-note">Aprende frases y vocabulario aquí, entrena lo que ya conoces en Práctica y ensaya conversaciones completas en Coach.</p>
+          <p class="learn-home-note">Aprende y practica aquí. Usa Coach cuando quieras ensayar una conversación completa en una situación real.</p>
         </section>
 
         <section id="learn-sounds-branch" class="learn-branch is-hidden" aria-label="Sonidos y pronunciación">
@@ -500,7 +493,7 @@
         </section>
       </section>
 
-      <section id="practice-view" class="practice-view is-hidden" aria-labelledby="practice-title">
+      <section id="practice-view" class="practice-view is-hidden legacy-practice-view" aria-labelledby="practice-title" aria-hidden="true" hidden inert>
         <div class="practice-heading">
           <p class="section-label">PRÁCTICA · ENTRENA LO QUE YA APRENDISTE</p>
           <h2 id="practice-title">Repite. Corrige. <em>Mejora.</em></h2>
@@ -1117,7 +1110,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.7.5"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.7.5"></script>
+    <script src="/play-billing.js?v=1.7.6"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.7.6"></script>
   </body>
 </html>
