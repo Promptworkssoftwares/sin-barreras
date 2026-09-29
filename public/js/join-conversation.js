@@ -1,6 +1,6 @@
-import { createAutoVoiceTurn } from '../voice-turn.js?v=1.7.11';
-import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.7.11';
-import { LANGUAGES } from '../languages.js?v=1.7.11';
+import { createAutoVoiceTurn } from '../voice-turn.js?v=1.7.12';
+import { playBase64Audio, unlockAudioPlayback } from '../audio-playback.js?v=1.7.12';
+import { LANGUAGES } from '../languages.js?v=1.7.12';
 
 const code = location.pathname.split('/').filter(Boolean).pop()?.toUpperCase() || '';
 const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('token') || new URLSearchParams(location.search).get('token') || '';

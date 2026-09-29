@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.11
+# Sin Barreras v1.7.12
+
+### Nuevo en 1.7.12
+
+- Onda real de la voz IA en la traducción, la pantalla principal y las tarjetas de aprendizaje.
+- El medidor usa muestras del audio reproducido y vuelve a reposo cuando termina.
 
 ### Nuevo en 1.7.11
 

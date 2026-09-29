@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.11
+# Sin Barreras v1.7.12
+
+## 1.7.12 · Onda de audio medida en traducción y voz IA
+- La tarjeta de traducción y el escenario de conversación muestran barras basadas en energía real de la salida de audio.
+- Las tarjetas de Aprender y Practicar reciben quince niveles de la misma señal, sin animación genérica durante la voz IA.
+- El reproductor alternativo conecta el audio a un analizador cuando Web Audio está disponible.
+- Android actualizado a versionCode 1712 / versionName 1.7.12.
 
 ## 1.7.11 · Enlace de Admin solo para owner
 - Corregido el estilo de Mi cuenta que mostraba controles marcados como ocultos.

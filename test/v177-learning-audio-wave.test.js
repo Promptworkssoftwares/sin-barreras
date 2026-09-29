@@ -16,7 +16,7 @@ test('v1.7.8 ships a dedicated dual-voice learning waveform', () => {
   assert.match(wave, /BAR_COUNT = 15/);
   assert.match(wave, /VOZ AI/);
   assert.match(wave, /TU VOZ/);
-  assert.match(wave, /detail\.volume|numericLevel/);
+  assert.match(wave, /detail\.volume|Number\(level\)/);
   assert.match(css, /Futuristic dual-voice waveform for Aprender/);
   assert.match(css, /learning-wave-track\[data-wave-role="user"\]/);
 });
@@ -44,5 +44,5 @@ test('sound lab distinguishes AI model audio from the learner recording', () => 
 });
 
 test('PWA release caches the learning waveform module for installed app use', () => {
-  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.11/);
+  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.12/);
 });

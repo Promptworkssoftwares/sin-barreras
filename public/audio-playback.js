@@ -4,6 +4,7 @@ let context = null;
 let masterGain = null;
 let currentSource = null;
 let currentMedia = null;
+let mediaMeterSource = null;
 let finishCurrentPlayback = null;
 let currentMeterSource = null;
 let currentMeterAnalyser = null;
@@ -15,8 +16,8 @@ let destroyed = false;
 
 const gestureEvents = ['pointerdown', 'touchstart', 'keydown'];
 
-function reportPlaybackLevel(level, playing) {
-  window.dispatchEvent(new CustomEvent('sinbarreras:playback-level', { detail: { level, playing } }));
+function reportPlaybackLevel(level, playing, levels = []) {
+  window.dispatchEvent(new CustomEvent('sinbarreras:playback-level', { detail: { level, levels, playing } }));
 }
 
 function stopPlaybackMeter(owner = null) {
@@ -29,30 +30,59 @@ function stopPlaybackMeter(owner = null) {
   reportPlaybackLevel(0, false);
 }
 
-function connectPlaybackMeter(source, audioContext) {
+function connectPlaybackMeter(source, audioContext, owner = source) {
   if (!audioContext.createAnalyser) {
     source.connect(masterGain || audioContext.destination);
-    currentMeterSource = source;
+    currentMeterSource = owner;
     reportPlaybackLevel(null, true);
     return;
   }
   const analyser = audioContext.createAnalyser();
-  analyser.fftSize = 512;
-  analyser.smoothingTimeConstant = .68;
+  analyser.fftSize = 2048;
+  analyser.smoothingTimeConstant = .55;
   source.connect(analyser);
   analyser.connect(masterGain || audioContext.destination);
-  currentMeterSource = source;
+  currentMeterSource = owner;
   currentMeterAnalyser = analyser;
   const samples = new Uint8Array(analyser.fftSize);
+  const previous = new Float32Array(15);
   const tick = () => {
-    if (currentMeterSource !== source) return;
+    if (currentMeterSource !== owner) return;
     analyser.getByteTimeDomainData(samples);
-    let power = 0;
-    for (const value of samples) power += ((value - 128) / 128) ** 2;
-    reportPlaybackLevel(Math.min(1, Math.sqrt(power / samples.length) * 6), true);
+    const levels = Array.from(previous, (_, index) => {
+      let power = 0;
+      const start = Math.floor(index * samples.length / previous.length);
+      const end = Math.floor((index + 1) * samples.length / previous.length);
+      for (let offset = start; offset < end; offset += 1) {
+        const sample = (samples[offset] - 128) / 128;
+        power += sample * sample;
+      }
+      const energy = Math.min(1, Math.max(0, (Math.sqrt(power / (end - start)) - .008) * 8));
+      previous[index] = previous[index] * .32 + energy * .68;
+      return Number(previous[index].toFixed(3));
+    });
+    reportPlaybackLevel(Math.max(...levels), true, levels);
     currentMeterFrame = window.requestAnimationFrame(tick);
   };
   currentMeterFrame = window.requestAnimationFrame(tick);
+}
+
+function connectMediaPlaybackMeter(media) {
+  const audioContext = getContext();
+  if (audioContext?.state !== 'running' || !audioContext.createMediaElementSource) {
+    currentMeterSource = media;
+    reportPlaybackLevel(null, true);
+    return;
+  }
+  try {
+    if (!mediaMeterSource) mediaMeterSource = audioContext.createMediaElementSource(media);
+    mediaMeterSource.disconnect();
+    connectPlaybackMeter(mediaMeterSource, audioContext, media);
+  } catch {
+    try { mediaMeterSource?.connect(masterGain || audioContext.destination); } catch { /* no-op */ }
+    currentMeterSource = media;
+    reportPlaybackLevel(null, true);
+  }
 }
 
 function makeSilentWavBlob() {
@@ -263,7 +293,7 @@ async function playWithMediaElement(base64) {
     media.addEventListener('error', failed, { once: true });
     finishCurrentPlayback = ended;
     media.play().then(() => {
-      if (!settled) { currentMeterSource = media; reportPlaybackLevel(null, true); }
+      if (!settled) connectMediaPlaybackMeter(media);
     }).catch((error) => {
       if (settled) return;
       settled = true;
@@ -314,6 +344,8 @@ export function destroyAudioPlayback() {
   silentObjectUrl = null;
   if (currentMedia?.isConnected) currentMedia.remove();
   currentMedia = null;
+  try { mediaMeterSource?.disconnect(); } catch { /* no-op */ }
+  mediaMeterSource = null;
   if (context && context.state !== 'closed') context.close().catch(() => {});
   context = null;
   masterGain = null;

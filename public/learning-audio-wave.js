@@ -147,18 +147,17 @@ function statusCopy(role, state, label) {
   return 'REPRODUCIENDO';
 }
 
-function updateReactiveBars(track, level, gain = 12) {
+function updateReactiveBars(track, level, levels = null) {
+  if (!track) return false;
   const bars = [...track.querySelectorAll('.learning-wave-bars i')];
-  const numericLevel = Number(level);
-  if (!Number.isFinite(numericLevel)) return false;
-  const normalized = Math.max(.05, Math.min(1, numericLevel * gain));
-  const center = (bars.length - 1) / 2;
+  if (!Array.isArray(levels) && (level === null || !Number.isFinite(Number(level)))) return false;
   bars.forEach((bar, index) => {
-    const distance = Math.abs(index - center) / Math.max(1, center);
-    const shape = .42 + ((1 - distance) * .58);
-    const pulse = .84 + ((index % 4) * .055);
-    bar.style.height = `${Math.round(3 + normalized * (5 + 16 * shape * pulse))}px`;
-    bar.style.opacity = String(Math.min(1, .32 + normalized * .68));
+    const energy = Array.isArray(levels) && levels.length
+      ? Number(levels[Math.min(levels.length - 1, Math.floor(index * levels.length / bars.length))])
+      : Number(level) * 5;
+    const normalized = Math.max(0, Math.min(1, energy || 0));
+    bar.style.height = `${Math.round(3 + normalized * 15)}px`;
+    bar.style.opacity = String(.42 + normalized * .58);
   });
   return true;
 }
@@ -209,15 +208,14 @@ export async function withLearningAudioWave(target, options, task) {
 window.addEventListener('sinbarreras:playback-level', (event) => {
   const wave = activeWave;
   if (!wave || wave.dataset.activeRole !== 'ai') return;
-  const { level, playing } = event.detail || {};
+  const { level, levels, playing } = event.detail || {};
   if (!playing) {
     wave.dataset.reactive = 'false';
+    resetTrack(wave.querySelector('[data-wave-role="ai"]'));
     return;
   }
   const track = wave.querySelector('[data-wave-role="ai"]');
-  // Web Audio supplies real speech energy. The media element fallback keeps
-  // the animated playing state when an analyser is unavailable.
-  wave.dataset.reactive = updateReactiveBars(track, level, 2.2) ? 'true' : 'false';
+  wave.dataset.reactive = updateReactiveBars(track, level, levels) ? 'true' : 'false';
 });
 
 startObserver();
