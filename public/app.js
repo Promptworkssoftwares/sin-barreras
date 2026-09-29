@@ -1,16 +1,17 @@
-import { initLearning } from './learn.js?v=1.7.6';
-import { initSounds } from './sounds.js?v=1.7.6';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.6';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.6';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.6';
-import { initAIStage } from './ai-stage.js?v=1.7.6';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.6';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.6';
-import { initPhrasebook } from './phrasebook.js?v=1.7.6';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.6';
-import { initQrConversation } from './qr-conversation.js?v=1.7.6';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.6';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.6';
+import { initLearning } from './learn.js?v=1.7.7';
+import { initSounds } from './sounds.js?v=1.7.7';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.7';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.7';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.7';
+import { initAIStage } from './ai-stage.js?v=1.7.7';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.7';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.7';
+import { initPhrasebook } from './phrasebook.js?v=1.7.7';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.7';
+import { initQrConversation } from './qr-conversation.js?v=1.7.7';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.7';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.7';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.7';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -118,6 +119,11 @@ function setVoiceSignal(element, mode = 'ready', label = '', detail = {}) {
 
   const bars = [...element.querySelectorAll('.voice-bars i')];
   const rawVolume = Number(detail?.volume);
+  const inLearnSurface = Boolean(element.closest('#learn-view'));
+  if (inLearnSurface) {
+    if (mode === 'ready') hideLearningAudioWave(120);
+    else setLearningAudioWave(element, { role: 'user', state: mode === 'listening' ? 'listening' : mode === 'processing' ? 'processing' : 'waiting', level: rawVolume });
+  }
   const hasLiveLevel = mode === 'listening' && Number.isFinite(rawVolume);
   element.dataset.reactive = hasLiveLevel ? 'true' : 'false';
   if (!hasLiveLevel) {
@@ -754,20 +760,24 @@ function playAudio(base64, language, { resumeConversation = false, sessionId = s
     });
 }
 
-async function speakText(text, language, { speed = 1 } = {}) {
-  const safeSpeed = Math.max(0.25, Math.min(4, Number(speed) || 1));
-  const voice = state.settings.translatorVoice || 'coral';
-  const result = await getOrCreateTts({
-    text,
-    language,
-    voice,
-    speed: safeSpeed,
-    create: () => request('/api/speak', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, language, voice, speed: safeSpeed })
-    })
-  });
-  await playAudio(result.audioBase64, language, { resumeConversation: false });
+async function speakText(text, language, { speed = 1, visualTarget = null, visualRole = 'ai', visualLabel = '' } = {}) {
+  const run = async () => {
+    const safeSpeed = Math.max(0.25, Math.min(4, Number(speed) || 1));
+    const voice = state.settings.translatorVoice || 'coral';
+    const result = await getOrCreateTts({
+      text,
+      language,
+      voice,
+      speed: safeSpeed,
+      create: () => request('/api/speak', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, language, voice, speed: safeSpeed })
+      })
+    });
+    await playAudio(result.audioBase64, language, { resumeConversation: false });
+  };
+  if (!visualTarget) return run();
+  return withLearningAudioWave(visualTarget, { role: visualRole, state: 'playing', label: visualLabel || (visualRole === 'user' ? 'REPRODUCIENDO' : 'REPRODUCIENDO') }, run);
 }
 
 function getPracticePoints() { return Number(localStorage.getItem(PRACTICE_POINTS_KEY) || 0); }
@@ -1906,7 +1916,7 @@ listen(ui.conversationLearningList, 'click', async (event) => {
   const item = conversationLearningCandidates().find((entry) => entry.id === id);
   if (!item) return;
   try {
-    if (action === 'listen') await speakText(item.englishText, 'en');
+    if (action === 'listen') await speakText(item.englishText, 'en', { visualTarget:event.target.closest('[data-learning-action]'), visualLabel:'VOZ AI' });
     if (action === 'practice') preparePhraseForPractice(item);
     if (action === 'save') await phrasebook?.savePhrase({
       sourceText: item.meaning, translatedText: item.englishText, sourceLanguage: item.nativeLanguage, targetLanguage: 'en', situation: item.situation
@@ -1992,7 +2002,7 @@ listen(ui.practiceConversationEnd, 'click', finishPracticeConversation);
 listen(ui.practiceConversationNew, 'click', resetPracticeConversation);
 listen(ui.listenPractice, 'click', async () => {
   if (!state.practice) return;
-  try { await speakText(state.practice.targetText || state.practice.english, state.practice.targetLanguage || 'en'); } catch (error) { notify(error.message); }
+  try { await speakText(state.practice.targetText || state.practice.english, state.practice.targetLanguage || 'en', { visualTarget:ui.listenPractice, visualLabel:'VOZ AI' }); } catch (error) { notify(error.message); }
 });
 listen(ui.recordPractice, 'click', togglePracticeRecording);
 

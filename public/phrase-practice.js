@@ -1,4 +1,5 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.6';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.7';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.7';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -193,11 +194,11 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     await loadLesson(false);
   }
 
-  async function listen(speed = 1) {
+  async function listen(speed = 1, visualTarget = ui.listen) {
     const step = state.steps[state.index];
     if (!step?.targetText || !state.lesson?.targetLanguage) return;
     try {
-      await speakText(step.targetText, state.lesson.targetLanguage, { speed });
+      await speakText(step.targetText, state.lesson.targetLanguage, { speed, visualTarget, visualLabel:'VOZ AI' });
     } catch (error) { notify?.(error.message || 'No pudimos reproducir esta parte.'); }
   }
 
@@ -211,10 +212,10 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
       const capture = await createAutoVoiceTurn({
         onState: (mode, detail = {}) => {
           if (!ui.record) return;
-          if (mode === 'waiting') { ui.record.textContent = '● Habla cuando estés listo'; setVoiceSignal('waiting'); }
-          if (mode === 'listening') { ui.record.textContent = '● Te escucho…'; setVoiceSignal('listening', detail); }
-          if (mode === 'thinking') { ui.record.textContent = '◌ Puedes continuar…'; setVoiceSignal('thinking'); }
-          if (mode === 'processing') { ui.record.textContent = '✓ Revisando…'; setVoiceSignal('processing'); }
+          if (mode === 'waiting') { ui.record.textContent = '● Habla cuando estés listo'; setVoiceSignal('waiting'); setLearningAudioWave(ui.record, { role:'user', state:'waiting' }); }
+          if (mode === 'listening') { ui.record.textContent = '● Te escucho…'; setVoiceSignal('listening', detail); setLearningAudioWave(ui.record, { role:'user', state:'listening', level:detail.volume }); }
+          if (mode === 'thinking') { ui.record.textContent = '◌ Puedes continuar…'; setVoiceSignal('thinking'); setLearningAudioWave(ui.record, { role:'user', state:'waiting', label:'PAUSA NATURAL' }); }
+          if (mode === 'processing') { ui.record.textContent = '✓ Revisando…'; setVoiceSignal('processing'); setLearningAudioWave(ui.record, { role:'user', state:'processing' }); }
         }
       });
       state.voiceCapture = capture;
@@ -238,6 +239,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
       state.voiceCapture = null;
       state.voiceBusy = false;
       if (ui.record) { ui.record.disabled = false; ui.record.classList.remove('recording'); ui.record.textContent = '● Practicar mi voz'; }
+      hideLearningAudioWave(180);
       setVoiceSignal('ready');
     }
   }
@@ -258,8 +260,8 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
 
   ui.close?.addEventListener('click', hidePlayer);
   ui.retry?.addEventListener('click', () => loadLesson(true));
-  ui.listen?.addEventListener('click', () => listen(1));
-  ui.slow?.addEventListener('click', () => listen(0.72));
+  ui.listen?.addEventListener('click', () => listen(1, ui.listen));
+  ui.slow?.addEventListener('click', () => listen(0.72, ui.slow));
   ui.record?.addEventListener('click', practiceVoice);
   ui.previous?.addEventListener('click', () => { if (state.index > 0) { state.index -= 1; renderStep(); } });
   ui.next?.addEventListener('click', () => {

@@ -1,13 +1,12 @@
-# Sin Barreras v1.7.6
+# Sin Barreras v1.7.7
 
-### Nuevo en 1.7.6
+### Nuevo en 1.7.7
 
-- **Aprender → Frases rápidas:** crea una frase nueva, aprende su forma natural y practica pronunciación en cualquier idioma compatible.
-- **Aprender → Frases Guardadas:** biblioteca personal para escuchar y practicar por partes las frases almacenadas.
-- **Práctica** ahora es un centro de entrenamiento para material ya aprendido/guardado, sin duplicar la creación de frases.
-- **Coach** conserva en exclusiva las conversaciones completas y los escenarios reales.
-- Navegación y tarjetas ajustadas para teléfono con acceso claro entre Aprender, Práctica y Coach.
-- Se conservan límites de IA, cache privado/TTS, Google Play Billing, prueba de 7 días, QR, Stripe, AndroidX y correcciones del micrófono Android.
+- **Waveform futurista dual:** VOZ AI y TU VOZ tienen una identidad visual distinta dentro de Aprender.
+- **Tu voz reacciona al micrófono real:** las barras cambian con el nivel capturado mientras practicas pronunciación.
+- **La voz AI también cobra vida:** palabras, Frases rápidas, Frases Guardadas, lecciones, práctica por partes y sonidos muestran un waveform durante el audio.
+- **Comparación A/B moderna:** Sound Lab muestra claramente el modelo AI y tu propia grabación.
+- UI compacta para teléfono; no se reemplazó la lógica de IA, Billing, autenticación, QR ni cache.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
 

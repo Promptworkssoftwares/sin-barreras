@@ -1,5 +1,6 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.6';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.6';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.7';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.7';
+import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.7';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -148,7 +149,7 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
     }, { audioBase64: result.audioBase64, category });
   }
 
-  async function playPhrase(item) {
+  async function playPhrase(item, visualTarget = null) {
     await unlockAudioPlayback();
     let audio = await cachedAudio(item.id);
     if (!audio?.audioBase64) {
@@ -166,7 +167,9 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
       audio = { audioBase64: result.audioBase64, language: item.targetLanguage };
       await cacheAudio(item.id, audio.audioBase64, audio.language);
     }
-    await playBase64Audio(audio.audioBase64);
+    const play = () => playBase64Audio(audio.audioBase64);
+    if (visualTarget) await withLearningAudioWave(visualTarget, { role:'ai', state:'playing', label:'VOZ AI' }, play);
+    else await play();
   }
 
   async function handleAction(event) {
@@ -176,7 +179,7 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
     const item = read().find((entry) => entry.id === id);
     if (!item) return;
     try {
-      if (action === 'listen') await playPhrase(item);
+      if (action === 'listen') await playPhrase(item, event.target.closest('[data-action]'));
       if (action === 'practice') onPractice?.(item);
       if (action === 'copy') { await navigator.clipboard.writeText(`${item.sourceText}\n${item.translatedText}`); notify?.('Frase copiada.'); }
       if (action === 'share') {

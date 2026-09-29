@@ -1,4 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.6';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.7';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.7';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
@@ -542,7 +543,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
         return `<button class="lesson-option" type="button" data-answer="${encodeURIComponent(label)}"><span class="lesson-choice-art"><span class="choice-number">${String(index + 1).padStart(2,'0')}</span>${session.course.id === 'custom' ? iconSvg('bookmark', 'sb-line-icon choice-icon') : courseIconImage(session.course.id, 'lesson-course-image')}</span><strong>${escapeHTML(label)}</strong><kbd>${index + 1}</kbd></button>`;
       }).join('') : '';
     }
-    if (exercise.type === 'listen') window.setTimeout(() => speakText?.(exercise.word.word, 'en').catch?.(() => {}), 180);
+    if (exercise.type === 'listen') window.setTimeout(() => speakText?.(exercise.word.word, 'en', { visualTarget: ui.listen, visualLabel: 'REPRODUCIENDO' }).catch?.(() => {}), 180);
     if (exercise.type === 'type') window.setTimeout(() => ui.input?.focus(), 120);
   }
 
@@ -640,12 +641,12 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
       lessonVoiceBusy = true;
       ui.voice?.classList.add('recording');
       const capture = await createAutoVoiceTurn({
-        onState: (mode) => {
+        onState: (mode, detail = {}) => {
           if (!ui.voice) return;
-          if (mode === 'waiting') ui.voice.innerHTML = '<span>●</span><b>HABLA CUANDO ESTÉS LISTO</b><small>No tienes que presionar Stop</small>';
-          if (mode === 'listening') ui.voice.innerHTML = '<span>●</span><b>TE ESCUCHO…</b><small>Termina la palabra o frase y haz una pausa</small>';
-          if (mode === 'thinking') ui.voice.innerHTML = '<span>◌</span><b>PAUSA NATURAL</b><small>Espero un momento por si continúas</small>';
-          if (mode === 'processing') ui.voice.innerHTML = '<span>✓</span><b>ENTENDIDO</b><small>Revisando tu respuesta…</small>';
+          if (mode === 'waiting') { ui.voice.innerHTML = '<span>●</span><b>HABLA CUANDO ESTÉS LISTO</b><small>No tienes que presionar Stop</small>'; setLearningAudioWave(ui.voice, { role:'user', state:'waiting' }); }
+          if (mode === 'listening') { ui.voice.innerHTML = '<span>●</span><b>TE ESCUCHO…</b><small>Termina la palabra o frase y haz una pausa</small>'; setLearningAudioWave(ui.voice, { role:'user', state:'listening', level:detail.volume }); }
+          if (mode === 'thinking') { ui.voice.innerHTML = '<span>◌</span><b>PAUSA NATURAL</b><small>Espero un momento por si continúas</small>'; setLearningAudioWave(ui.voice, { role:'user', state:'waiting', label:'PAUSA NATURAL' }); }
+          if (mode === 'processing') { ui.voice.innerHTML = '<span>✓</span><b>ENTENDIDO</b><small>Revisando tu respuesta…</small>'; setLearningAudioWave(ui.voice, { role:'user', state:'processing' }); }
         }
       });
       lessonVoiceCapture = capture;
@@ -667,6 +668,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
       lessonVoiceBusy = false;
       ui.voice?.classList.remove('recording');
       if (ui.voice && !session?.answered) ui.voice.innerHTML = '<span>●</span><b>RESPONDER CON MI VOZ</b><small>Habla y la app detectará cuando termines</small>';
+      hideLearningAudioWave(180);
     }
   }
 
@@ -686,7 +688,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (button.dataset.locked === '1') { notify?.('Completa las 5 sesiones del nivel anterior para desbloquear este nivel.'); return; }
     resetQuestionVisibility(); startLesson(button.dataset.course, null, button.dataset.level);
   });
-  listen(ui.wordsList, 'click', async (event) => { const button = event.target.closest('[data-speak-word]'); if (!button) return; try { await speakText?.(decodeURIComponent(button.dataset.speakWord), 'en'); } catch (error) { notify?.(error.message); } });
+  listen(ui.wordsList, 'click', async (event) => { const button = event.target.closest('[data-speak-word]'); if (!button) return; try { await speakText?.(decodeURIComponent(button.dataset.speakWord), 'en', { visualTarget: button, visualLabel: 'VOZ MODELO' }); } catch (error) { notify?.(error.message); } });
   listen(ui.customPracticeAll, 'click', () => { resetQuestionVisibility(); startLesson('custom'); });
   listen(ui.customList, 'click', async (event) => {
     const button = event.target.closest('[data-custom-action]');
@@ -696,7 +698,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (!item) return;
     const action = button.dataset.customAction;
     if (action === 'listen') {
-      try { await speakText?.(item.word, 'en'); } catch (error) { notify?.(error.message); }
+      try { await speakText?.(item.word, 'en', { visualTarget: button, visualLabel: 'VOZ MODELO' }); } catch (error) { notify?.(error.message); }
       return;
     }
     if (action === 'practice') { practiceCustomWord(item); return; }
@@ -711,7 +713,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   });
   listen(ui.close, 'click', () => { lessonVoiceCapture?.cancel?.(); lessonVoiceCapture = null; lessonVoiceBusy = false; hidePlayer(); });
   listen(ui.voice, 'click', answerWithVoice);
-  listen(ui.listen, 'click', async () => { const exercise = session?.exercises?.[session.index]; if (!exercise) return; try { await speakText?.(exercise.word.word, 'en'); } catch (error) { notify?.(error.message); } });
+  listen(ui.listen, 'click', async () => { const exercise = session?.exercises?.[session.index]; if (!exercise) return; try { await speakText?.(exercise.word.word, 'en', { visualTarget: ui.listen, visualLabel: 'VOZ MODELO' }); } catch (error) { notify?.(error.message); } });
   listen(ui.options, 'click', (event) => { const button = event.target.closest('[data-answer]'); if (!button || session?.answered) return; ui.options.querySelectorAll('.lesson-option').forEach((item) => item.classList.remove('is-selected')); button.classList.add('is-selected'); session.selectedValue = decodeURIComponent(button.dataset.answer || ''); if (ui.check) ui.check.disabled = false; });
   listen(ui.input, 'input', () => { if (ui.check) ui.check.disabled = !ui.input.value.trim(); });
   listen(ui.input, 'keydown', (event) => { if (event.key === 'Enter' && !ui.check?.disabled) { event.preventDefault(); ui.check.click(); } });

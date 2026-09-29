@@ -1,4 +1,13 @@
-# Sin Barreras v1.7.6
+# Sin Barreras v1.7.7
+
+## 1.7.7 · Waveform futurista de voz AI + voz del usuario
+- Añadido un sistema visual de audio unificado para **Aprender** con dos identidades claras: **VOZ AI** y **TU VOZ**.
+- La voz del usuario usa el nivel real del micrófono para mover el waveform durante pronunciación y respuestas por voz.
+- La voz AI muestra un waveform futurista durante TTS en palabras, lecciones, Frases rápidas, Frases Guardadas, práctica por partes y Sound Lab.
+- Sound Lab diferencia visualmente **VOZ MODELO** de **TU VOZ** al comparar pronunciación.
+- Diseño compacto mobile-first con orb, waveform, glow y estados Reproduciendo / Escuchando / Analizando.
+- El nuevo módulo se incluye en el Service Worker para la experiencia PWA instalada.
+- Android actualizado a versionCode 1707 / versionName 1.7.7.
 
 ## 1.7.6 · Aprender + Práctica unificados
 - Eliminado el tab independiente **Práctica** del menú inferior.
@@ -10,7 +19,7 @@
 - Android actualizado a versionCode 1706 / versionName 1.7.6.
 
 
-## 1.7.6 · Frases rápidas y Frases Guardadas dentro de Aprender
+## 1.7.5 · Frases rápidas y Frases Guardadas dentro de Aprender
 - **Frases rápidas** se movió de Práctica a **Aprender**, donde ahora funciona como una ruta para crear y aprender una frase nueva en cualquier idioma compatible.
 - Añadida la opción **Frases Guardadas** dentro de Aprender para abrir la biblioteca personal, escuchar frases y practicar por partes.
 - La biblioteca antes titulada “Mis frases” ahora se presenta como **Frases Guardadas** y tiene regreso directo a Aprender.
@@ -18,7 +27,7 @@
 - **Coach** continúa siendo el único lugar visible para conversaciones completas y role-play de situaciones reales.
 - La navegación marca Frases Guardadas como contenido de Aprender y mantiene acceso directo desde Hablar/Settings.
 - Diseño mobile-first para las nuevas tarjetas y accesos, sin duplicar la lógica de pronunciación ni la biblioteca offline.
-- Android actualizado a versionCode 1705 / versionName 1.7.6.
+- Android actualizado a versionCode 1705 / versionName 1.7.5.
 
 
 ## v1.7.3 · Premium practice UI polish

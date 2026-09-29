@@ -1,5 +1,6 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.6';
-import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.6';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.7';
+import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.7';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.7';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 
@@ -298,16 +299,19 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
     lastRecordingSoundId = selected?.id || null;
   }
 
-  function playMyRecording() {
+  function playMyRecording(visualTarget = null) {
+    if (visualTarget) setLearningAudioWave(visualTarget, { role:'user', state:'playing', label:'REPRODUCIENDO' });
     return new Promise((resolve, reject) => {
       if (!lastRecordingUrl || lastRecordingSoundId !== selected?.id) {
         reject(new Error('Primero graba tu voz para poder escucharla.'));
         return;
       }
       const audio = new Audio(lastRecordingUrl);
-      audio.addEventListener('ended', resolve, { once:true });
-      audio.addEventListener('error', () => reject(new Error('No se pudo reproducir tu grabación.')), { once:true });
-      audio.play().catch(reject);
+      const done = () => { if (visualTarget) hideLearningAudioWave(160); resolve(); };
+      const fail = () => { if (visualTarget) hideLearningAudioWave(120); reject(new Error('No se pudo reproducir tu grabación.')); };
+      audio.addEventListener('ended', done, { once:true });
+      audio.addEventListener('error', fail, { once:true });
+      audio.play().catch((error) => { if (visualTarget) hideLearningAudioWave(120); reject(error); });
     });
   }
 
@@ -553,12 +557,12 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
         try {
           startPracticeSession();
           button.disabled = true;
-          if (action === 'model') await speakText?.(activeLevel.model, 'en', { speed:.78 });
-          if (action === 'mine') await playMyRecording();
+          if (action === 'model') await speakText?.(activeLevel.model, 'en', { speed:.78, visualTarget:button, visualLabel:'VOZ MODELO' });
+          if (action === 'mine') await playMyRecording(button);
           if (action === 'compare') {
-            await speakText?.(activeLevel.model, 'en', { speed:.78 });
+            await speakText?.(activeLevel.model, 'en', { speed:.78, visualTarget:button, visualLabel:'VOZ MODELO' });
             await new Promise((resolve) => setTimeout(resolve, 280));
-            await playMyRecording();
+            await playMyRecording(button);
           }
         } catch (error) {
           notify?.(error.message || 'No se pudo reproducir el audio.');
@@ -576,7 +580,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       if (action === 'listen' || action === 'slow') {
         startPracticeSession();
         busy = true; button.disabled = true;
-        await speakText?.(currentLevelData().model, 'en', { speed: action === 'slow' ? .7 : 1 });
+        await speakText?.(currentLevelData().model, 'en', { speed: action === 'slow' ? .7 : 1, visualTarget:button, visualLabel:'VOZ MODELO' });
         const entry = entryFor(selected);
         entry.listens += 1;
         saveState(state);
@@ -600,22 +604,26 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       button.textContent = '● Habla cuando estés listo';
       setAIActivity('waiting');
       const capture = await createAutoVoiceTurn({
-        onState: (mode) => {
+        onState: (mode, detail = {}) => {
           if (mode === 'waiting') {
             button.textContent = '● Habla cuando estés listo';
             setAIActivity('waiting');
+            setLearningAudioWave(button, { role:'user', state:'waiting' });
           }
           if (mode === 'listening') {
             button.textContent = '● Escuchando tu voz';
             setAIActivity('listening');
+            setLearningAudioWave(button, { role:'user', state:'listening', level:detail.volume });
           }
           if (mode === 'thinking') {
             button.textContent = '● Grabación activa';
             setAIActivity('thinking');
+            setLearningAudioWave(button, { role:'user', state:'waiting', label:'PAUSA NATURAL' });
           }
           if (mode === 'processing') {
             button.textContent = '✓ Voz recibida';
             setAIActivity('processing');
+            setLearningAudioWave(button, { role:'user', state:'processing' });
           }
         }
       });
@@ -702,6 +710,7 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
       if (!ui.aiActivity?.classList.contains('is-hidden') && ui.aiActivity?.dataset.state !== 'finalizing') {
         setAIActivity('hidden', { delay: 180 });
       }
+      hideLearningAudioWave(180);
     }
   }
 

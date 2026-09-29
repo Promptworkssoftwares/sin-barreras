@@ -42,7 +42,7 @@ test('every phrase segment can be listened to slowly and scored by voice', () =>
   assert.match(appHtml, /id="phrase-practice-listen"/);
   assert.match(appHtml, /id="phrase-practice-slow"/);
   assert.match(appHtml, /id="phrase-practice-record"/);
-  assert.match(phrasePractice, /listen\(0\.72\)/);
+  assert.match(phrasePractice, /listen\(0\.72, ui\.slow\)/);
   assert.match(phrasePractice, /createAutoVoiceTurn/);
   assert.match(phrasePractice, /\/api\/practice\/score/);
   assert.match(phrasePractice, /targetText', step\.targetText/);

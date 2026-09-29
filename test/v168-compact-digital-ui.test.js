@@ -8,7 +8,7 @@ const js = read('public/app.js');
 const sounds = read('public/sounds.js');
 const phrase = read('public/phrase-practice.js');
 
-test('v1.7.6 Hablar is compact and keeps quick actions horizontal', () => {
+test('v1.7.7 Hablar is compact and keeps quick actions horizontal', () => {
   assert.match(app, /<h1>Habla\. Entiende\. <em>Sigue adelante\.<\/em><\/h1>/);
   assert.doesNotMatch(app, /Habla\. Entiende\.<br/);
   for (const id of ['open-face-to-face','open-phrasebook','open-qr-conversation']) assert.match(app, new RegExp(`id="${id}"`));
@@ -16,7 +16,7 @@ test('v1.7.6 Hablar is compact and keeps quick actions horizontal', () => {
   assert.match(css, /@media\(max-width:560px\)[\s\S]*conversation-tools\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
 });
 
-test('v1.7.6 learning surfaces use graphical pronunciation meters without changing scoring endpoints', () => {
+test('v1.7.7 learning surfaces use graphical pronunciation meters without changing scoring endpoints', () => {
   assert.match(app, /id="practice-score-meter" class="pronunciation-gauge"/);
   assert.match(app, /id="phrase-practice-score-meter" class="pronunciation-gauge compact"/);
   assert.match(css, /\.pronunciation-gauge\{/);
