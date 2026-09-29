@@ -8,21 +8,14 @@ const appJs = read('public/app.js');
 const server = read('server/server.js');
 const styles = read('public/styles.css');
 
-test('Practice keeps quick phrases and adds multilingual guided real-life conversations', () => {
-  assert.match(appHtml, /id="practice-mode-phrase"/);
-  assert.match(appHtml, /id="practice-mode-conversation"/);
-  assert.match(appHtml, /data-practice-scenario="traffic"/);
-  assert.match(appHtml, /data-practice-scenario="fastfood"/);
-  assert.match(appHtml, /data-practice-scenario="pharmacy"/);
-  assert.match(appHtml, /data-practice-scenario="dmv"/);
-  assert.match(appHtml, /id="practice-conversation-native"/);
-  assert.match(appHtml, /id="practice-conversation-target"/);
-  assert.match(appJs, /\/api\/practice\/conversation\/start/);
-  assert.match(appJs, /\/api\/practice\/conversation\/turn/);
-  assert.match(appJs, /speakText\(result\.partnerLine, targetLanguage/);
-  assert.match(server, /practiceConversationStart = async \(\{ scenario, nativeLanguage, targetLanguage/);
-  assert.match(server, /practiceConversationTurn = async \(\{ heardText, scenario, nativeLanguage, targetLanguage/);
-  assert.match(styles, /\.practice-scenario-grid/);
+test('Quick phrase learning lives in Learn while conversation role-play remains in Coach', () => {
+  assert.match(appHtml, /data-learn-path="quick-phrases"/);
+  assert.match(appHtml, /id="learn-quick-phrases-branch"/);
+  assert.match(appHtml, /PRÁCTICA · ENTRENA LO QUE YA APRENDISTE/);
+  assert.match(appHtml, /id="practice-conversation-mode"[^>]*hidden inert/);
+  assert.match(appHtml, /class="coach-scenario-grid"/);
+  assert.match(appJs, /destination === 'coach'/);
+  assert.match(server, /practiceConversationStart = async/);
 });
 
 test('Coach exposes essential newcomer scenarios including traffic stop and fast food', () => {

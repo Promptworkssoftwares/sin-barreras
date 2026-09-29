@@ -1,16 +1,16 @@
-import { initLearning } from './learn.js?v=1.7.2';
-import { initSounds } from './sounds.js?v=1.7.2';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.2';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.2';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.2';
-import { initAIStage } from './ai-stage.js?v=1.7.2';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.2';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.2';
-import { initPhrasebook } from './phrasebook.js?v=1.7.2';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.2';
-import { initQrConversation } from './qr-conversation.js?v=1.7.2';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.2';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.2';
+import { initLearning } from './learn.js?v=1.7.5';
+import { initSounds } from './sounds.js?v=1.7.5';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.5';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.5';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.5';
+import { initAIStage } from './ai-stage.js?v=1.7.5';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.5';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.5';
+import { initPhrasebook } from './phrasebook.js?v=1.7.5';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.5';
+import { initQrConversation } from './qr-conversation.js?v=1.7.5';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.5';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.5';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -34,12 +34,12 @@ const ui = {
   originalText: $('#original-text'), translationText: $('#translation-text'), originalLanguage: $('#original-language'), translationLanguage: $('#translation-language'), sourceFlag: $('#source-flag'), repeatButton: $('#repeat-button'),
   partnerLanguageSelect: $('#partner-language-select'), myLanguageName: $('#my-language-name'), autoLanguageCopy: $('#auto-language-copy'), conversationSituation: $('#conversation-situation'), translatorVoiceSelect: $('#translator-voice-select'), previewVoice: $('#preview-voice'),
   toast: $('#toast'), historyView: $('#history-view'), historyList: $('#history-list'), historyEmpty: $('#history-empty'), clearHistory: $('#clear-history'), openHistory: $('#open-history'),
-  phrasebookView: $('#phrasebook-view'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
+  phrasebookView: $('#phrasebook-view'), phrasebookBackToLearn: $('#phrasebook-back-to-learn'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
   faceView: $('#face-to-face-view'), openFaceToFace: $('#open-face-to-face'), closeFaceToFace: $('#close-face-to-face'), faceToggleListening: $('#face-toggle-listening'), faceStatus: $('#face-status'), faceStatusDot: $('#face-status-dot'), facePartnerLanguage: $('#face-partner-language'), faceUserLanguage: $('#face-user-language'), facePartnerText: $('#face-partner-text'), faceUserText: $('#face-user-text'), facePartnerRepeat: $('#face-partner-repeat'), faceUserRepeat: $('#face-user-repeat'),
-  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
+  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), learnQuickPhrasesBranch: $('#learn-quick-phrases-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
   settingsDialog: $('#settings-dialog'), onboardingDialog: $('#onboarding-dialog'), fontSize: $('#font-size-select'), themeButton: $('#theme-button'),
   practiceView: $('#practice-view'), practiceForm: $('#practice-form'), practiceInput: $('#practice-input'), practiceLanguage: $('#practice-language'), practiceTargetLanguage: $('#practice-target-language'), practiceSituation: $('#practice-situation'),
-  practiceModePhrase: $('#practice-mode-phrase'), practiceModeConversation: $('#practice-mode-conversation'), practicePhraseMode: $('#practice-phrase-mode'), practiceConversationMode: $('#practice-conversation-mode'),
+  practicePhraseMode: $('#practice-phrase-mode'), practiceConversationMode: $('#practice-conversation-mode'),
   practiceConversationSetup: $('#practice-conversation-setup'), practiceConversationSession: $('#practice-conversation-session'), practiceConversationNative: $('#practice-conversation-native'), practiceConversationTarget: $('#practice-conversation-target'), practiceConversationLevel: $('#practice-conversation-level'), practiceConversationStart: $('#practice-conversation-start'),
   practiceConversationRole: $('#practice-conversation-role'), practiceConversationTitle: $('#practice-conversation-title'), practiceConversationObjective: $('#practice-conversation-objective'), practiceConversationIcon: $('#practice-conversation-icon'), practiceConversationProgressValue: $('#practice-conversation-progress-value'), practiceConversationProgressBar: $('#practice-conversation-progress-bar'), practiceConversationThread: $('#practice-conversation-thread'), practiceConversationSuggestions: $('#practice-conversation-suggestions'), practiceConversationListen: $('#practice-conversation-listen'), practiceConversationSlow: $('#practice-conversation-slow'), practiceConversationEnd: $('#practice-conversation-end'), practiceConversationRecord: $('#practice-conversation-record'), practiceConversationText: $('#practice-conversation-text'), practiceConversationSend: $('#practice-conversation-send'), practiceConversationSummary: $('#practice-conversation-summary'), practiceConversationNew: $('#practice-conversation-new'),
   practiceResult: $('#practice-result'), practiceEnglish: $('#practice-english'), practiceTargetLabel: $('#practice-target-label'), practiceMeaning: $('#practice-meaning'), practicePronunciation: $('#practice-pronunciation'), practiceTip: $('#practice-tip'),
@@ -893,17 +893,11 @@ async function togglePracticeRecording() {
 }
 
 
-function setPracticeMode(mode = 'phrase') {
-  const next = mode === 'conversation' ? 'conversation' : 'phrase';
-  if (state.practiceConversationActive && next !== 'conversation') resetPracticeConversation({ scroll: false });
-  state.practiceMode = next;
-  ui.practiceModePhrase?.classList.toggle('is-active', next === 'phrase');
-  ui.practiceModeConversation?.classList.toggle('is-active', next === 'conversation');
-  ui.practiceModePhrase?.setAttribute('aria-selected', String(next === 'phrase'));
-  ui.practiceModeConversation?.setAttribute('aria-selected', String(next === 'conversation'));
-  ui.practicePhraseMode?.classList.toggle('is-hidden', next !== 'phrase');
-  ui.practiceConversationMode?.classList.toggle('is-hidden', next !== 'conversation');
-  if (next === 'conversation') guidedScroll(ui.practiceConversationMode, { block: 'start', delay: 40 });
+function setPracticeMode() {
+  if (state.practiceConversationActive) resetPracticeConversation({ scroll: false });
+  state.practiceMode = 'phrase';
+  ui.practicePhraseMode?.classList.remove('is-hidden');
+  ui.practiceConversationMode?.classList.add('is-hidden');
 }
 
 function setPracticeConversationScenario(scenario = 'traffic') {
@@ -1704,17 +1698,24 @@ function showLearnHome() {
   ui.learnRoutesBranch?.classList.add('is-hidden');
   ui.learnConversationsBranch?.classList.add('is-hidden');
   ui.learnWordsBranch?.classList.add('is-hidden');
+  ui.learnQuickPhrasesBranch?.classList.add('is-hidden');
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
 function openLearnPath(path) {
+  if (path === 'saved-phrases') {
+    showView('phrasebook');
+    return;
+  }
   ui.learnHome?.classList.add('is-hidden');
   ui.learnSoundsBranch?.classList.toggle('is-hidden', path !== 'sounds');
   ui.learnRoutesBranch?.classList.toggle('is-hidden', path !== 'routes');
   ui.learnConversationsBranch?.classList.toggle('is-hidden', path !== 'conversations');
   ui.learnWordsBranch?.classList.toggle('is-hidden', path !== 'words');
+  ui.learnQuickPhrasesBranch?.classList.toggle('is-hidden', path !== 'quick-phrases');
   if (path === 'sounds') sounds?.render();
   if (path === 'routes' || path === 'words') learning?.render();
+  if (path === 'quick-phrases') renderPracticePoints();
   if (path === 'conversations') renderConversationLearning();
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
@@ -1732,7 +1733,8 @@ function showView(view) {
   ui.practiceView?.classList.toggle('is-hidden', view !== 'practice');
   ui.coachView?.classList.toggle('is-hidden', view !== 'coach');
   ui.cameraView?.classList.toggle('is-hidden', view !== 'camera');
-  $$('.nav-item').forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
+  const navView = view === 'phrasebook' ? 'learn' : view;
+  $$('.nav-item').forEach((item) => item.classList.toggle('is-active', item.dataset.view === navView));
   if (view === 'history') renderHistory();
   if (view === 'phrasebook') phrasebook?.render();
   if (view === 'practice') renderPracticePoints();
@@ -1794,6 +1796,14 @@ qrConversation = initQrConversation({
 
 $$('[data-learn-path]').forEach((button) => listen(button, 'click', () => openLearnPath(button.dataset.learnPath)));
 $$('[data-learn-back]').forEach((button) => listen(button, 'click', showLearnHome));
+listen(ui.phrasebookBackToLearn, 'click', () => showView('learn'));
+$$('[data-practice-destination]').forEach((button) => listen(button, 'click', () => {
+  const destination = button.dataset.practiceDestination;
+  if (destination === 'coach') { showView('coach'); return; }
+  if (destination === 'saved-phrases') { showView('phrasebook'); return; }
+  showView('learn');
+  openLearnPath(destination);
+}));
 
 listen(ui.conversationButton, 'click', toggleConversation);
 listen(ui.openFaceToFace, 'click', openFaceToFace);
@@ -1957,8 +1967,6 @@ listen($('#onboarding-continue'), 'click', () => {
 listen(ui.practiceForm, 'submit', preparePractice);
 listen(ui.practiceLanguage, 'change', () => keepPracticeLanguagesDistinct('native'));
 listen(ui.practiceTargetLanguage, 'change', () => keepPracticeLanguagesDistinct('target'));
-listen(ui.practiceModePhrase, 'click', () => setPracticeMode('phrase'));
-listen(ui.practiceModeConversation, 'click', () => setPracticeMode('conversation'));
 $$('[data-practice-scenario]').forEach((button) => listen(button, 'click', () => setPracticeConversationScenario(button.dataset.practiceScenario)));
 listen(ui.practiceConversationNative, 'change', () => keepPracticeConversationLanguagesDistinct('native'));
 listen(ui.practiceConversationTarget, 'change', () => keepPracticeConversationLanguagesDistinct('target'));
@@ -2088,7 +2096,7 @@ updateConversationSettings();
 updatePartnerSelectionUI();
 renderHistory();
 renderPracticePoints();
-setPracticeMode('phrase');
+setPracticeMode();
 setPracticeConversationScenario('traffic');
 $$('[data-coach-scenario]').forEach((item) => item.classList.toggle('is-active', item.dataset.coachScenario === ui.coachScenario?.value));
 setCameraAnalyzeButton('ready');

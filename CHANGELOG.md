@@ -1,12 +1,24 @@
+# Sin Barreras v1.7.5
 
-## v1.7.2 · Premium practice UI polish
+## 1.7.5 · Frases rápidas y Frases Guardadas dentro de Aprender
+- **Frases rápidas** se movió de Práctica a **Aprender**, donde ahora funciona como una ruta para crear y aprender una frase nueva en cualquier idioma compatible.
+- Añadida la opción **Frases Guardadas** dentro de Aprender para abrir la biblioteca personal, escuchar frases y practicar por partes.
+- La biblioteca antes titulada “Mis frases” ahora se presenta como **Frases Guardadas** y tiene regreso directo a Aprender.
+- **Práctica** deja de crear frases nuevas y pasa a ser un centro de entrenamiento para Sonidos, Palabras guardadas, Frases Guardadas y acceso a Coach.
+- **Coach** continúa siendo el único lugar visible para conversaciones completas y role-play de situaciones reales.
+- La navegación marca Frases Guardadas como contenido de Aprender y mantiene acceso directo desde Hablar/Settings.
+- Diseño mobile-first para las nuevas tarjetas y accesos, sin duplicar la lógica de pronunciación ni la biblioteca offline.
+- Android actualizado a versionCode 1705 / versionName 1.7.5.
+
+
+## v1.7.3 · Premium practice UI polish
 - Rediseño visual de tabs, toggles y filtros con relieve sutil y estados activos más modernos.
 - Tarjetas de palabras, frases y práctica con más profundidad, brillo superior y sombras suaves.
 - Contenedores de práctica ahora reaccionan al audio con glow visual al escuchar/procesar.
 - UI móvil conservada compacta para teléfono, sin hacerla exagerada ni pesada.
-# Sin Barreras v1.7.2
+# Sin Barreras v1.7.3
 
-## 1.7.2
+## 1.7.3
 - Resultados de traducción y pronunciación rediseñados para móvil: tipografía modesta, tarjetas compactas y menor altura vertical en Práctica, Coach, Frases y Sonidos.
 - Medidores y señal de audio se mantienen visibles sin dominar la pantalla.
 - Sin cambios en lógica de IA, puntuación, Billing, autenticación o backend.
@@ -22,7 +34,7 @@
 - Conversación guiada de Práctica usa sesiones cortas de 5–8 turnos, respuestas sugeridas, audio normal/lento, progreso de misión y feedback amigable en el idioma del usuario.
 - Coach amplía sus escenarios con situaciones específicas y accesos rápidos para tráfico, comida rápida, farmacia, trabajo, vivienda y DMV.
 - Escenarios sensibles (tráfico, DMV, salud, farmacia, banco, vivienda y emergencia) se mantienen como práctica de comunicación, sin asesoría legal, médica o financiera.
-- Android actualizado a versionCode 1700 / versionName 1.7.2.
+- Android actualizado a versionCode 1700 / versionName 1.7.3.
 
 # Sin Barreras v1.6.8
 

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const text = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-test('v1.7.2 Coach exposes native and target language using the full app language catalog', () => {
+test('v1.7.5 Coach exposes native and target language using the full app language catalog', () => {
   const html = text('private/app.html');
   const app = text('public/app.js');
   assert.match(html, /id="coach-language"/);
@@ -18,7 +18,7 @@ test('v1.7.2 Coach exposes native and target language using the full app languag
   assert.match(app, /speakText\(firstReply, currentCoachTargetLanguage\(\)/);
 });
 
-test('v1.7.2 Coach backend never hardcodes English as the learning language', () => {
+test('v1.7.5 Coach backend never hardcodes English as the learning language', () => {
   const server = text('server/server.js');
   assert.match(server, /coachStart = async \(\{ scenario, nativeLanguage, targetLanguage = 'en'/);
   assert.match(server, /learner is a \$\{nativeName\} speaker learning \$\{targetName\}/);
@@ -28,7 +28,7 @@ test('v1.7.2 Coach backend never hardcodes English as the learning language', ()
   assert.match(server, /nativeLanguage === targetLanguage/);
 });
 
-test('v1.7.2 practice and Coach use compact mobile feedback and live audio visual states', () => {
+test('v1.7.5 practice and Coach use compact mobile feedback and live audio visual states', () => {
   const html = text('private/app.html');
   const css = text('public/styles.css');
   const app = text('public/app.js');

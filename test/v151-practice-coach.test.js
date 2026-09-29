@@ -9,7 +9,8 @@ const server = read('server/server.js');
 const styles = read('public/styles.css');
 
 test('Practice is multilingual from UI through generation, TTS, and scoring', () => {
-  assert.match(appHtml, /PRÁCTICA MULTILENGUAJE/);
+  assert.match(appHtml, /id="learn-quick-phrases-branch"/);
+  assert.match(appHtml, /FRASES RÁPIDAS/);
   assert.match(appHtml, /id="practice-target-language"/);
   assert.match(appHtml, /Idioma que quiero practicar/);
   assert.match(appJs, /populatePracticeLanguageSelects/);

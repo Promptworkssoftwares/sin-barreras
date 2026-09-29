@@ -1,13 +1,12 @@
-# Sin Barreras v1.7.2
+# Sin Barreras v1.7.5
 
-### Nuevo en 1.7.2
+### Nuevo en 1.7.5
 
-- **Coach multilenguaje completo:** selecciona el idioma del usuario y cualquier idioma objetivo disponible en la app.
-- **Escenarios reales:** tráfico, fast food, farmacia, doctor, trabajo, vivienda, banco, escuela, transporte, DMV, emergencia y más.
-- **Práctica en dos modos:** frase rápida y conversación guiada por escenarios, ambas multilenguaje.
-- **UI móvil más compacta:** resultados, correcciones, medidores y tarjetas ocupan menos espacio en teléfonos.
-- **Entrada de audio visual:** las barras responden al volumen real del micrófono mientras escucha y cambian de estado al pausar o analizar.
-- **Coach Principiante pre-A1/A1:** frases cortas, significado visible y ayuda concreta en cualquier idioma objetivo.
+- **Aprender → Frases rápidas:** crea una frase nueva, aprende su forma natural y practica pronunciación en cualquier idioma compatible.
+- **Aprender → Frases Guardadas:** biblioteca personal para escuchar y practicar por partes las frases almacenadas.
+- **Práctica** ahora es un centro de entrenamiento para material ya aprendido/guardado, sin duplicar la creación de frases.
+- **Coach** conserva en exclusiva las conversaciones completas y los escenarios reales.
+- Navegación y tarjetas ajustadas para teléfono con acceso claro entre Aprender, Práctica y Coach.
 - Se conservan límites de IA, cache privado/TTS, Google Play Billing, prueba de 7 días, QR, Stripe, AndroidX y correcciones del micrófono Android.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
