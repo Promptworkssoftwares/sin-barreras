@@ -1,16 +1,16 @@
-import { initLearning } from './learn.js?v=1.7.1';
-import { initSounds } from './sounds.js?v=1.7.1';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.1';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.1';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.1';
-import { initAIStage } from './ai-stage.js?v=1.7.1';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.1';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.1';
-import { initPhrasebook } from './phrasebook.js?v=1.7.1';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.1';
-import { initQrConversation } from './qr-conversation.js?v=1.7.1';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.1';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.1';
+import { initLearning } from './learn.js?v=1.7.2';
+import { initSounds } from './sounds.js?v=1.7.2';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.2';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.2';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.2';
+import { initAIStage } from './ai-stage.js?v=1.7.2';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.2';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.2';
+import { initPhrasebook } from './phrasebook.js?v=1.7.2';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.2';
+import { initQrConversation } from './qr-conversation.js?v=1.7.2';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.2';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.2';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -110,6 +110,11 @@ function setVoiceSignal(element, mode = 'ready', label = '', detail = {}) {
     ready: 'LISTO', waiting: 'HABLA', listening: 'ENTRADA DE AUDIO', thinking: 'PAUSA', processing: 'ANALIZANDO'
   };
   if (copy) copy.textContent = label || labels[mode] || labels.ready;
+
+  const surface = element.closest('.practice-result, .practice-conversation-response, .coach-response-box, .phrase-practice-card');
+  if (surface) {
+    ['ready', 'waiting', 'listening', 'thinking', 'processing'].forEach((state) => surface.classList.toggle(`audio-state-${state}`, state === mode));
+  }
 
   const bars = [...element.querySelectorAll('.voice-bars i')];
   const rawVolume = Number(detail?.volume);

@@ -1,6 +1,6 @@
-# Sin Barreras v1.7.1
+# Sin Barreras v1.7.2
 
-### Nuevo en 1.7.1
+### Nuevo en 1.7.2
 
 - **Coach multilenguaje completo:** selecciona el idioma del usuario y cualquier idioma objetivo disponible en la app.
 - **Escenarios reales:** tráfico, fast food, farmacia, doctor, trabajo, vivienda, banco, escuela, transporte, DMV, emergencia y más.

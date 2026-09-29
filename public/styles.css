@@ -2522,7 +2522,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 /* v1.6.1 Google Play / safety surfaces */
 .qr-terms-consent{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:.82rem;line-height:1.45}.qr-terms-consent input{width:18px;height:18px;flex:0 0 auto;margin-top:2px}.qr-terms-consent a{color:inherit;text-decoration:underline}.qr-moderation-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.qr-moderation-tools select,.qr-moderation-tools button{min-height:42px}.qr-moderation-tools .danger{border-color:rgba(190,42,42,.35)}.qr-report-message{margin-top:6px;border:0;background:transparent;text-decoration:underline;opacity:.75;cursor:pointer}.report-ai-button{font-size:.86rem}.account-link-action{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.account-link-action>div{display:flex;flex:1;min-width:0;flex-direction:column}.data-use-list{padding-left:20px;text-align:left;line-height:1.55}.data-use-list li+li{margin-top:10px}.data-use-dialog .onboarding-content{max-width:620px}
 
-/* v1.7.1 · Modern user settings + live AI minutes */
+/* v1.7.2 · Modern user settings + live AI minutes */
 .settings-dialog{
   width:min(94vw,680px);
   max-width:680px;
@@ -2572,7 +2572,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 @media(prefers-reduced-motion:reduce){.settings-close,.settings-shortcut-card,.settings-usage-meter i{transition:none}}
 
 
-/* v1.7.1 · Compact Hablar + digital learning/pronunciation UI */
+/* v1.7.2 · Compact Hablar + digital learning/pronunciation UI */
 .hero{padding:18px 0 12px}.hero .eyebrow{margin-bottom:5px;font-size:7.5px}.hero h1{font-size:clamp(20px,5.3vw,31px);line-height:1;letter-spacing:-1.35px;white-space:nowrap}.hero-copy{max-width:620px;margin-top:7px;font-size:10.5px;line-height:1.4}
 .mode-panel{padding:11px 12px;border-radius:16px}.mode-head{gap:8px}.mode-head strong{font-size:11px}.mode-head .section-label{font-size:7px;margin-bottom:2px}.mode-dot{width:8px;height:8px}
 .auto-language-panel{grid-template-columns:minmax(0,.8fr) 48px minmax(0,1.2fr);gap:7px;margin-top:9px}.auto-language-card{min-height:58px;padding:9px 10px;border-radius:13px}.auto-language-card small{font-size:7.5px;line-height:1.25}.auto-language-card span{font-size:6.7px}.auto-language-card strong{font-size:10px}.auto-language-icon{width:30px;height:30px;border-radius:9px}.auto-language-flow{min-height:58px;gap:2px}.auto-language-flow b{font-size:5.8px}.partner-language-control select{min-height:35px;font-size:10px}.context-row{grid-template-columns:minmax(0,210px) 1fr;gap:9px;margin-top:9px;padding-top:9px}.context-row label{gap:4px;font-size:7px}.context-row select{min-height:35px;font-size:10px}.context-help{font-size:8px;line-height:1.3}
@@ -2611,7 +2611,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 }
 @media(max-width:360px){.hero h1{font-size:16.5px}.conversation-tool strong{font-size:7px}.learn-path-card{min-height:98px}.sound-feedback-compare{grid-template-columns:1fr}}
 
-/* v1.7.1 · Real-life scenario practice + Coach shortcuts */
+/* v1.7.2 · Real-life scenario practice + Coach shortcuts */
 .practice-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:18px 0 4px;padding:5px;border:1px solid var(--line);border-radius:15px;background:var(--card)}
 .practice-mode-switch button{min-height:42px;border:0;border-radius:11px;background:transparent;color:var(--muted);font:800 11px Manrope,sans-serif;letter-spacing:.2px}
 .practice-mode-switch button.is-active{background:var(--surface);color:var(--ink);box-shadow:0 3px 10px rgba(35,49,53,.08)}
@@ -2625,7 +2625,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 @media(max-width:760px){.practice-scenario-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.practice-conversation-controls{grid-template-columns:1fr 1fr}.practice-conversation-controls .primary-button{grid-column:1/-1}.coach-scenario-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.practice-heading h2{font-size:25px}.practice-mode-switch{margin-top:13px}.practice-conversation-intro{display:grid;gap:5px}.practice-conversation-intro p{text-align:left}.practice-scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.practice-scenario-grid button{min-height:59px;padding:8px;grid-template-columns:27px minmax(0,1fr);column-gap:6px}.practice-scenario-grid button>span{width:27px;height:27px;font-size:15px}.practice-conversation-controls{grid-template-columns:1fr;padding:11px}.practice-conversation-controls .primary-button{grid-column:auto}.practice-conversation-hero{grid-template-columns:auto minmax(0,1fr);padding:12px}.practice-conversation-progress{grid-column:1/-1;grid-template-columns:auto auto;justify-content:start;gap:4px;align-items:baseline}.practice-conversation-thread{min-height:210px;padding:10px}.practice-conversation-bubble{max-width:94%}.practice-conversation-bubble.learner{grid-template-columns:50px minmax(0,1fr)}.practice-turn-score{width:50px;height:50px}.practice-conversation-suggestions{grid-template-columns:1fr}.practice-conversation-suggestions button{min-height:47px}.practice-conversation-actions{flex-wrap:wrap}.practice-conversation-actions .text-button{margin-left:0}.practice-conversation-summary>div{grid-template-columns:auto auto auto auto}.coach-scenario-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.coach-scenario-shortcuts button{min-height:50px}}
 
-/* v1.7.1 · Fully multilingual Coach + compact mobile practice + live voice visualizer */
+/* v1.7.2 · Fully multilingual Coach + compact mobile practice + live voice visualizer */
 .coach-language-pair{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--card) 60%,var(--surface))}
 .coach-language-pair label{padding:0!important;border:0!important;background:transparent!important}.coach-language-arrow{display:grid;place-items:center;align-self:center;width:24px;height:24px;margin-bottom:8px;border-radius:999px;background:var(--accent);color:white;font-weight:900;font-size:11px}
 .coach-language-pair select{min-height:38px!important;background:var(--surface)!important;border:1px solid var(--line)!important;padding:0 8px!important;font-size:10.5px!important}
@@ -2639,7 +2639,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 @media(prefers-reduced-motion:reduce){.voice-input-signal .voice-bars i,.voice-input-signal .voice-signal-dot{animation:none!important}}
 
 
-/* v1.7.1 · Mobile-first compact translation and practice results */
+/* v1.7.2 · Mobile-first compact translation and practice results */
 /* Keep learning content readable on phones without letting one result dominate the viewport. */
 .practice-result,
 .practice-score,
@@ -2765,3 +2765,479 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
   .practice-conversation-bubble>strong { font-size:10px; }
   .correction-block>p,.phrase-practice-score dl dd { font-size:7.8px!important; }
 }
+
+
+/* v1.7.2 · premium tabs + lifted cards + audio-reactive practice surfaces */
+.practice-mode-switch,
+.sound-lab-tabs,
+.phrasebook-filters,
+.auth-tabs {
+  padding:5px;
+  border-color:color-mix(in srgb,var(--line) 84%,rgba(255,255,255,.45));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 94%,white 6%),color-mix(in srgb,var(--card) 82%,var(--surface)));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 10px 24px rgba(17,32,35,.06);
+}
+.practice-mode-switch button,
+.sound-tab,
+.phrasebook-filters button,
+.auth-tab {
+  position:relative;
+  overflow:hidden;
+  transition:transform .16s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease,color .18s ease;
+}
+.practice-mode-switch button::after,
+.sound-tab::after,
+.phrasebook-filters button::after,
+.auth-tab::after {
+  content:'';
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0));
+  opacity:.7;
+  pointer-events:none;
+}
+.practice-mode-switch button.is-active,
+.sound-tab.is-active,
+.phrasebook-filters button.is-active,
+.auth-tab.is-active {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 96%,white 4%),color-mix(in srgb,var(--surface) 78%,var(--card)));
+  box-shadow:0 10px 22px rgba(19,36,39,.10), inset 0 1px 0 rgba(255,255,255,.9);
+  transform:translateY(-1px);
+}
+
+.learn-word-row,
+.saved-word-card,
+.phrase-card,
+.course-card,
+.sound-card,
+.practice-result,
+.practice-score,
+.practice-conversation-response,
+.coach-response-box,
+.phrase-practice-card,
+.practice-conversation-summary,
+.coach-setup,
+.practice-form,
+.practice-conversation-setup,
+.practice-conversation-session,
+.saved-words-hero,
+.phrase-practice-context {
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 95%,white 5%),color-mix(in srgb,var(--surface) 88%,var(--card)));
+  box-shadow:0 14px 34px rgba(17,32,35,.06), inset 0 1px 0 rgba(255,255,255,.72);
+}
+.learn-word-row::before,
+.saved-word-card::before,
+.phrase-card::before,
+.course-card::before,
+.sound-card::before,
+.practice-result::before,
+.practice-score::before,
+.practice-conversation-response::before,
+.coach-response-box::before,
+.phrase-practice-card::before,
+.practice-conversation-summary::before,
+.coach-setup::before,
+.practice-form::before,
+.practice-conversation-setup::before,
+.practice-conversation-session::before,
+.saved-words-hero::before,
+.phrase-practice-context::before {
+  content:'';
+  position:absolute;
+  left:10px;
+  right:10px;
+  top:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+  pointer-events:none;
+}
+.learn-word-row:hover,
+.saved-word-card:hover,
+.phrase-card:hover,
+.course-card:hover,
+.sound-card:hover,
+.practice-conversation-response:hover,
+.coach-response-box:hover,
+.phrase-practice-card:hover {
+  border-color:color-mix(in srgb,var(--accent) 34%,var(--line));
+  box-shadow:0 18px 40px rgba(17,32,35,.09), inset 0 1px 0 rgba(255,255,255,.78);
+}
+
+.practice-scenario-grid button,
+.coach-scenario-shortcuts button,
+.saved-word-tools button,
+.phrase-actions button,
+.practice-conversation-suggestions button {
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--paper) 96%,white 4%),color-mix(in srgb,var(--paper) 86%,var(--card)));
+  box-shadow:0 8px 18px rgba(19,36,39,.05), inset 0 1px 0 rgba(255,255,255,.7);
+  transition:transform .16s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+.practice-scenario-grid button:hover,
+.coach-scenario-shortcuts button:hover,
+.saved-word-tools button:hover,
+.phrase-actions button:hover,
+.practice-conversation-suggestions button:hover {
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--accent) 42%,var(--line));
+  box-shadow:0 12px 24px rgba(19,36,39,.09), inset 0 1px 0 rgba(255,255,255,.75);
+}
+.practice-scenario-grid button.is-active,
+.coach-scenario-shortcuts button.is-active,
+.saved-word-tools button[data-custom-action="practice"] {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,white),color-mix(in srgb,var(--accent) 7%,var(--paper)));
+  border-color:color-mix(in srgb,var(--accent) 68%,var(--line));
+  box-shadow:0 14px 28px rgba(217,89,61,.14), inset 0 1px 0 rgba(255,255,255,.72);
+}
+
+.voice-input-signal {
+  border-color:color-mix(in srgb,var(--line) 80%,rgba(255,255,255,.45));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--card) 82%,white 18%),color-mix(in srgb,var(--card) 92%,var(--surface)));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 8px 18px rgba(19,36,39,.05);
+}
+.voice-input-signal[data-state="listening"] {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86),0 0 0 1px rgba(47,155,119,.10),0 12px 26px rgba(47,155,119,.14);
+}
+.voice-input-signal[data-state="processing"] {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86),0 0 0 1px rgba(217,89,61,.10),0 12px 26px rgba(217,89,61,.14);
+}
+.practice-result.audio-state-listening,
+.practice-conversation-response.audio-state-listening,
+.coach-response-box.audio-state-listening,
+.phrase-practice-card.audio-state-listening {
+  border-color:color-mix(in srgb,#2f9b77 54%,var(--line));
+  box-shadow:0 16px 38px rgba(47,155,119,.12), inset 0 1px 0 rgba(255,255,255,.76);
+}
+.practice-result.audio-state-listening::after,
+.practice-conversation-response.audio-state-listening::after,
+.coach-response-box.audio-state-listening::after,
+.phrase-practice-card.audio-state-listening::after,
+.practice-result.audio-state-processing::after,
+.practice-conversation-response.audio-state-processing::after,
+.coach-response-box.audio-state-processing::after,
+.phrase-practice-card.audio-state-processing::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:1;
+}
+.practice-result.audio-state-listening::after,
+.practice-conversation-response.audio-state-listening::after,
+.coach-response-box.audio-state-listening::after,
+.phrase-practice-card.audio-state-listening::after {
+  background:radial-gradient(circle at 12% 16%,rgba(47,155,119,.15),transparent 40%),linear-gradient(180deg,rgba(47,155,119,.03),transparent 38%);
+}
+.practice-result.audio-state-processing,
+.practice-conversation-response.audio-state-processing,
+.coach-response-box.audio-state-processing,
+.phrase-practice-card.audio-state-processing {
+  border-color:color-mix(in srgb,var(--accent) 48%,var(--line));
+  box-shadow:0 16px 38px rgba(217,89,61,.12), inset 0 1px 0 rgba(255,255,255,.76);
+}
+.practice-result.audio-state-processing::after,
+.practice-conversation-response.audio-state-processing::after,
+.coach-response-box.audio-state-processing::after,
+.phrase-practice-card.audio-state-processing::after {
+  background:radial-gradient(circle at 12% 16%,rgba(217,89,61,.14),transparent 40%),linear-gradient(180deg,rgba(217,89,61,.03),transparent 38%);
+}
+.practice-result.audio-state-thinking,
+.practice-conversation-response.audio-state-thinking,
+.coach-response-box.audio-state-thinking,
+.phrase-practice-card.audio-state-thinking,
+.practice-result.audio-state-waiting,
+.practice-conversation-response.audio-state-waiting,
+.coach-response-box.audio-state-waiting,
+.phrase-practice-card.audio-state-waiting {
+  border-color:color-mix(in srgb,#d28a23 36%,var(--line));
+}
+
+.dark .practice-mode-switch,
+.dark .sound-lab-tabs,
+.dark .phrasebook-filters,
+.dark .auth-tabs,
+.dark .learn-word-row,
+.dark .saved-word-card,
+.dark .phrase-card,
+.dark .course-card,
+.dark .sound-card,
+.dark .practice-result,
+.dark .practice-score,
+.dark .practice-conversation-response,
+.dark .coach-response-box,
+.dark .phrase-practice-card,
+.dark .practice-conversation-summary,
+.dark .coach-setup,
+.dark .practice-form,
+.dark .practice-conversation-setup,
+.dark .practice-conversation-session,
+.dark .saved-words-hero,
+.dark .phrase-practice-context {
+  background:linear-gradient(180deg,#1d3034,#16262a 72%);
+  box-shadow:0 18px 38px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.03);
+}
+.dark .practice-mode-switch button.is-active,
+.dark .sound-tab.is-active,
+.dark .phrasebook-filters button.is-active,
+.dark .auth-tab.is-active,
+.dark .practice-scenario-grid button.is-active,
+.dark .coach-scenario-shortcuts button.is-active,
+.dark .saved-word-tools button[data-custom-action="practice"] {
+  background:linear-gradient(180deg,#294248,#1d3034);
+}
+
+@media(max-width:620px){
+  .practice-mode-switch,
+  .sound-lab-tabs,
+  .phrasebook-filters,
+  .auth-tabs { box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 8px 18px rgba(17,32,35,.05); }
+  .learn-word-row,
+  .saved-word-card,
+  .phrase-card,
+  .course-card,
+  .sound-card,
+  .practice-result,
+  .practice-score,
+  .practice-conversation-response,
+  .coach-response-box,
+  .phrase-practice-card,
+  .practice-conversation-summary,
+  .coach-setup,
+  .practice-form,
+  .practice-conversation-setup,
+  .practice-conversation-session,
+  .saved-words-hero,
+  .phrase-practice-context { box-shadow:0 10px 22px rgba(17,32,35,.055), inset 0 1px 0 rgba(255,255,255,.68); }
+  .practice-scenario-grid button,
+  .coach-scenario-shortcuts button,
+  .saved-word-tools button,
+  .phrase-actions button,
+  .practice-conversation-suggestions button { box-shadow:0 6px 14px rgba(19,36,39,.055), inset 0 1px 0 rgba(255,255,255,.66); }
+}
+
+/* v1.7.2 · refined tactile tabs + richer cards + subtle waveform finish */
+.practice-mode-switch,
+.sound-lab-tabs,
+.phrasebook-filters,
+.auth-tabs{
+  position:relative;
+  isolation:isolate;
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+}
+.practice-mode-switch::before,
+.sound-lab-tabs::before,
+.phrasebook-filters::before,
+.auth-tabs::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:radial-gradient(circle at top left, rgba(255,255,255,.55), transparent 34%),linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0));
+  pointer-events:none;
+}
+.practice-mode-switch button,
+.sound-tab,
+.phrasebook-filters button,
+.auth-tab{
+  border:1px solid transparent;
+  border-radius:13px;
+}
+.practice-mode-switch button:hover,
+.sound-tab:hover,
+.phrasebook-filters button:hover,
+.auth-tab:hover{
+  color:var(--ink);
+  border-color:color-mix(in srgb,var(--accent) 18%, transparent);
+  background:color-mix(in srgb,var(--surface) 88%, white 12%);
+  transform:translateY(-1px);
+}
+.practice-mode-switch button.is-active::before,
+.sound-tab.is-active::before,
+.phrasebook-filters button.is-active::before,
+.auth-tab.is-active::before{
+  content:'';
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:5px;
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--aqua) 68%, white));
+  opacity:.95;
+}
+
+.learn-word-row,
+.saved-word-card,
+.phrase-card,
+.course-card,
+.sound-card,
+.practice-result,
+.practice-score,
+.practice-conversation-response,
+.coach-response-box,
+.phrase-practice-card,
+.practice-conversation-summary,
+.coach-setup,
+.practice-form,
+.practice-conversation-setup,
+.practice-conversation-session,
+.saved-words-hero,
+.phrase-practice-context{
+  border-color:color-mix(in srgb,var(--line) 84%, rgba(255,255,255,.45));
+}
+.learn-word-row::after,
+.saved-word-card::after,
+.phrase-card::after,
+.practice-result::after,
+.practice-conversation-response::after,
+.coach-response-box::after,
+.phrase-practice-card::after{
+  content:'';
+  position:absolute;
+  right:12px;
+  bottom:10px;
+  width:54px;
+  height:18px;
+  border-radius:999px;
+  opacity:.22;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0)),
+    repeating-linear-gradient(90deg,
+      rgba(217,89,61,.55) 0 2px,
+      transparent 2px 6px,
+      rgba(74,159,140,.46) 6px 8px,
+      transparent 8px 12px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  pointer-events:none;
+}
+.learn-word-row:hover,
+.saved-word-card:hover,
+.phrase-card:hover,
+.course-card:hover,
+.sound-card:hover,
+.practice-result:hover,
+.practice-score:hover,
+.practice-conversation-response:hover,
+.coach-response-box:hover,
+.phrase-practice-card:hover{
+  transform:translateY(-1px);
+}
+.learn-word-row strong,
+.saved-word-copy>strong,
+.phrase-translation{
+  letter-spacing:-.02em;
+}
+.learn-word-row small,
+.saved-word-copy>small,
+.saved-word-copy>p,
+.phrase-source,
+.phrase-card-progress{
+  color:color-mix(in srgb,var(--muted) 92%, var(--ink));
+}
+.saved-word-tools button,
+.phrase-actions button,
+.practice-conversation-suggestions button{
+  border-color:color-mix(in srgb,var(--line) 84%, rgba(255,255,255,.42));
+  border-radius:11px;
+}
+.saved-word-tools button[data-custom-action="practice"],
+.practice-conversation-suggestions button.is-active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--accent),#ef826a);
+  box-shadow:0 12px 24px rgba(217,89,61,.14), inset 0 1px 0 rgba(255,255,255,.24);
+}
+.phrase-card-top span,
+.saved-word-copy>span{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.phrase-card-top span::before,
+.saved-word-copy>span::before{
+  content:'';
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#ef826a);
+  box-shadow:0 0 0 4px rgba(217,89,61,.09);
+}
+
+.voice-input-signal{
+  position:relative;
+}
+.voice-input-signal::after{
+  content:'';
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.practice-result.audio-state-listening,
+.practice-conversation-response.audio-state-listening,
+.coach-response-box.audio-state-listening,
+.phrase-practice-card.audio-state-listening{
+  transform:translateY(-1px);
+}
+.practice-result.audio-state-listening::before,
+.practice-conversation-response.audio-state-listening::before,
+.coach-response-box.audio-state-listening::before,
+.phrase-practice-card.audio-state-listening::before,
+.practice-result.audio-state-processing::before,
+.practice-conversation-response.audio-state-processing::before,
+.coach-response-box.audio-state-processing::before,
+.phrase-practice-card.audio-state-processing::before{
+  content:'';
+  position:absolute;
+  left:14px;
+  right:14px;
+  top:0;
+  height:4px;
+  border-radius:999px;
+  pointer-events:none;
+}
+.practice-result.audio-state-listening::before,
+.practice-conversation-response.audio-state-listening::before,
+.coach-response-box.audio-state-listening::before,
+.phrase-practice-card.audio-state-listening::before{
+  background:linear-gradient(90deg,rgba(47,155,119,.0),rgba(47,155,119,.94),rgba(47,155,119,.0));
+}
+.practice-result.audio-state-processing::before,
+.practice-conversation-response.audio-state-processing::before,
+.coach-response-box.audio-state-processing::before,
+.phrase-practice-card.audio-state-processing::before{
+  background:linear-gradient(90deg,rgba(217,89,61,.0),rgba(217,89,61,.95),rgba(217,89,61,.0));
+}
+
+@media(max-width:620px){
+  .practice-mode-switch,
+  .sound-lab-tabs,
+  .phrasebook-filters,
+  .auth-tabs{ border-radius:16px; }
+  .practice-mode-switch button,
+  .sound-tab,
+  .phrasebook-filters button,
+  .auth-tab{ border-radius:12px; }
+  .learn-word-row::after,
+  .saved-word-card::after,
+  .phrase-card::after,
+  .practice-result::after,
+  .practice-conversation-response::after,
+  .coach-response-box::after,
+  .phrase-practice-card::after{ width:42px; height:14px; right:10px; bottom:8px; opacity:.18; }
+}
+
+.dark .phrase-card-top span::before,
+.dark .saved-word-copy>span::before{ box-shadow:0 0 0 4px rgba(217,89,61,.16); }
+.dark .learn-word-row::after,
+.dark .saved-word-card::after,
+.dark .phrase-card::after,
+.dark .practice-result::after,
+.dark .practice-conversation-response::after,
+.dark .coach-response-box::after,
+.dark .phrase-practice-card::after{ opacity:.28; }

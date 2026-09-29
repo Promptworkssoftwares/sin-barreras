@@ -1,6 +1,12 @@
-# Sin Barreras v1.7.1
 
-## 1.7.1
+## v1.7.2 · Premium practice UI polish
+- Rediseño visual de tabs, toggles y filtros con relieve sutil y estados activos más modernos.
+- Tarjetas de palabras, frases y práctica con más profundidad, brillo superior y sombras suaves.
+- Contenedores de práctica ahora reaccionan al audio con glow visual al escuchar/procesar.
+- UI móvil conservada compacta para teléfono, sin hacerla exagerada ni pesada.
+# Sin Barreras v1.7.2
+
+## 1.7.2
 - Resultados de traducción y pronunciación rediseñados para móvil: tipografía modesta, tarjetas compactas y menor altura vertical en Práctica, Coach, Frases y Sonidos.
 - Medidores y señal de audio se mantienen visibles sin dominar la pantalla.
 - Sin cambios en lógica de IA, puntuación, Billing, autenticación o backend.
@@ -16,7 +22,7 @@
 - Conversación guiada de Práctica usa sesiones cortas de 5–8 turnos, respuestas sugeridas, audio normal/lento, progreso de misión y feedback amigable en el idioma del usuario.
 - Coach amplía sus escenarios con situaciones específicas y accesos rápidos para tráfico, comida rápida, farmacia, trabajo, vivienda y DMV.
 - Escenarios sensibles (tráfico, DMV, salud, farmacia, banco, vivienda y emergencia) se mantienen como práctica de comunicación, sin asesoría legal, médica o financiera.
-- Android actualizado a versionCode 1700 / versionName 1.7.1.
+- Android actualizado a versionCode 1700 / versionName 1.7.2.
 
 # Sin Barreras v1.6.8
 

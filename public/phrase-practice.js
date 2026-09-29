@@ -1,4 +1,4 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.1';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.2';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -48,6 +48,10 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     const copy = ui.voiceSignal.querySelector('small');
     const labels = { ready: 'LISTO', waiting: 'HABLA', listening: 'ENTRADA DE AUDIO', thinking: 'PAUSA', processing: 'ANALIZANDO' };
     if (copy) copy.textContent = labels[mode] || labels.ready;
+    const surface = ui.voiceSignal.closest('.phrase-practice-card');
+    if (surface) {
+      ['ready', 'waiting', 'listening', 'thinking', 'processing'].forEach((state) => surface.classList.toggle(`audio-state-${state}`, state === mode));
+    }
     const bars = [...ui.voiceSignal.querySelectorAll('.voice-bars i')];
     const rawVolume = Number(detail?.volume);
     const hasLiveLevel = mode === 'listening' && Number.isFinite(rawVolume);

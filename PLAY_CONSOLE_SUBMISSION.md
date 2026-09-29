@@ -1,4 +1,4 @@
-# Play Console submission — Sin Barreras v1.7.1
+# Play Console submission — Sin Barreras v1.7.2
 
 ## Before uploading the AAB
 1. Deploy the exact backend/web version bundled with this source.
