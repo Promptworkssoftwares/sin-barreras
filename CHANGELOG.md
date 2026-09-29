@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.10
+# Sin Barreras v1.7.11
+
+## 1.7.11 · Enlace de Admin solo para owner
+- Corregido el estilo de Mi cuenta que mostraba controles marcados como ocultos.
+- El enlace de Admin se retira de la vista para usuarios normales; el backend continúa exigiendo el rol owner.
+- Android actualizado a versionCode 1711 / versionName 1.7.11.
 
 ## 1.7.10 · Onda real de voz IA y práctica renovada
 - La onda de la voz IA responde al nivel del audio que se está reproduciendo en Web Audio; conserva una animación activa en el modo de reproducción alterno.

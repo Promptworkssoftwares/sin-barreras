@@ -151,7 +151,8 @@ export function initAccountUI() {
     else if (user.subscriptionStatus === 'active') plan.textContent = 'PLAN SIN BARRERAS · $5.99/MES';
     else plan.textContent = 'SIN SUSCRIPCIÓN ACTIVA';
   }
-  if (admin) admin.hidden = user.role !== 'owner';
+  if (admin && user.role !== 'owner') admin.remove();
+  else if (admin) admin.hidden = false;
   if (deleteButton) deleteButton.hidden = user.role === 'owner';
   if (manage) manage.hidden = user.role === 'owner' || !user.canManageBilling;
 
@@ -179,7 +180,7 @@ export function initAccountUI() {
       alert(error.message);
     } finally { manage.disabled = false; }
   });
-  admin?.addEventListener('click', () => window.location.assign('/admin'));
+  if (user.role === 'owner') admin?.addEventListener('click', () => window.location.assign('/admin'));
 
   deleteButton?.addEventListener('click', () => {
     dialog?.close();

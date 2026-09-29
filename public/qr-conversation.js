@@ -1,4 +1,4 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.10';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.11';
 
 export function initQrConversation({ notify, request, languages, createAutoVoiceTurn, getDefaults } = {}) {
   const dialog = document.querySelector('#qr-conversation-dialog');

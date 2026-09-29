@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.10
+# Sin Barreras v1.7.11
+
+### Nuevo en 1.7.11
+
+- El enlace de Admin solo se muestra en la sesión owner, tanto en Mi cuenta como en la portada.
+- Corregido el estilo de los botones ocultos de Mi cuenta.
 
 ### Nuevo en 1.7.10
 
