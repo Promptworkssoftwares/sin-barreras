@@ -116,13 +116,18 @@ function placeWave(target) {
   return ensurePermanentWave(surface);
 }
 
-function resetTrack(track) {
+function clearTrackBars(track) {
   if (!track) return;
-  track.querySelector('small').textContent = 'LISTO';
   track.querySelectorAll('.learning-wave-bars i').forEach((bar) => {
     bar.style.height = '';
     bar.style.opacity = '';
   });
+}
+
+function resetTrack(track) {
+  if (!track) return;
+  track.querySelector('small').textContent = 'LISTO';
+  clearTrackBars(track);
 }
 
 function resetWave(wave) {
@@ -151,12 +156,13 @@ function updateReactiveBars(track, level, levels = null) {
   if (!track) return false;
   const bars = [...track.querySelectorAll('.learning-wave-bars i')];
   if (!Array.isArray(levels) && (level === null || !Number.isFinite(Number(level)))) return false;
+  const tallTrack = Boolean(track.closest('.phrase-card,.saved-word-card,.phrase-practice-card'));
   bars.forEach((bar, index) => {
     const energy = Array.isArray(levels) && levels.length
       ? Number(levels[Math.min(levels.length - 1, Math.floor(index * levels.length / bars.length))])
       : Number(level) * 5;
     const normalized = Math.max(0, Math.min(1, energy || 0));
-    bar.style.height = `${Math.round(3 + normalized * 15)}px`;
+    bar.style.height = `${Math.round((tallTrack ? 4 : 3) + normalized * (tallTrack ? 25 : 15))}px`;
     bar.style.opacity = String(.42 + normalized * .58);
   });
   return true;
@@ -211,7 +217,9 @@ window.addEventListener('sinbarreras:playback-level', (event) => {
   const { level, levels, playing } = event.detail || {};
   if (!playing) {
     wave.dataset.reactive = 'false';
-    resetTrack(wave.querySelector('[data-wave-role="ai"]'));
+    // A previous voice is stopped just before this voice starts. Keep the
+    // current label until its own playback promise settles.
+    clearTrackBars(wave.querySelector('[data-wave-role="ai"]'));
     return;
   }
   const track = wave.querySelector('[data-wave-role="ai"]');

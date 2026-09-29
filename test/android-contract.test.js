@@ -17,8 +17,8 @@ test('Android release targets the current Google Play API requirement', () => {
   assert.match(gradle, /compileSdk = 36/);
   assert.match(gradle, /targetSdk = 36/);
   assert.match(gradle, /applicationId = 'com\.promptworks\.sinbarreras'/);
-  assert.match(gradle, /versionName = '1.7.12'/);
-  assert.match(gradle, /versionCode = 1712/);
+  assert.match(gradle, /versionName = '1.7.13'/);
+  assert.match(gradle, /versionCode = 1713/);
 });
 
 

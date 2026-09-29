@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.12
+# Sin Barreras v1.7.13
+
+## 1.7.13 · Onda real en Frases guardadas y Practicar
+- Restaurada la pantalla Hablar sin la segunda onda añadida por error en la entrega anterior.
+- Escuchar en Frases guardadas mantiene el indicador de reproducción y mueve barras más visibles con niveles medidos del audio.
+- Ampliada la onda en palabras guardadas y práctica por partes sin alterar la fila de botones.
+- Android actualizado a versionCode 1713 / versionName 1.7.13.
 
 ## 1.7.12 · Onda de audio medida en traducción y voz IA
 - La tarjeta de traducción y el escenario de conversación muestran barras basadas en energía real de la salida de audio.

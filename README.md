@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.12
+# Sin Barreras v1.7.13
+
+### Nuevo en 1.7.13
+
+- En Frases guardadas → Escuchar, la onda de VOZ AI responde a la señal real de audio.
+- Mejor visibilidad de las barras en frases, palabras y práctica por partes.
+- Hablar conserva su única onda original.
 
 ### Nuevo en 1.7.12
 

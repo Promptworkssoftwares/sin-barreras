@@ -1,17 +1,17 @@
-import { initLearning } from './learn.js?v=1.7.12';
-import { initSounds } from './sounds.js?v=1.7.12';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.12';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.12';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.12';
-import { initAIStage } from './ai-stage.js?v=1.7.12';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.12';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.12';
-import { initPhrasebook } from './phrasebook.js?v=1.7.12';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.12';
-import { initQrConversation } from './qr-conversation.js?v=1.7.12';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.12';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.12';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.12';
+import { initLearning } from './learn.js?v=1.7.13';
+import { initSounds } from './sounds.js?v=1.7.13';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.13';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.13';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.13';
+import { initAIStage } from './ai-stage.js?v=1.7.13';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.13';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.13';
+import { initPhrasebook } from './phrasebook.js?v=1.7.13';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.13';
+import { initQrConversation } from './qr-conversation.js?v=1.7.13';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.13';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.13';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.13';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -32,7 +32,7 @@ const ui = {
   statusPill: $('#status-pill'), statusCopy: $('#status-copy'), stage: $('.interpreter-stage'), modeDot: $('#mode-dot'), modeName: $('#mode-name'),
   aiStage: $('#ai-stage'), aiCanvas: $('#ai-core-canvas'), aiFallback: $('#ai-stage-fallback'),
   conversationButton: $('#conversation-button'), conversationButtonText: $('#conversation-button-text'), conversationButtonSubtext: $('.conversation-button-subtext'),
-  originalText: $('#original-text'), translationText: $('#translation-text'), translationVoiceWave: $('#translation-voice-wave'), translationVoiceStatus: $('#translation-voice-status'), originalLanguage: $('#original-language'), translationLanguage: $('#translation-language'), sourceFlag: $('#source-flag'), repeatButton: $('#repeat-button'),
+  originalText: $('#original-text'), translationText: $('#translation-text'), originalLanguage: $('#original-language'), translationLanguage: $('#translation-language'), sourceFlag: $('#source-flag'), repeatButton: $('#repeat-button'),
   partnerLanguageSelect: $('#partner-language-select'), myLanguageName: $('#my-language-name'), autoLanguageCopy: $('#auto-language-copy'), conversationSituation: $('#conversation-situation'), translatorVoiceSelect: $('#translator-voice-select'), previewVoice: $('#preview-voice'),
   toast: $('#toast'), historyView: $('#history-view'), historyList: $('#history-list'), historyEmpty: $('#history-empty'), clearHistory: $('#clear-history'), openHistory: $('#open-history'),
   phrasebookView: $('#phrasebook-view'), phrasebookBackToLearn: $('#phrasebook-back-to-learn'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
@@ -173,9 +173,8 @@ function setStatus(kind, copy) {
   if (ui.statusPill) ui.statusPill.textContent = pill;
   if (ui.statusCopy) ui.statusCopy.textContent = text;
   ui.stage?.classList.toggle('listening', kind === 'listening');
-  ui.stage?.classList.toggle('speaking', kind === 'speaking');
   ui.stage?.classList.toggle('thinking', kind === 'thinking');
-  ui.stage?.classList.toggle('processing', kind === 'translating');
+  ui.stage?.classList.toggle('processing', ['translating','speaking'].includes(kind));
   ui.modeDot?.classList.toggle('active', ['listening','thinking'].includes(kind));
   aiStageController?.setState?.(kind);
   if (ui.faceStatus) ui.faceStatus.textContent = pill;
@@ -199,7 +198,7 @@ function renderConversationButtonState(mode = state.running ? 'running' : 'idle'
   ui.conversationButton.setAttribute('aria-label', selected ? 'Activar conversación manos libres' : 'Selecciona el idioma de la otra persona');
 }
 
-function updateWaveVisual(volume = 0, speaking = false, levels = null) {
+function updateWaveVisual(volume = 0, speaking = false) {
   const level = Math.max(0, Math.min(1, volume * 10));
   aiStageController?.setVolume?.(level, speaking);
   const bars = ui.stage?.querySelectorAll('.sound-waves i');
@@ -209,31 +208,12 @@ function updateWaveVisual(volume = 0, speaking = false, levels = null) {
     const distance = Math.abs(index - center) / Math.max(1, center);
     const shape = 1 - (distance * .62);
     const idle = 10 + shape * 20;
-    const sample = Array.isArray(levels) && levels.length
-      ? Math.max(0, Math.min(1, Number(levels[Math.floor(index * levels.length / bars.length)]) || 0))
-      : level;
-    const height = speaking ? idle + sample * (18 + shape * 36) : idle;
+    const active = idle + level * (18 + shape * 36);
+    const height = speaking ? active : idle;
     bar.style.height = `${Math.round(height)}px`;
-    bar.style.opacity = String(speaking ? .4 + sample * .6 : .42 + shape * .22);
+    bar.style.opacity = String(speaking ? .62 + level * .38 : .42 + shape * .22);
   });
 }
-
-window.addEventListener('sinbarreras:playback-level', (event) => {
-  const { playing, level, levels } = event.detail || {};
-  const measured = playing && Array.isArray(levels) && levels.length > 0;
-  const wave = ui.translationVoiceWave;
-  if (wave) {
-    wave.dataset.state = playing ? (measured ? 'speaking' : 'unmetered') : 'idle';
-    if (ui.translationVoiceStatus) ui.translationVoiceStatus.textContent = playing ? 'HABLANDO' : 'LISTA';
-    wave.querySelectorAll('.translation-voice-bars i').forEach((bar, index, bars) => {
-      const energy = measured ? Math.max(0, Math.min(1, Number(levels[Math.floor(index * levels.length / bars.length)]) || 0)) : 0;
-      bar.style.height = `${Math.round(4 + energy * 24)}px`;
-      bar.style.opacity = String(.38 + energy * .62);
-    });
-  }
-  if (playing && measured) updateWaveVisual(level, true, levels);
-  else updateWaveVisual(0, false);
-});
 
 function notify(message) {
   if (!ui.toast) return;

@@ -46,10 +46,11 @@ function connectPlaybackMeter(source, audioContext, owner = source) {
   currentMeterAnalyser = analyser;
   const samples = new Uint8Array(analyser.fftSize);
   const previous = new Float32Array(15);
+  let recentPeak = .045;
   const tick = () => {
     if (currentMeterSource !== owner) return;
     analyser.getByteTimeDomainData(samples);
-    const levels = Array.from(previous, (_, index) => {
+    const energyByBand = Array.from(previous, (_, index) => {
       let power = 0;
       const start = Math.floor(index * samples.length / previous.length);
       const end = Math.floor((index + 1) * samples.length / previous.length);
@@ -57,7 +58,11 @@ function connectPlaybackMeter(source, audioContext, owner = source) {
         const sample = (samples[offset] - 128) / 128;
         power += sample * sample;
       }
-      const energy = Math.min(1, Math.max(0, (Math.sqrt(power / (end - start)) - .008) * 8));
+      return Math.sqrt(power / (end - start));
+    });
+    recentPeak = Math.max(.045, ...energyByBand, recentPeak * .96);
+    const levels = energyByBand.map((rms, index) => {
+      const energy = Math.min(1, Math.max(0, (rms - .008) / (recentPeak * .85)));
       previous[index] = previous[index] * .32 + energy * .68;
       return Number(previous[index].toFixed(3));
     });

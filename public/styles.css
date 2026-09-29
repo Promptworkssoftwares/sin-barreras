@@ -4051,39 +4051,46 @@ textarea,
   .phrase-practice-navigation{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
 }
 
-/* Voice output uses measured PCM energy, including the interpretation card. */
-.interpreter-stage.speaking .sound-waves i,
-.interpreter-stage.listening .sound-waves i,
+/* Saved phrases and words: the AI waveform is measured from the played audio. */
+.phrase-card>.learning-audio-wave,.saved-word-card>.learning-audio-wave{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:3px!important;
+  padding:5px 7px!important;
+  border:1px solid color-mix(in srgb,var(--aqua-strong) 26%,var(--line))!important;
+  background:linear-gradient(115deg,color-mix(in srgb,var(--aqua) 19%,var(--surface)),var(--surface))!important;
+}
+.phrase-card>.learning-audio-wave .learning-wave-track,
+.saved-word-card>.learning-audio-wave .learning-wave-track{
+  grid-template-columns:50px minmax(0,1fr) 65px;
+  gap:7px;min-height:25px;padding:2px 5px;
+}
+.phrase-card>.learning-audio-wave .learning-wave-track>small,
+.saved-word-card>.learning-audio-wave .learning-wave-track>small{
+  display:block;min-width:0;font-size:6px;letter-spacing:.1px;
+}
+.phrase-card>.learning-audio-wave .learning-wave-track>b,
+.saved-word-card>.learning-audio-wave .learning-wave-track>b{font-size:7px}
+.phrase-card>.learning-audio-wave .learning-wave-track .learning-wave-bars,
+.saved-word-card>.learning-audio-wave .learning-wave-track .learning-wave-bars{
+  height:32px;gap:3px;
+}
+.phrase-practice-card>.learning-audio-wave .learning-wave-track .learning-wave-bars{height:32px;gap:3px}
+.phrase-card>.learning-audio-wave .learning-wave-bars i,
+.saved-word-card>.learning-audio-wave .learning-wave-bars i{
+  width:3px;flex:1 1 3px;max-width:5px;
+}
+.phrase-card>.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"],
+.saved-word-card>.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"]{
+  border-color:color-mix(in srgb,var(--aqua-strong) 52%,var(--line));
+  background:linear-gradient(90deg,color-mix(in srgb,var(--aqua) 28%,var(--surface)),var(--surface));
+  box-shadow:0 0 15px color-mix(in srgb,var(--aqua-strong) 20%,transparent);
+}
 .learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"] .learning-wave-bars i{
-  animation:none!important;
-  transition:height .065s linear,opacity .065s linear;
+  animation:none!important;transition:height .065s linear,opacity .065s linear;
 }
-.translation-voice-wave{
-  display:grid;grid-template-columns:29px auto minmax(0,1fr);align-items:center;gap:10px;
-  width:100%;min-height:50px;margin-top:14px;padding:8px 12px;
-  border:1px solid rgba(27,88,82,.22);border-radius:15px;
-  background:linear-gradient(110deg,rgba(255,255,255,.43),rgba(255,255,255,.12));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.4);
+@media(max-width:380px){
+  .phrase-card>.learning-audio-wave .learning-wave-track,
+  .saved-word-card>.learning-audio-wave .learning-wave-track{grid-template-columns:42px minmax(0,1fr) 54px;gap:3px}
+  .phrase-card>.learning-audio-wave .learning-wave-track>small,
+  .saved-word-card>.learning-audio-wave .learning-wave-track>small{font-size:5px}
 }
-.translation-voice-orb{
-  width:27px;height:27px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#fff 0 9%,#a7e5d5 20%,#318e82 65%,#153d3c 100%);
-  box-shadow:0 0 0 3px rgba(35,115,106,.12);
-  transition:box-shadow .12s ease;
-}
-.translation-voice-wave[data-state="speaking"] .translation-voice-orb{
-  box-shadow:0 0 0 4px rgba(35,115,106,.18),0 0 20px rgba(35,115,106,.48);
-}
-.translation-voice-label{display:grid;gap:2px;min-width:45px;color:#184b48;font:800 9px 'DM Mono',monospace;letter-spacing:.5px}
-.translation-voice-label small{color:#34746d;font:700 7px 'DM Mono',monospace;letter-spacing:.4px}
-.translation-voice-bars{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;overflow:hidden}
-.translation-voice-bars i{
-  display:block;flex:1 1 3px;max-width:5px;height:4px;border-radius:99px;
-  opacity:.38;background:linear-gradient(180deg,#bff9e9,#177568);
-  box-shadow:0 0 7px rgba(19,112,99,.38);
-  transition:height .065s linear,opacity .065s linear;
-}
-.dark .translation-voice-wave{border-color:rgba(167,229,213,.25);background:linear-gradient(110deg,rgba(88,166,151,.18),rgba(17,53,51,.36))}
-.dark .translation-voice-label{color:#ccf8ec}.dark .translation-voice-label small{color:#a7e5d5}
-@media(max-width:420px){.translation-voice-wave{gap:7px;padding:7px 9px}.translation-voice-bars{gap:2px}}
-@media(prefers-reduced-motion:reduce){.translation-voice-orb,.translation-voice-bars i{transition:none}}

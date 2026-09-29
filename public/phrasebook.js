@@ -1,6 +1,6 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.12';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.12';
-import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.12';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.13';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.13';
+import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.13';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -168,7 +168,7 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
       await cacheAudio(item.id, audio.audioBase64, audio.language);
     }
     const play = () => playBase64Audio(audio.audioBase64);
-    if (visualTarget) await withLearningAudioWave(visualTarget, { role:'ai', state:'playing', label:'VOZ AI' }, play);
+    if (visualTarget) await withLearningAudioWave(visualTarget, { role:'ai', state:'playing', label:'REPRODUCIENDO' }, play);
     else await play();
   }
 
