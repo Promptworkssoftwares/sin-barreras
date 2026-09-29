@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.9
+# Sin Barreras v1.7.10
+
+### Nuevo en 1.7.10
+
+- Onda de voz IA que responde al audio durante la reproducción.
+- Pantallas de practicar palabras y frases más legibles y organizadas, conservando los controles existentes.
 
 ### Nuevo en 1.7.9
 

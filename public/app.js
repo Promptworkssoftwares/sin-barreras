@@ -1,17 +1,17 @@
-import { initLearning } from './learn.js?v=1.7.9';
-import { initSounds } from './sounds.js?v=1.7.9';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.9';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.9';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.9';
-import { initAIStage } from './ai-stage.js?v=1.7.9';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.9';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.9';
-import { initPhrasebook } from './phrasebook.js?v=1.7.9';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.9';
-import { initQrConversation } from './qr-conversation.js?v=1.7.9';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.9';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.9';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.9';
+import { initLearning } from './learn.js?v=1.7.10';
+import { initSounds } from './sounds.js?v=1.7.10';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.10';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.10';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.10';
+import { initAIStage } from './ai-stage.js?v=1.7.10';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.10';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.10';
+import { initPhrasebook } from './phrasebook.js?v=1.7.10';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.10';
+import { initQrConversation } from './qr-conversation.js?v=1.7.10';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.10';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.10';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.10';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -761,23 +761,21 @@ function playAudio(base64, language, { resumeConversation = false, sessionId = s
 }
 
 async function speakText(text, language, { speed = 1, visualTarget = null, visualRole = 'ai', visualLabel = '' } = {}) {
-  const run = async () => {
-    const safeSpeed = Math.max(0.25, Math.min(4, Number(speed) || 1));
-    const voice = state.settings.translatorVoice || 'coral';
-    const result = await getOrCreateTts({
-      text,
-      language,
-      voice,
-      speed: safeSpeed,
-      create: () => request('/api/speak', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, language, voice, speed: safeSpeed })
-      })
-    });
-    await playAudio(result.audioBase64, language, { resumeConversation: false });
-  };
-  if (!visualTarget) return run();
-  return withLearningAudioWave(visualTarget, { role: visualRole, state: 'playing', label: visualLabel || (visualRole === 'user' ? 'REPRODUCIENDO' : 'REPRODUCIENDO') }, run);
+  const safeSpeed = Math.max(0.25, Math.min(4, Number(speed) || 1));
+  const voice = state.settings.translatorVoice || 'coral';
+  const result = await getOrCreateTts({
+    text,
+    language,
+    voice,
+    speed: safeSpeed,
+    create: () => request('/api/speak', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, language, voice, speed: safeSpeed })
+    })
+  });
+  const play = () => playAudio(result.audioBase64, language, { resumeConversation: false });
+  if (!visualTarget) return play();
+  return withLearningAudioWave(visualTarget, { role: visualRole, state: 'playing', label: visualLabel || 'REPRODUCIENDO' }, play);
 }
 
 function getPracticePoints() { return Number(localStorage.getItem(PRACTICE_POINTS_KEY) || 0); }

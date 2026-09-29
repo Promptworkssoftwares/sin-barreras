@@ -3958,3 +3958,95 @@ textarea,
   .saved-word-card>.learning-audio-wave .learning-wave-track,
   .phrase-card>.learning-audio-wave .learning-wave-track{grid-template-columns:35px minmax(0,1fr);gap:3px;padding:2px}
 }
+
+/* v1.7.10 · Audio-reactive AI voice and guided practice polish */
+.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"] .learning-wave-bars i:nth-child(2n){animation-delay:-.28s}
+.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"] .learning-wave-bars i:nth-child(3n){animation-duration:.48s;animation-delay:-.52s}
+.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"] .learning-wave-bars i:nth-child(5n){animation-duration:1.04s;animation-delay:-.17s}
+.learning-audio-wave[data-active-role="ai"][data-reactive="true"] .learning-wave-track[data-wave-role="ai"] .learning-wave-bars i{
+  animation:none!important;transition:height .065s linear,opacity .065s linear;
+}
+.learning-audio-wave[data-active-role="ai"] .learning-wave-track[data-wave-role="ai"]{
+  background:linear-gradient(100deg,color-mix(in srgb,var(--aqua) 24%,var(--surface)),color-mix(in srgb,var(--aqua) 6%,var(--surface)));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--aqua-strong) 18%,transparent),0 8px 24px color-mix(in srgb,var(--aqua-strong) 16%,transparent);
+}
+.phrase-practice-player{
+  background:
+    radial-gradient(circle at 78% 9%,color-mix(in srgb,var(--aqua) 20%,transparent),transparent 36%),
+    linear-gradient(180deg,var(--paper),color-mix(in srgb,var(--aqua) 8%,var(--paper)));
+}
+.phrase-practice-topbar{border-bottom-color:color-mix(in srgb,var(--aqua) 30%,var(--line));box-shadow:0 8px 24px rgba(18,44,45,.05)}
+.phrase-practice-main{width:min(680px,100%);padding-top:18px}
+.phrase-practice-context{
+  gap:7px;margin-bottom:12px;padding:14px 16px;border-radius:18px;
+  background:linear-gradient(120deg,color-mix(in srgb,var(--aqua) 13%,var(--surface)),var(--surface));
+}
+.phrase-practice-context>span{font-size:9px}
+.phrase-practice-context p{font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.phrase-practice-context strong{color:var(--ink);font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.phrase-practice-player .phrase-practice-card{
+  padding:clamp(18px,4vw,26px)!important;border-radius:23px!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--aqua) 11%,var(--surface)),var(--surface) 45%,color-mix(in srgb,var(--accent) 5%,var(--surface)));
+  box-shadow:0 20px 48px rgba(19,36,39,.09);
+}
+.phrase-practice-step-head span{padding:7px 11px;border-radius:999px;font-size:9px}
+.phrase-practice-step-head small{font-size:8px;line-height:1.4}
+.phrase-practice-player .phrase-practice-meaning{
+  margin:18px 0 7px;color:var(--muted);font-size:12px!important;line-height:1.5;
+}
+.phrase-practice-player .phrase-practice-card h2{
+  width:fit-content;max-width:100%;padding:1px 4px;border-radius:6px;
+  color:var(--ink);font-size:clamp(23px,6vw,32px)!important;line-height:1.24!important;letter-spacing:-.6px!important;
+  background:linear-gradient(transparent 58%,color-mix(in srgb,var(--aqua) 58%,transparent) 58%);
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.phrase-practice-card>.learning-audio-wave{
+  margin:15px 0 0!important;padding:8px!important;border:1px solid color-mix(in srgb,var(--aqua) 40%,var(--line));
+  background:linear-gradient(120deg,color-mix(in srgb,var(--aqua) 10%,var(--surface)),var(--surface))!important;
+}
+.phrase-practice-card>.learning-audio-wave .learning-wave-track{min-height:29px}
+.phrase-practice-player .phrase-practice-pronunciation{
+  margin-top:13px;padding:13px!important;border:1px solid color-mix(in srgb,var(--aqua) 34%,var(--line));
+  border-radius:15px!important;background:color-mix(in srgb,var(--aqua) 16%,var(--surface));
+}
+.phrase-practice-pronunciation span{font-size:9px}
+.phrase-practice-player .phrase-practice-pronunciation strong{font-size:15px!important;line-height:1.4!important}
+.phrase-practice-player .phrase-practice-pronunciation p{font-size:11px!important;line-height:1.5!important}
+.phrase-practice-player .phrase-practice-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.phrase-practice-player .phrase-practice-actions button{
+  min-width:0;min-height:44px;padding:0 10px;border-radius:12px;font-size:11px;font-weight:800;
+}
+.phrase-practice-player .phrase-practice-actions .phrase-practice-record{
+  grid-column:1/-1;min-height:50px;color:#fff;background:linear-gradient(110deg,var(--accent),#e77a5e);
+  box-shadow:0 10px 23px color-mix(in srgb,var(--accent) 19%,transparent);
+}
+.phrase-practice-player .phrase-practice-actions .voice-input-signal{display:none}
+.phrase-practice-player .phrase-practice-score{
+  margin-top:14px;padding:14px!important;border:1px solid color-mix(in srgb,var(--aqua) 35%,var(--line));
+  border-radius:16px!important;
+}
+.phrase-practice-player .phrase-practice-score-copy>strong{font-size:12px!important;line-height:1.4!important}
+.phrase-practice-player .phrase-practice-score dl dd{font-size:10px!important;line-height:1.45!important}
+.phrase-practice-navigation{gap:8px;margin-top:14px}
+.phrase-practice-navigation button{min-height:46px;border-radius:12px;font-size:10px}
+.lesson-player .lesson-question-shell{
+  border-color:color-mix(in srgb,var(--aqua) 26%,var(--line));
+  background:linear-gradient(145deg,color-mix(in srgb,var(--aqua) 9%,var(--surface)),var(--surface) 58%);
+}
+.lesson-question-shell>.learning-audio-wave{
+  margin-top:14px!important;border:1px solid color-mix(in srgb,var(--aqua) 32%,var(--line));
+}
+.lesson-player .lesson-option{border-radius:16px;background:var(--surface)}
+.lesson-player .lesson-option.is-selected{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.dark .phrase-practice-player .phrase-practice-card,.dark .phrase-practice-context,.dark .lesson-player .lesson-question-shell{
+  background:linear-gradient(140deg,#1c3235,#17292d 72%,#27292b);
+  border-color:#345052;
+}
+@media(max-width:560px){
+  .phrase-practice-main{padding:13px 11px 40px}
+  .phrase-practice-player .phrase-practice-card{padding:16px 13px!important;border-radius:20px!important}
+  .phrase-practice-player .phrase-practice-card h2{font-size:clamp(22px,6.8vw,28px)!important}
+  .phrase-practice-player .phrase-practice-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .phrase-practice-player .phrase-practice-pronunciation{padding:11px!important}
+  .phrase-practice-navigation{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
+}

@@ -5,12 +5,55 @@ let masterGain = null;
 let currentSource = null;
 let currentMedia = null;
 let finishCurrentPlayback = null;
+let currentMeterSource = null;
+let currentMeterAnalyser = null;
+let currentMeterFrame = 0;
 let silentObjectUrl = null;
 let unlockStarted = false;
 let unlocked = false;
 let destroyed = false;
 
 const gestureEvents = ['pointerdown', 'touchstart', 'keydown'];
+
+function reportPlaybackLevel(level, playing) {
+  window.dispatchEvent(new CustomEvent('sinbarreras:playback-level', { detail: { level, playing } }));
+}
+
+function stopPlaybackMeter(owner = null) {
+  if (owner && currentMeterSource !== owner) return;
+  if (currentMeterFrame) window.cancelAnimationFrame(currentMeterFrame);
+  currentMeterFrame = 0;
+  try { currentMeterAnalyser?.disconnect(); } catch { /* no-op */ }
+  currentMeterAnalyser = null;
+  currentMeterSource = null;
+  reportPlaybackLevel(0, false);
+}
+
+function connectPlaybackMeter(source, audioContext) {
+  if (!audioContext.createAnalyser) {
+    source.connect(masterGain || audioContext.destination);
+    currentMeterSource = source;
+    reportPlaybackLevel(null, true);
+    return;
+  }
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 512;
+  analyser.smoothingTimeConstant = .68;
+  source.connect(analyser);
+  analyser.connect(masterGain || audioContext.destination);
+  currentMeterSource = source;
+  currentMeterAnalyser = analyser;
+  const samples = new Uint8Array(analyser.fftSize);
+  const tick = () => {
+    if (currentMeterSource !== source) return;
+    analyser.getByteTimeDomainData(samples);
+    let power = 0;
+    for (const value of samples) power += ((value - 128) / 128) ** 2;
+    reportPlaybackLevel(Math.min(1, Math.sqrt(power / samples.length) * 6), true);
+    currentMeterFrame = window.requestAnimationFrame(tick);
+  };
+  currentMeterFrame = window.requestAnimationFrame(tick);
+}
 
 function makeSilentWavBlob() {
   const sampleRate = 22050;
@@ -140,6 +183,7 @@ async function ensureAudioRunning() {
 }
 
 export function stopAudioPlayback() {
+  stopPlaybackMeter();
   const finish = finishCurrentPlayback;
   finishCurrentPlayback = null;
   finish?.();
@@ -164,7 +208,7 @@ async function playWithWebAudio(base64) {
   stopAudioPlayback();
   const source = audioContext.createBufferSource();
   source.buffer = decoded;
-  source.connect(masterGain || audioContext.destination);
+  connectPlaybackMeter(source, audioContext);
   currentSource = source;
 
   return new Promise((resolve, reject) => {
@@ -174,6 +218,7 @@ async function playWithWebAudio(base64) {
       settled = true;
       if (finishCurrentPlayback === finish) finishCurrentPlayback = null;
       if (currentSource === source) currentSource = null;
+      stopPlaybackMeter(source);
       try { source.disconnect(); } catch { /* no-op */ }
       if (error) reject(error);
       else resolve();
@@ -202,6 +247,7 @@ async function playWithMediaElement(base64) {
       if (settled) return;
       settled = true;
       if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
+      stopPlaybackMeter(media);
       cleanup();
       resolve();
     };
@@ -209,16 +255,20 @@ async function playWithMediaElement(base64) {
       if (settled) return;
       settled = true;
       if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
+      stopPlaybackMeter(media);
       cleanup();
       reject(new Error('No se pudo reproducir la voz.'));
     };
     media.addEventListener('ended', ended, { once: true });
     media.addEventListener('error', failed, { once: true });
     finishCurrentPlayback = ended;
-    media.play().catch((error) => {
+    media.play().then(() => {
+      if (!settled) { currentMeterSource = media; reportPlaybackLevel(null, true); }
+    }).catch((error) => {
       if (settled) return;
       settled = true;
       if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
+      stopPlaybackMeter(media);
       cleanup();
       const blocked = new Error('El navegador pausó el audio. Toca la app una vez para reactivarlo.');
       blocked.name = error?.name === 'NotAllowedError' ? 'AudioPlaybackBlockedError' : (error?.name || 'AudioPlaybackError');

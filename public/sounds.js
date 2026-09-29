@@ -1,6 +1,6 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.9';
-import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.9';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.9';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.10';
+import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.10';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.10';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 

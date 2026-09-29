@@ -1,4 +1,11 @@
-# Sin Barreras v1.7.9
+# Sin Barreras v1.7.10
+
+## 1.7.10 · Onda real de voz IA y práctica renovada
+- La onda de la voz IA responde al nivel del audio que se está reproduciendo en Web Audio; conserva una animación activa en el modo de reproducción alterno.
+- La onda se activa al comenzar la reproducción, después de preparar el audio, y vuelve a reposo al terminar.
+- La práctica por partes muestra el segmento y su pronunciación con jerarquía visual más clara, acciones agrupadas y el waveform junto al texto.
+- El ejercicio de palabras comparte el mismo lenguaje visual y sitúa el waveform junto a la pregunta.
+- Android actualizado a versionCode 1710 / versionName 1.7.10.
 
 ## 1.7.9 · Frases y palabras guardadas compactas
 - Tarjetas de Frases Guardadas y Palabras guardadas más pequeñas, con contenido destacado y mejor jerarquía visual.

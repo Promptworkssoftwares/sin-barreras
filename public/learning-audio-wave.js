@@ -52,7 +52,13 @@ function ensurePermanentWave(surface) {
   wave.dataset.activeRole = 'none';
   wave.setAttribute('aria-hidden', 'true');
   wave.innerHTML = waveMarkup();
-  surface.appendChild(wave);
+  const anchor = surface.matches('.phrase-card') ? surface.querySelector('.phrase-translation')
+    : surface.matches('.saved-word-card') ? surface.querySelector('.saved-word-copy')
+    : surface.matches('.phrase-practice-card') ? surface.querySelector('#phrase-practice-target')
+    : surface.matches('.lesson-question-shell') ? surface.querySelector('#lesson-prompt')
+    : null;
+  if (anchor) anchor.after(wave);
+  else surface.appendChild(wave);
   surface.classList.add('has-learning-wave');
   return wave;
 }
@@ -141,11 +147,11 @@ function statusCopy(role, state, label) {
   return 'REPRODUCIENDO';
 }
 
-function updateReactiveBars(track, level) {
+function updateReactiveBars(track, level, gain = 12) {
   const bars = [...track.querySelectorAll('.learning-wave-bars i')];
   const numericLevel = Number(level);
   if (!Number.isFinite(numericLevel)) return false;
-  const normalized = Math.max(.05, Math.min(1, numericLevel * 12));
+  const normalized = Math.max(.05, Math.min(1, numericLevel * gain));
   const center = (bars.length - 1) / 2;
   bars.forEach((bar, index) => {
     const distance = Math.abs(index - center) / Math.max(1, center);
@@ -199,5 +205,19 @@ export async function withLearningAudioWave(target, options, task) {
     if (activeWave === wave && activeWaveToken === token) hideLearningAudioWave(180);
   }
 }
+
+window.addEventListener('sinbarreras:playback-level', (event) => {
+  const wave = activeWave;
+  if (!wave || wave.dataset.activeRole !== 'ai') return;
+  const { level, playing } = event.detail || {};
+  if (!playing) {
+    wave.dataset.reactive = 'false';
+    return;
+  }
+  const track = wave.querySelector('[data-wave-role="ai"]');
+  // Web Audio supplies real speech energy. The media element fallback keeps
+  // the animated playing state when an analyser is unavailable.
+  wave.dataset.reactive = updateReactiveBars(track, level, 2.2) ? 'true' : 'false';
+});
 
 startObserver();
