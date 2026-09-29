@@ -12,6 +12,7 @@ const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
 function authRedirect(user) {
   if (user?.role === 'owner') return '/admin';
+  if (user?.mustChangePassword) return '/change-password';
   return user?.hasAppAccess() ? '/app' : '/?pay=required';
 }
 
@@ -138,7 +139,6 @@ export function createAuthRouter({ googleEnabled, chatgptEnabled }) {
       const token = String(request.body?.token || '').trim();
       const password = String(request.body?.password || '');
       if (password.length < 10) return response.status(400).json({ error: 'La contraseña debe tener al menos 10 caracteres.' });
-      if (!termsAccepted || !ageConfirmed) return response.status(400).json({ error: 'Debes confirmar que tienes 18 años o más y aceptar los Términos y la Política de Privacidad.' });
       const record = await consumeAccountToken(token, 'reset_password');
       if (!record) return response.status(400).json({ error: 'Este enlace no es válido o ya venció. Solicita uno nuevo.' });
       const user = await User.findById(record.user).select('+passwordHash');

@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: { type: String, select: false, default: null },
   emailVerifiedAt: { type: Date, default: null },
   emailVerificationRequired: { type: Boolean, default: false, index: true },
+  mustChangePassword: { type: Boolean, default: false, index: true },
+  temporaryPasswordIssuedAt: { type: Date, default: null },
   ageConfirmedAt: { type: Date, default: null },
   termsAcceptedAt: { type: Date, default: null },
   privacyAcceptedAt: { type: Date, default: null },

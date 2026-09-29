@@ -12,6 +12,13 @@ export async function requireAccess(request, response, next) {
     return response.redirect('/?login=required');
   }
 
+  if (request.user.mustChangePassword && request.user.role !== 'owner') {
+    if (request.originalUrl.startsWith('/api/')) {
+      return response.status(403).json({ error: 'Debes crear una contraseña personal antes de continuar.', code: 'PASSWORD_CHANGE_REQUIRED' });
+    }
+    return response.redirect('/change-password');
+  }
+
   if (request.user.billingProvider === 'google_play') {
     try {
       await refreshGooglePlayEntitlement(request.user);

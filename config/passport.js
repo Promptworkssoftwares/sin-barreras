@@ -4,6 +4,45 @@ import { Strategy as OAuth2Strategy } from 'passport-oauth2';
 import User from '../models/User.js';
 import { applyFreeGrant, normalizeEmail } from '../services/accessService.js';
 
+
+function normalizeBaseUrl(value = '') {
+  const raw = String(value || '').trim().replace(/\/$/, '');
+  if (!raw) return '';
+  try {
+    const url = new URL(raw);
+    if (!['http:', 'https:'].includes(url.protocol)) return '';
+    return url.origin;
+  } catch { return ''; }
+}
+
+export function resolveGoogleCallbackUrl() {
+  const explicit = String(process.env.GOOGLE_CALLBACK_URL || '').trim();
+  const production = process.env.NODE_ENV === 'production';
+  if (explicit) {
+    try {
+      const url = new URL(explicit);
+      const local = ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
+      if (!production || (url.protocol === 'https:' && !local)) return url.toString();
+      console.warn(`[AUTH] Ignorando GOOGLE_CALLBACK_URL inseguro para producción: ${explicit}`);
+    } catch {
+      console.warn('[AUTH] GOOGLE_CALLBACK_URL no es una URL válida; se intentará derivar desde APP_URL.');
+    }
+  }
+
+  const candidates = [process.env.APP_URL, process.env.RENDER_EXTERNAL_URL, process.env.RENDER_EXTERNAL_HOSTNAME ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME}` : '', 'https://sin-barreras.onrender.com'];
+  for (const candidate of candidates) {
+    const base = normalizeBaseUrl(candidate);
+    if (!base) continue;
+    const url = new URL(base);
+    const local = ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
+    if (production && (url.protocol !== 'https:' || local)) continue;
+    return `${base}/auth/google/callback`;
+  }
+
+  if (production) throw new Error('Google OAuth requiere GOOGLE_CALLBACK_URL o APP_URL con una URL HTTPS pública en producción.');
+  return 'http://localhost:3000/auth/google/callback';
+}
+
 async function upsertSocialUser({ provider, providerId, email, name, avatarUrl }) {
   const normalizedEmail = normalizeEmail(email);
   if (!normalizedEmail) throw new Error(`El proveedor ${provider} no devolvió un email válido.`);
@@ -52,10 +91,12 @@ passport.deserializeUser(async (id, done) => {
 export function configurePassport() {
   const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
   if (googleEnabled) {
+    const googleCallbackUrl = resolveGoogleCallbackUrl();
+    console.log(`[AUTH] Google OAuth callback: ${googleCallbackUrl}`);
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || `${process.env.APP_URL}/auth/google/callback`,
+      callbackURL: googleCallbackUrl,
       passReqToCallback: false
     }, async (_accessToken, _refreshToken, profile, done) => {
       try {

@@ -1,4 +1,4 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.6';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.9';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -36,7 +36,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     player: $('#phrase-practice-player'), close: $('#phrase-practice-close'), progressBar: $('#phrase-practice-progress-bar'), progressCopy: $('#phrase-practice-progress-copy'), language: $('#phrase-practice-language'),
     loading: $('#phrase-practice-loading'), content: $('#phrase-practice-content'), error: $('#phrase-practice-error'), retry: $('#phrase-practice-retry'),
     sourceFull: $('#phrase-practice-source-full'), targetFull: $('#phrase-practice-target-full'), stepBadge: $('#phrase-practice-step-badge'), meaning: $('#phrase-practice-meaning'), target: $('#phrase-practice-target'), pronunciation: $('#phrase-practice-pronunciation'), tip: $('#phrase-practice-tip'),
-    listen: $('#phrase-practice-listen'), slow: $('#phrase-practice-slow'), record: $('#phrase-practice-record'), score: $('#phrase-practice-score'), scoreNumber: $('#phrase-practice-score-number'), scoreFeedback: $('#phrase-practice-score-feedback'), heard: $('#phrase-practice-heard'), focus: $('#phrase-practice-focus'),
+    listen: $('#phrase-practice-listen'), slow: $('#phrase-practice-slow'), record: $('#phrase-practice-record'), score: $('#phrase-practice-score'), scoreMeter: $('#phrase-practice-score-meter'), scoreNumber: $('#phrase-practice-score-number'), scoreFeedback: $('#phrase-practice-score-feedback'), heard: $('#phrase-practice-heard'), focus: $('#phrase-practice-focus'),
     previous: $('#phrase-practice-previous'), next: $('#phrase-practice-next'), complete: $('#phrase-practice-complete'), completeAverage: $('#phrase-practice-complete-average'), completeParts: $('#phrase-practice-complete-parts'), done: $('#phrase-practice-done')
   };
 
@@ -104,6 +104,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     if (result) {
       if (ui.score) ui.score.hidden = false;
       if (ui.scoreNumber) ui.scoreNumber.textContent = `${result.score}%`;
+      if (ui.scoreMeter) { ui.scoreMeter.style.setProperty('--score', String(Math.max(0, Math.min(100, Number(result.score || 0))))); ui.scoreMeter.dataset.level = Number(result.score || 0) >= 90 ? 'great' : Number(result.score || 0) >= 70 ? 'good' : 'work'; }
       if (ui.scoreFeedback) ui.scoreFeedback.textContent = friendlyDifference(result);
       if (ui.heard) ui.heard.textContent = friendlyRecognition(result);
       if (ui.focus) ui.focus.textContent = friendlyFocus(result);

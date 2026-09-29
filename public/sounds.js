@@ -1,4 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.6';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.9';
+import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.6.9';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 
@@ -661,13 +662,13 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
         <div class="sound-feedback-head">
           <span class="sound-feedback-icon" aria-hidden="true">${resultIcon}</span>
           <div class="sound-feedback-copy"><small>RESULTADO</small><h5>${escapeHtml(result.title || 'Sigue practicando')}</h5><p>${escapeHtml(result.feedback || 'Escucha el ejemplo y vuelve a intentarlo.')}</p></div>
-          <div class="sound-feedback-score"><strong>${Math.round(result.score || 0)}%</strong><small>${escapeHtml(result.metricLabel || 'Reconocimiento')}</small></div>
+          <div class="sound-feedback-score pronunciation-gauge compact" style="--score:${Math.round(result.score || 0)}"><div><strong>${Math.round(result.score || 0)}%</strong><small>${escapeHtml(result.metricLabel || 'CLARO')}</small></div></div>
         </div>
         <div class="sound-feedback-compare">
           <div><small>OBJETIVO · NIVEL ${activeLevel.id}</small><strong>${escapeHtml(activeLevel.model)}</strong></div>
-          <div><small>LA APP ENTENDIÓ</small><strong>${escapeHtml(result.heardText || 'No pude reconocerla')}</strong></div>
+          <div><small>LA APP ENTENDIÓ · EN TU IDIOMA</small><strong>${escapeHtml(friendlyRecognition(result))}</strong></div>
         </div>
-        <div class="sound-feedback-tip"><small>PRUEBA ESTO</small><p>${escapeHtml(result.focus || selected.tip)}</p></div>
+        <div class="sound-feedback-tip"><small>PRÓXIMO PASO</small><p>${escapeHtml(friendlyFocus(result) || selected.tip)}</p></div>
         ${justCompletedLevel ? `<div class="sound-level-unlock-note"><span>✓ NIVEL ${selectedLevel} COMPLETADO</span><strong>${selectedLevel < SOUND_LEVEL_COUNT ? `Se desbloqueó el nivel ${selectedLevel + 1}.` : 'Completaste los 4 niveles de este sonido.'}</strong></div>` : ''}
         <div class="sound-voice-compare">
           <div class="sound-voice-compare-head">

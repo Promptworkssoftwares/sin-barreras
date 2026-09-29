@@ -1,17 +1,17 @@
-const CACHE = 'sin-barreras-v1.6.6';
+const CACHE = 'sin-barreras-v1.6.9';
 const ASSETS = [
-  '/', '/manifest.webmanifest', '/css/landing.css?v=1.6.6', '/js/landing.js?v=1.6.6',
-  '/styles.css?v=1.6.6', '/app-bootstrap.js?v=1.6.6', '/cloud.js?v=1.6.6', '/account-ui.js?v=1.6.6',
-  '/app.js?v=1.6.6', '/learner-feedback.js?v=1.6.6', '/phrasebook.js?v=1.6.6', '/phrase-practice.js?v=1.6.6', '/qr-conversation.js?v=1.6.6', '/ai-stage.js?v=1.6.6', '/audio-playback.js?v=1.6.6', '/tts-cache.js?v=1.6.6', '/navigation-flow.js?v=1.6.6', '/play-billing.js?v=1.6.6', '/languages.js?v=1.6.6', '/learn.js?v=1.6.6', '/sounds.js?v=1.6.6', '/voice-turn.js?v=1.6.6', '/icons/icon-192.png', '/icons/icon-512.png',
+  '/', '/manifest.webmanifest', '/css/landing.css?v=1.6.9', '/js/landing.js?v=1.6.9',
+  '/styles.css?v=1.6.9', '/app-bootstrap.js?v=1.6.9', '/cloud.js?v=1.6.9', '/account-ui.js?v=1.6.9',
+  '/app.js?v=1.6.9', '/learner-feedback.js?v=1.6.9', '/phrasebook.js?v=1.6.9', '/phrase-practice.js?v=1.6.9', '/qr-conversation.js?v=1.6.9', '/ai-stage.js?v=1.6.9', '/audio-playback.js?v=1.6.9', '/tts-cache.js?v=1.6.9', '/navigation-flow.js?v=1.6.9', '/play-billing.js?v=1.6.9', '/languages.js?v=1.6.9', '/learn.js?v=1.6.9', '/sounds.js?v=1.6.9', '/voice-turn.js?v=1.6.9', '/icons/icon-192.png', '/icons/icon-512.png',
     '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
   '/assets/learn/everyday.png', '/assets/learn/work.png', '/assets/learn/construction.png', '/assets/learn/medical.png',
   '/assets/learn/shopping.png', '/assets/learn/restaurant.png', '/assets/learn/interview.png', '/assets/learn/school.png',
   '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png', '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',
   '/assets/footer-menu-v1413/practica.png', '/assets/footer-menu-v1413/practica-active.png', '/assets/footer-menu-v1413/coach.png', '/assets/footer-menu-v1413/coach-active.png',
   '/assets/footer-menu-v1413/camara.png', '/assets/footer-menu-v1413/camara-active.png',
-  '/offline-phrases.html', '/css/offline-phrases.css?v=1.6.6', '/js/offline-phrases.js?v=1.6.6', '/css/room.css?v=1.6.6', '/js/join-conversation.js?v=1.6.6'
+  '/offline-phrases.html', '/css/offline-phrases.css?v=1.6.9', '/js/offline-phrases.js?v=1.6.9', '/css/room.css?v=1.6.9', '/js/join-conversation.js?v=1.6.9'
 ];
-const PRIVATE_PREFIXES = ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/join/'];
+const PRIVATE_PREFIXES = ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/change-password', '/join/'];
 
 self.addEventListener('install', (event) => event.waitUntil(
   caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())

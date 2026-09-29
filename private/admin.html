@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#132427">
   <title>Sin Barreras · Admin Dashboard</title>
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
-  <link rel="stylesheet" href="/css/admin.css?v=1.6.6">
+  <link rel="stylesheet" href="/css/admin.css?v=1.6.9">
 </head>
 <body>
   <button id="admin-menu-toggle" class="admin-menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="admin-sidebar">
@@ -60,8 +60,8 @@
       <div class="overview-grid">
         <article class="control-card">
           <div class="card-head"><div><span>ACCESO DIRECTO</span><h2>Dar acceso gratis</h2></div><i>◇</i></div>
-          <p>Escribe un email ahora. Cuando esa persona se registre con el mismo email, entrará sin pagar.</p>
-          <form id="quick-grant-form" class="grant-form"><input id="quick-grant-email" type="email" placeholder="persona@email.com" required><input id="quick-grant-note" type="text" maxlength="240" placeholder="Nota opcional"><button type="submit">DAR ACCESO <span>→</span></button></form>
+          <p>Crea o actualiza una cuenta gratuita con una contraseña temporal. En el primer login, la persona deberá crear su contraseña personal.</p>
+          <form id="quick-grant-form" class="grant-form"><input id="quick-grant-email" type="email" placeholder="persona@email.com" required><input id="quick-grant-password" type="password" minlength="10" maxlength="128" autocomplete="new-password" placeholder="Contraseña temporal · mínimo 10 caracteres" required><input id="quick-grant-note" type="text" maxlength="240" placeholder="Nota opcional"><button type="submit">CREAR ACCESO <span>→</span></button></form>
         </article>
         <article class="control-card compact-card">
           <div class="card-head"><div><span>ESTADO</span><h2>Operación</h2></div><i>●</i></div>
@@ -78,7 +78,7 @@
 
     <section id="grants-section" class="admin-section is-hidden">
       <div class="section-toolbar"><div><span class="eyebrow">INVITACIONES PRIVADAS</span><h2>Acceso gratuito por email</h2></div></div>
-      <article class="control-card grant-manager"><p>El email queda preautorizado. Si ya existe una cuenta con ese email, el acceso se activa inmediatamente.</p><form id="grant-form" class="grant-form horizontal"><input id="grant-email" type="email" placeholder="persona@email.com" required><input id="grant-note" type="text" maxlength="240" placeholder="Ej. familia, beta tester"><button type="submit">AÑADIR EMAIL</button></form></article>
+      <article class="control-card grant-manager"><p>El Owner define una contraseña temporal. La cuenta queda lista para iniciar sesión inmediatamente y obliga a crear una contraseña personal en el primer acceso.</p><form id="grant-form" class="grant-form horizontal"><input id="grant-email" type="email" placeholder="persona@email.com" required><input id="grant-password" type="password" minlength="10" maxlength="128" autocomplete="new-password" placeholder="Contraseña temporal" required><input id="grant-note" type="text" maxlength="240" placeholder="Ej. familia, beta tester"><button type="submit">CREAR ACCESO</button></form></article>
       <div id="grants-grid" class="grants-grid"></div>
     </section>
 
@@ -119,6 +119,6 @@
 
   <div id="admin-toast" class="admin-toast" role="status"></div>
   <dialog id="confirm-dialog" class="confirm-dialog"><form method="dialog"><span class="eyebrow">CONFIRMAR ACCIÓN</span><h3 id="confirm-title">¿Continuar?</h3><p id="confirm-copy"></p><div><button value="cancel">Cancelar</button><button id="confirm-action" value="confirm" class="danger">Confirmar</button></div></form></dialog>
-  <script type="module" src="/js/admin.js?v=1.6.6"></script>
+  <script type="module" src="/js/admin.js?v=1.6.9"></script>
 </body>
 </html>

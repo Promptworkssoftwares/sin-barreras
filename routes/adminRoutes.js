@@ -1,4 +1,5 @@
 import express from 'express';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import AccessGrant from '../models/AccessGrant.js';
 import { requireOwner } from '../middleware/auth.js';
@@ -271,21 +272,44 @@ router.post('/grants', async (request, response, next) => {
   try {
     const email = normalizeEmail(request.body?.email);
     const note = String(request.body?.note || '').trim().slice(0, 240);
+    const temporaryPassword = String(request.body?.temporaryPassword || '');
     if (!/^\S+@\S+\.\S+$/.test(email)) return response.status(400).json({ error: 'Escribe un email válido.' });
+    if (email === normalizeEmail(process.env.OWNER_EMAIL)) return response.status(400).json({ error: 'La cuenta owner ya tiene acceso total.' });
+    if (temporaryPassword.length < 10) return response.status(400).json({ error: 'La contraseña temporal debe tener al menos 10 caracteres.' });
+    if (temporaryPassword.length > 128) return response.status(400).json({ error: 'La contraseña temporal es demasiado larga.' });
+
     const grant = await AccessGrant.findOneAndUpdate(
       { email },
       { $set: { active: true, note, createdBy: request.user._id }, $setOnInsert: { email } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-    const user = await User.findOne({ email, role: 'user' });
-    if (user) {
-      user.freeAccess = true;
-      user.freeAccessGrantedAt = new Date();
-      grant.claimedBy = user._id;
-      grant.claimedAt = new Date();
-      await Promise.all([user.save(), grant.save()]);
-    }
-    response.status(201).json({ ok: true, grant });
+
+    let user = await User.findOne({ email, role: 'user' }).select('+passwordHash');
+    const created = !user;
+    if (!user) user = new User({ email, role: 'user' });
+    user.accountStatus = 'active';
+    user.passwordHash = await bcrypt.hash(temporaryPassword, 12);
+    user.emailVerifiedAt = user.emailVerifiedAt || new Date();
+    user.emailVerificationRequired = false;
+    user.mustChangePassword = true;
+    user.temporaryPasswordIssuedAt = new Date();
+    user.freeAccess = true;
+    user.freeAccessGrantedAt = user.freeAccessGrantedAt || new Date();
+    await user.save();
+
+    grant.claimedBy = user._id;
+    grant.claimedAt = new Date();
+    await grant.save();
+
+    response.status(201).json({
+      ok: true,
+      grant,
+      user: publicUser(user),
+      created,
+      message: created
+        ? 'Cuenta gratuita creada. Comparte el email y la contraseña temporal; deberá crear una contraseña personal al entrar.'
+        : 'Acceso gratuito actualizado. La contraseña temporal reemplazó el acceso local anterior y deberá cambiarse al entrar.'
+    });
   } catch (error) { next(error); }
 });
 

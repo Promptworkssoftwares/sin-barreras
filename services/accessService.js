@@ -47,6 +47,7 @@ export function publicUser(user) {
     cancelAtPeriodEnd: Boolean(user.cancelAtPeriodEnd),
     billingProvider: user.billingProvider || (user.stripeCustomerId ? 'stripe' : 'none'),
     emailVerified: !user.emailVerificationRequired || Boolean(user.emailVerifiedAt),
+    mustChangePassword: Boolean(user.mustChangePassword),
     canManageBilling: user.role !== 'owner' && Boolean(user.stripeCustomerId || user.googlePlayPurchaseToken),
     hasAccess: user.hasAppAccess()
   };

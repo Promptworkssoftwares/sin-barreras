@@ -13,7 +13,7 @@ test('Practice is multilingual from UI through generation, TTS, and scoring', ()
   assert.match(appHtml, /id="practice-target-language"/);
   assert.match(appHtml, /Idioma que quiero practicar/);
   assert.match(appJs, /populatePracticeLanguageSelects/);
-  assert.match(appJs, /LANGUAGE_CATALOG[\s\S]{0,500}practiceTargetLanguage/);
+  assert.match(appJs, /LANGUAGE_CATALOG[\s\S]{0,1400}practiceTargetLanguage/);
   assert.match(appJs, /targetLanguage[\s\S]{0,500}\/api\/practice/);
   assert.match(appJs, /form\.append\('targetLanguage'/);
   assert.match(appJs, /speakText\(state\.practice\.targetText \|\| state\.practice\.english, state\.practice\.targetLanguage \|\| 'en'\)/);

@@ -1,13 +1,31 @@
+# Sin Barreras v1.6.9
+
+- Práctica ahora ofrece dos modos: Frase rápida y Conversación guiada multilenguaje.
+- Nuevos escenarios esenciales para personas nuevas en el país: parada de tráfico, fast food, farmacia, doctor, trabajo, vivienda, banco, escuela, compras, transporte, DMV y emergencia.
+- Conversación guiada de Práctica usa sesiones cortas de 5–8 turnos, respuestas sugeridas, audio normal/lento, progreso de misión y feedback amigable en el idioma del usuario.
+- Coach amplía sus escenarios con situaciones específicas y accesos rápidos para tráfico, comida rápida, farmacia, trabajo, vivienda y DMV.
+- Escenarios sensibles (tráfico, DMV, salud, farmacia, banco, vivienda y emergencia) se mantienen como práctica de comunicación, sin asesoría legal, médica o financiera.
+- Android actualizado a versionCode 1609 / versionName 1.6.9.
+
+# Sin Barreras v1.6.8
+
+- Hablar más compacto: lema en una sola línea, selector de idiomas y contexto reducidos, y Cara a cara / Mis frases / Conectar por QR en una sola fila horizontal.
+- Aprender rediseñado con launcher 2×2 más compacto y profesional.
+- Nuevos medidores circulares de pronunciación en Práctica, Frases por partes y Sonidos.
+- Coach incorpora medidor gráfico de claridad en el micro-feedback.
+- Sound Lab usa feedback amigable en el idioma del usuario en vez de mostrar texto crudo no latino como explicación principal.
+- Se conserva toda la lógica existente de voz, IA, Billing, caché, QR, autenticación y backend.
+
 # Changelog
 
-## 1.6.6 · Preferencias modernas + barra visible de minutos
+## 1.6.8 · Preferencias modernas + barra visible de minutos
 
 - Rediseño completo del menú de Preferencias con tarjetas modernas, jerarquía visual y mejor comportamiento móvil.
 - Barra de uso visible dentro de Preferencias con minutos usados, límite del período, porcentaje, minutos restantes y fecha de renovación.
 - La barra refleja específicamente el consumo de minutos de voz; el límite general de IA sigue protegido en backend.
 - Estados visuales normal, advertencia y límite alcanzado, sincronizados con el endpoint real de la cuenta.
 - Preferencias conserva todas las funciones existentes: idioma automático, voz, prueba de voz, tamaño de texto, tema, Mis frases e Historial.
-- Android actualizado a versionCode 1606 / versionName 1.6.6.
+- Android actualizado a versionCode 1606 / versionName 1.6.8.
 
 ## 1.6.5 · Límites mensuales de uso de IA
 

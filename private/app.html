@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.6.6" />
+    <link rel="stylesheet" href="/styles.css?v=1.6.9" />
   </head>
   <body>
     <main class="app-shell">
@@ -27,8 +27,8 @@
 
       <section class="hero" id="conversation">
         <p class="eyebrow">INTÉRPRETE INTELIGENTE</p>
-        <h1>Habla. Entiende.<br /><em>Sigue adelante.</em></h1>
-        <p class="hero-copy">Elige el idioma de la otra persona. Tu idioma se detecta automáticamente y Sin Barreras traduce en la dirección correcta por ti.</p>
+        <h1>Habla. Entiende. <em>Sigue adelante.</em></h1>
+        <p class="hero-copy">Elige el idioma de la otra persona y habla. Tu idioma se detecta automáticamente.</p>
       </section>
 
       <section class="mode-panel" aria-label="Configuración de conversación">
@@ -45,7 +45,7 @@
             <div class="auto-language-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
             </div>
-            <div><span>MI IDIOMA · AUTO</span><strong id="my-language-name">Detectando automáticamente</strong><small>Sin Barreras reconoce tu idioma cuando hablas.</small></div>
+            <div><span>MI IDIOMA · AUTO</span><strong id="my-language-name">Automático</strong><small>Se detecta al hablar.</small></div>
           </div>
           <div class="auto-language-flow" aria-hidden="true">
             <span class="auto-pulse"></span>
@@ -60,7 +60,7 @@
               <select id="partner-language-select" aria-label="Idioma de la otra persona" required>
                 <option value="" selected disabled>Selecciona su idioma…</option>
               </select>
-              <small id="auto-language-copy">Selecciona manualmente el idioma de la otra persona. Este valor nunca cambia solo.</small>
+              <small id="auto-language-copy">Selecciona el idioma de la otra persona.</small>
             </label>
           </div>
         </div>
@@ -87,9 +87,9 @@
       </section>
 
       <section class="conversation-tools" aria-label="Herramientas de conversación">
-        <button id="open-face-to-face" class="conversation-tool" type="button"><span>↕</span><strong>Cara a cara</strong><small>Pantalla para dos personas</small></button>
-        <button id="open-phrasebook" class="conversation-tool" type="button"><span>★</span><strong>Mis frases</strong><small>Acceso rápido y offline</small></button>
-        <button id="open-qr-conversation" class="conversation-tool" type="button"><span>▦</span><strong>Conectar por QR</strong><small>Dos teléfonos · sin instalar</small></button>
+        <button id="open-face-to-face" class="conversation-tool" type="button" aria-label="Abrir modo Cara a cara"><span>↕</span><strong>Cara a cara</strong><small>Dos personas</small></button>
+        <button id="open-phrasebook" class="conversation-tool" type="button" aria-label="Abrir Mis frases"><span>★</span><strong>Mis frases</strong><small>Guardadas</small></button>
+        <button id="open-qr-conversation" class="conversation-tool" type="button" aria-label="Conectar dos teléfonos por QR"><span>▦</span><strong>Conectar por QR</strong><small>Dos teléfonos</small></button>
       </section>
 
       <section class="interpreter-stage" aria-live="polite">
@@ -210,7 +210,7 @@
           <div class="learn-home-copy">
             <p class="section-label">SIN BARRERAS · APRENDER</p>
             <h2 id="learn-title">¿Qué quieres practicar <em>hoy?</em></h2>
-            <p>Elige un camino. Mantuvimos Sonidos y las Rutas por situación separados para que puedas concentrarte en una sola meta a la vez.</p>
+            <p>Elige una práctica y empieza. Tu progreso se guarda automáticamente.</p>
           </div>
 
           <div class="learn-home-stats" aria-label="Tu progreso">
@@ -226,7 +226,7 @@
               <span class="learn-path-copy">
                 <small>PRONUNCIACIÓN</small>
                 <strong>Sonidos y pronunciación</strong>
-                <span>Vocales, consonantes, palabras, frases y práctica con tu voz.</span>
+                <span>Escucha, repite y mide tu pronunciación.</span>
               </span>
               <span class="learn-path-meta"><b>39 sonidos</b><b>4 niveles por sonido</b></span>
               <span class="learn-path-arrow">→</span>
@@ -239,7 +239,7 @@
               <span class="learn-path-copy">
                 <small>INGLÉS PARA TU VIDA</small>
                 <strong>Rutas por situación</strong>
-                <span>Trabajo, vida diaria, construcción, doctor, compras, restaurante y más.</span>
+                <span>Práctica útil para situaciones reales.</span>
               </span>
               <span class="learn-path-meta"><b>Niveles progresivos</b><b>Vocabulario real</b></span>
               <span class="learn-path-arrow">→</span>
@@ -250,7 +250,7 @@
               <span class="learn-path-copy">
                 <small>DE TU VIDA REAL</small>
                 <strong>Aprender de mis conversaciones</strong>
-                <span>Convierte lo que ya dijiste y tradujiste en frases para escuchar, guardar y practicar.</span>
+                <span>Convierte conversaciones reales en práctica.</span>
               </span>
               <span class="learn-path-meta"><b>Tu historial</b><b>Práctica personalizada</b></span>
               <span class="learn-path-arrow">→</span>
@@ -261,7 +261,7 @@
               <span class="learn-path-copy">
                 <small>MIS PALABRAS</small>
                 <strong>Palabras que guardé</strong>
-                <span>Todo lo que guardas desde Hablar aparece aquí, listo para escuchar y practicar.</span>
+                <span>Escucha, repasa y practica tus palabras.</span>
               </span>
               <span class="learn-path-meta"><b id="learn-home-custom-count">0 guardadas</b><b>Acceso rápido</b></span>
               <span class="learn-path-arrow">→</span>
@@ -409,62 +409,126 @@
       <section id="practice-view" class="practice-view is-hidden" aria-labelledby="practice-title">
         <div class="practice-heading">
           <p class="section-label">PRÁCTICA MULTILENGUAJE · SITUACIONES REALES</p>
-          <h2 id="practice-title">¿Cómo digo esto en otro idioma?</h2>
-          <p>Escribe lo que quieres comunicar, elige el idioma que quieres practicar y recibe una frase natural, pronunciación fácil, otra forma de decirlo y corrección inteligente.</p>
+          <h2 id="practice-title">Practica lo que vas a necesitar afuera.</h2>
+          <p>Aprende una frase específica o entra en una conversación guiada como una parada de tráfico, ordenar comida, ir a la farmacia o hablar con tu landlord.</p>
         </div>
 
-        <form id="practice-form" class="practice-form">
-          <label for="practice-input">¿Qué quieres decir?</label>
-          <textarea id="practice-input" maxlength="500" required placeholder="Ejemplo: Necesito decirle a mi supervisor que mañana llegaré un poco tarde."></textarea>
-          <div class="practice-form-row four">
-            <label>Mi idioma
-              <select id="practice-language" aria-label="Mi idioma"></select>
-            </label>
-            <label>Idioma que quiero practicar
-              <select id="practice-target-language" aria-label="Idioma que quiero practicar"></select>
-            </label>
-            <label>Situación
-              <select id="practice-situation">
-                <option value="everyday" selected>Vida diaria</option><option value="work">Trabajo</option><option value="construction">Construcción</option><option value="medical">Doctor / salud</option><option value="school">Escuela</option><option value="restaurant">Restaurante</option><option value="bank">Banco</option><option value="interview">Entrevista</option><option value="hotel">Hotel / viaje</option><option value="shopping">Compras</option><option value="emergency">Emergencia</option><option value="legal">Documento oficial</option>
-              </select>
-            </label>
-            <button class="primary-button" type="submit">Enseñarme</button>
-          </div>
-        </form>
+        <div class="practice-mode-switch" role="tablist" aria-label="Tipo de práctica">
+          <button id="practice-mode-phrase" class="is-active" type="button" role="tab" aria-selected="true">Frase rápida</button>
+          <button id="practice-mode-conversation" type="button" role="tab" aria-selected="false">Conversación</button>
+        </div>
 
-        <article id="practice-result" class="practice-result is-hidden">
-          <div class="practice-points"><span>★</span><strong id="total-points">0 puntos</strong></div>
-          <p id="practice-target-label" class="section-label">FORMA NATURAL EN EL IDIOMA ELEGIDO</p>
-          <h3 id="practice-english"></h3>
-          <p id="practice-meaning" class="practice-meaning"></p>
+        <div id="practice-phrase-mode">
+          <form id="practice-form" class="practice-form">
+            <label for="practice-input">¿Qué quieres decir?</label>
+            <textarea id="practice-input" maxlength="500" required placeholder="Ejemplo: Necesito decirle a mi supervisor que mañana llegaré un poco tarde."></textarea>
+            <div class="practice-form-row four">
+              <label>Mi idioma
+                <select id="practice-language" aria-label="Mi idioma"></select>
+              </label>
+              <label>Idioma que quiero practicar
+                <select id="practice-target-language" aria-label="Idioma que quiero practicar"></select>
+              </label>
+              <label>Situación
+                <select id="practice-situation">
+                  <option value="everyday" selected>Vida diaria</option><option value="traffic">Parada de tráfico</option><option value="fastfood">Comida rápida</option><option value="pharmacy">Farmacia</option><option value="medical">Doctor / salud</option><option value="work">Trabajo</option><option value="interview">Entrevista</option><option value="landlord">Vivienda / landlord</option><option value="school">Escuela</option><option value="bank">Banco</option><option value="shopping">Compras</option><option value="transport">Transporte</option><option value="dmv">DMV / oficina pública</option><option value="restaurant">Restaurante</option><option value="hotel">Hotel / viaje</option><option value="construction">Construcción</option><option value="emergency">Emergencia</option>
+                </select>
+              </label>
+              <button class="primary-button" type="submit">Enseñarme</button>
+            </div>
+          </form>
 
-          <div class="pronunciation-box">
-            <span>PRONUNCIACIÓN FÁCIL · SIN SÍMBOLOS</span>
-            <strong id="practice-pronunciation"></strong>
-            <p id="practice-tip"></p>
-          </div>
+          <article id="practice-result" class="practice-result is-hidden">
+            <div class="practice-points"><span>★</span><strong id="total-points">0 puntos</strong></div>
+            <p id="practice-target-label" class="section-label">FORMA NATURAL EN EL IDIOMA ELEGIDO</p>
+            <h3 id="practice-english"></h3>
+            <p id="practice-meaning" class="practice-meaning"></p>
 
-          <div class="alternative-box">
-            <span>OTRA FORMA NATURAL</span>
-            <strong id="practice-alternative"></strong>
-            <p id="practice-usage"></p>
-          </div>
+            <div class="pronunciation-box">
+              <span>PRONUNCIACIÓN FÁCIL · SIN SÍMBOLOS</span>
+              <strong id="practice-pronunciation"></strong>
+              <p id="practice-tip"></p>
+            </div>
 
-          <div class="practice-actions">
-            <button id="listen-practice" class="outline-button" type="button">◖ Escuchar ejemplo</button>
-            <button id="record-practice" class="record-button" type="button">● Practicar mi voz</button>
-            <button id="report-practice-content" class="outline-button report-ai-button" type="button">⚑ Reportar</button>
-          </div>
+            <div class="alternative-box">
+              <span>OTRA FORMA NATURAL</span>
+              <strong id="practice-alternative"></strong>
+              <p id="practice-usage"></p>
+            </div>
 
-          <div id="practice-score" class="practice-score is-hidden">
-            <div class="score-line"><strong id="score-number"></strong><span id="score-feedback"></span></div>
-            <div class="correction-block">
-              <span>LO QUE LA APP ENTENDIÓ · EN TU IDIOMA</span><p id="heard-text"></p>
-              <span>FRASE MODELO CORRECTA</span><p id="corrected-text"></p>
-              <span>PRÓXIMO PASO</span><p id="focus-text"></p>
+            <div class="practice-actions">
+              <button id="listen-practice" class="outline-button" type="button">◖ Escuchar ejemplo</button>
+              <button id="record-practice" class="record-button" type="button">● Practicar mi voz</button>
+              <button id="report-practice-content" class="outline-button report-ai-button" type="button">⚑ Reportar</button>
+            </div>
+
+            <div id="practice-score" class="practice-score is-hidden">
+              <div class="score-line digital-score-line">
+                <div id="practice-score-meter" class="pronunciation-gauge" style="--score:0" aria-label="Medidor de pronunciación">
+                  <div><strong id="score-number">0%</strong><small>CLARIDAD</small></div>
+                </div>
+                <div class="digital-score-copy"><span>ANÁLISIS DE PRONUNCIACIÓN</span><strong id="score-feedback">Listo para revisar tu pronunciación.</strong><small id="score-points">0 puntos</small></div>
+              </div>
+              <div class="correction-block">
+                <span>LO QUE LA APP ENTENDIÓ · EN TU IDIOMA</span><p id="heard-text"></p>
+                <span>FRASE MODELO CORRECTA</span><p id="corrected-text"></p>
+                <span>PRÓXIMO PASO</span><p id="focus-text"></p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <section id="practice-conversation-mode" class="practice-conversation-mode is-hidden" aria-label="Conversación guiada">
+          <div id="practice-conversation-setup" class="practice-conversation-setup">
+            <div class="practice-conversation-intro">
+              <div><span class="section-label">CONVERSACIÓN GUIADA</span><h3>Ensaya antes de que te pase de verdad.</h3></div>
+              <p>Elige un escenario. La otra persona responde como en la vida real y Sin Barreras te ayuda turno por turno.</p>
+            </div>
+            <div class="practice-scenario-grid" aria-label="Escenarios de práctica">
+              <button class="is-active" type="button" data-practice-scenario="traffic"><span>🚓</span><b>Parada de tráfico</b><small>Oficial y documentos</small></button>
+              <button type="button" data-practice-scenario="fastfood"><span>🍔</span><b>Comida rápida</b><small>Ordenar y pagar</small></button>
+              <button type="button" data-practice-scenario="pharmacy"><span>💊</span><b>Farmacia</b><small>Producto o receta</small></button>
+              <button type="button" data-practice-scenario="medical"><span>🩺</span><b>Doctor</b><small>Cita y síntomas</small></button>
+              <button type="button" data-practice-scenario="work"><span>🦺</span><b>Trabajo</b><small>Supervisor e instrucciones</small></button>
+              <button type="button" data-practice-scenario="landlord"><span>🏠</span><b>Vivienda</b><small>Landlord y reparaciones</small></button>
+              <button type="button" data-practice-scenario="bank"><span>🏦</span><b>Banco</b><small>Servicio en ventanilla</small></button>
+              <button type="button" data-practice-scenario="school"><span>🏫</span><b>Escuela</b><small>Maestro u oficina</small></button>
+              <button type="button" data-practice-scenario="shopping"><span>🛒</span><b>Compras</b><small>Precio, talla o devolución</small></button>
+              <button type="button" data-practice-scenario="transport"><span>🚌</span><b>Transporte</b><small>Ruta, parada o destino</small></button>
+              <button type="button" data-practice-scenario="dmv"><span>🪪</span><b>DMV</b><small>Turno, cita y documentos</small></button>
+              <button type="button" data-practice-scenario="emergency"><span>🚨</span><b>Emergencia</b><small>Comunicación clara</small></button>
+            </div>
+            <div class="practice-conversation-controls">
+              <label>Mi idioma<select id="practice-conversation-native" aria-label="Mi idioma para conversación"></select></label>
+              <label>Idioma que practico<select id="practice-conversation-target" aria-label="Idioma objetivo de conversación"></select></label>
+              <label>Nivel<select id="practice-conversation-level"><option value="beginner" selected>Principiante</option><option value="intermediate">Intermedio</option><option value="advanced">Avanzado</option></select></label>
+              <button id="practice-conversation-start" class="primary-button" type="button">▶ Empezar escenario</button>
             </div>
           </div>
-        </article>
+
+          <div id="practice-conversation-session" class="practice-conversation-session is-hidden">
+            <div class="practice-conversation-hero">
+              <span id="practice-conversation-icon" class="practice-conversation-icon">🚓</span>
+              <div><span id="practice-conversation-role">OFICIAL</span><h3 id="practice-conversation-title">Parada de tráfico</h3><p id="practice-conversation-objective"></p></div>
+              <div class="practice-conversation-progress"><strong id="practice-conversation-progress-value">0%</strong><small>misión</small></div>
+            </div>
+            <div class="practice-conversation-track"><i id="practice-conversation-progress-bar"></i></div>
+            <div id="practice-conversation-thread" class="practice-conversation-thread" aria-live="polite"></div>
+            <div id="practice-conversation-suggestions" class="practice-conversation-suggestions" aria-label="Respuestas sugeridas"></div>
+            <div class="practice-conversation-actions">
+              <button id="practice-conversation-listen" class="outline-button" type="button">◖ Escuchar</button>
+              <button id="practice-conversation-slow" class="outline-button" type="button">🐢 Más lento</button>
+              <button id="practice-conversation-end" class="text-button" type="button">Finalizar</button>
+            </div>
+            <div class="practice-conversation-response">
+              <span>Tu turno</span><small>Di una respuesta corta. Si necesitas ayuda, toca una sugerencia.</small>
+              <button id="practice-conversation-record" class="record-button large" type="button">● Responder con mi voz</button>
+              <div><input id="practice-conversation-text" type="text" maxlength="700" autocomplete="off" placeholder="O escribe tu respuesta…"><button id="practice-conversation-send" class="outline-button" type="button">Enviar</button></div>
+            </div>
+            <div id="practice-conversation-summary" class="practice-conversation-summary is-hidden"></div>
+            <button id="practice-conversation-new" class="outline-button is-hidden" type="button">Practicar otro escenario</button>
+          </div>
+        </section>
       </section>
 
       <section id="coach-view" class="coach-view is-hidden" aria-labelledby="coach-title">
@@ -482,21 +546,38 @@
             <span class="coach-setup-orb">AI</span>
             <div><strong>Prepara tu práctica</strong><small>Elige una situación y tu nivel. En Principiante, el Coach usa frases muy cortas, traducción visible y ayuda para responder.</small></div>
           </div>
+          <div class="coach-scenario-shortcuts" aria-label="Situaciones esenciales">
+            <button type="button" data-coach-scenario="traffic"><span>🚓</span>Tráfico</button>
+            <button type="button" data-coach-scenario="fastfood"><span>🍔</span>Fast food</button>
+            <button type="button" data-coach-scenario="pharmacy"><span>💊</span>Farmacia</button>
+            <button type="button" data-coach-scenario="work"><span>🦺</span>Trabajo</button>
+            <button type="button" data-coach-scenario="landlord"><span>🏠</span>Vivienda</button>
+            <button type="button" data-coach-scenario="dmv"><span>🪪</span>DMV</button>
+          </div>
           <label>Situación
             <select id="coach-scenario">
-              <option value="everyday">Conversación diaria</option>
-              <option value="work" selected>Trabajo · supervisor o compañero</option>
-              <option value="interview">Entrevista de trabajo</option>
-              <option value="medical">Doctor / cita médica</option>
-              <option value="restaurant">Restaurante</option>
-              <option value="school">Escuela</option>
-              <option value="shopping">Compras / servicio al cliente</option>
-              <option value="phone">Llamada telefónica</option>
-              <option value="landlord">Vivienda / landlord</option>
-              <option value="construction">Construcción / trabajo de campo</option>
-              <option value="bank">Banco</option>
-              <option value="hotel">Hotel / viaje</option>
-              <option value="emergency">Situación urgente</option>
+              <optgroup label="Situaciones esenciales">
+                <option value="traffic">Parada de tráfico · oficial</option>
+                <option value="fastfood">Comida rápida · ordenar comida</option>
+                <option value="pharmacy">Farmacia · producto o receta</option>
+                <option value="medical">Doctor / cita médica</option>
+                <option value="work" selected>Trabajo · supervisor o compañero</option>
+                <option value="landlord">Vivienda / landlord</option>
+                <option value="bank">Banco</option>
+                <option value="school">Escuela</option>
+                <option value="transport">Transporte público / rideshare</option>
+                <option value="dmv">DMV / oficina pública</option>
+                <option value="emergency">Situación urgente</option>
+              </optgroup>
+              <optgroup label="Más escenarios">
+                <option value="everyday">Conversación diaria</option>
+                <option value="interview">Entrevista de trabajo</option>
+                <option value="restaurant">Restaurante</option>
+                <option value="shopping">Compras / servicio al cliente</option>
+                <option value="phone">Llamada telefónica</option>
+                <option value="construction">Construcción / trabajo de campo</option>
+                <option value="hotel">Hotel / viaje</option>
+              </optgroup>
             </select>
           </label>
           <label>Mi idioma
@@ -746,7 +827,10 @@
             <button id="phrase-practice-record" class="phrase-practice-record" type="button">● Practicar mi voz</button>
           </div>
           <div id="phrase-practice-score" class="phrase-practice-score" hidden>
-            <div><strong id="phrase-practice-score-number">0%</strong><span id="phrase-practice-score-feedback"></span></div>
+            <div class="phrase-practice-score-summary">
+              <div id="phrase-practice-score-meter" class="pronunciation-gauge compact" style="--score:0" aria-label="Medidor de pronunciación"><div><strong id="phrase-practice-score-number">0%</strong><small>CLARO</small></div></div>
+              <div class="phrase-practice-score-copy"><span>RESULTADO</span><strong id="phrase-practice-score-feedback">Escucha y repite con calma.</strong></div>
+            </div>
             <dl>
               <div><dt>LO QUE LA APP ENTENDIÓ · EN TU IDIOMA</dt><dd id="phrase-practice-heard"></dd></div>
               <div><dt>PRÓXIMO PASO</dt><dd id="phrase-practice-focus"></dd></div>
@@ -976,7 +1060,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.6.6"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.6.6"></script>
+    <script src="/play-billing.js?v=1.6.9"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.6.9"></script>
   </body>
 </html>

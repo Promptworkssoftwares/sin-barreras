@@ -11,7 +11,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: APP_URL
-        sync: false
+        value: https://sin-barreras.onrender.com
       - key: SESSION_SECRET
         generateValue: true
       - key: MONGODB_URI
@@ -27,7 +27,7 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: GOOGLE_CALLBACK_URL
-        sync: false
+        value: https://sin-barreras.onrender.com/auth/google/callback
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
@@ -57,7 +57,7 @@ services:
       - key: AI_TRIAL_PERIOD_DAYS
         value: "7"
       - key: ALLOWED_ORIGINS
-        sync: false
+        value: https://sin-barreras.onrender.com
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT

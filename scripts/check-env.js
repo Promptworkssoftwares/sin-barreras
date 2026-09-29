@@ -10,6 +10,13 @@ try {
   if (process.env.NODE_ENV === 'production') {
     const origins = String(process.env.ALLOWED_ORIGINS || '').split(',').map((v) => v.trim()).filter(Boolean);
     if (!origins.length || origins.includes('*')) throw new Error('En producción ALLOWED_ORIGINS debe contener el dominio exacto y no puede usar *.');
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      const callback = String(process.env.GOOGLE_CALLBACK_URL || '').trim();
+      if (!callback) throw new Error('GOOGLE_CALLBACK_URL es obligatorio en producción cuando Google OAuth está habilitado.');
+      const callbackUrl = new URL(callback);
+      if (callbackUrl.protocol !== 'https:' || ['localhost','127.0.0.1','::1'].includes(callbackUrl.hostname)) throw new Error('GOOGLE_CALLBACK_URL debe usar HTTPS público en producción.');
+      if (!callbackUrl.pathname.endsWith('/auth/google/callback')) throw new Error('GOOGLE_CALLBACK_URL debe terminar en /auth/google/callback.');
+    }
   }
   console.log(`[OK] Configuración cargada desde: ${envPath}`);
   console.log(`[OK] MongoDB user: ${safe.username}`);

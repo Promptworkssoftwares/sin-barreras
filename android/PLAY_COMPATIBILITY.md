@@ -1,11 +1,11 @@
-# Android / Google Play compatibility — v1.6.6
+# Android / Google Play compatibility — v1.6.9
 
 - applicationId: `com.promptworks.sinbarreras`
 - minSdk: 26
 - compileSdk: 36
 - targetSdk: 36
-- versionCode: 1606
-- versionName: 1.6.6
+- versionCode: 1609
+- versionName: 1.6.9
 - BillingClient: 9.1.0
 - AndroidX: enabled (`android.useAndroidX=true`)
 - Jetifier: not required; no legacy Android Support Library dependencies are present

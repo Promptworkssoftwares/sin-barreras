@@ -83,6 +83,32 @@ router.get('/auth/me', async (request, response) => {
   response.json({ authenticated: Boolean(request.user), user: publicUser(request.user) });
 });
 
+router.post('/account/temporary-password', requireAuth, async (request, response, next) => {
+  try {
+    if (!request.user.mustChangePassword) return response.status(409).json({ error: 'Esta cuenta no tiene una contraseña temporal pendiente.' });
+    const password = String(request.body?.password || '');
+    const confirmation = String(request.body?.confirmation || '');
+    const termsAccepted = request.body?.termsAccepted === true || request.body?.termsAccepted === 'true';
+    const ageConfirmed = request.body?.ageConfirmed === true || request.body?.ageConfirmed === 'true';
+    if (password.length < 10) return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 10 caracteres.' });
+    if (password !== confirmation) return response.status(400).json({ error: 'Las contraseñas no coinciden.' });
+    if (!termsAccepted || !ageConfirmed) return response.status(400).json({ error: 'Debes confirmar que tienes 18 años o más y aceptar los Términos y la Política de Privacidad.' });
+
+    const user = await User.findById(request.user._id).select('+passwordHash');
+    if (!user || user.accountStatus !== 'active') return response.status(404).json({ error: 'Cuenta no encontrada.' });
+    user.passwordHash = await bcrypt.hash(password, 12);
+    user.mustChangePassword = false;
+    user.temporaryPasswordIssuedAt = null;
+    user.emailVerifiedAt = user.emailVerifiedAt || new Date();
+    user.emailVerificationRequired = false;
+    user.ageConfirmedAt = user.ageConfirmedAt || new Date();
+    user.termsAcceptedAt = user.termsAcceptedAt || new Date();
+    user.privacyAcceptedAt = user.privacyAcceptedAt || new Date();
+    await user.save();
+    response.json({ ok: true, user: publicUser(user), redirect: user.role === 'owner' ? '/admin' : '/app' });
+  } catch (error) { next(error); }
+});
+
 router.get('/account/ai-usage', requireAuth, async (request, response, next) => {
   try {
     const quota = await getAiQuotaStatus(request.user);
