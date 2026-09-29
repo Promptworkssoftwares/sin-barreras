@@ -2522,7 +2522,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 /* v1.6.1 Google Play / safety surfaces */
 .qr-terms-consent{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:.82rem;line-height:1.45}.qr-terms-consent input{width:18px;height:18px;flex:0 0 auto;margin-top:2px}.qr-terms-consent a{color:inherit;text-decoration:underline}.qr-moderation-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.qr-moderation-tools select,.qr-moderation-tools button{min-height:42px}.qr-moderation-tools .danger{border-color:rgba(190,42,42,.35)}.qr-report-message{margin-top:6px;border:0;background:transparent;text-decoration:underline;opacity:.75;cursor:pointer}.report-ai-button{font-size:.86rem}.account-link-action{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.account-link-action>div{display:flex;flex:1;min-width:0;flex-direction:column}.data-use-list{padding-left:20px;text-align:left;line-height:1.55}.data-use-list li+li{margin-top:10px}.data-use-dialog .onboarding-content{max-width:620px}
 
-/* v1.6.9 · Modern user settings + live AI minutes */
+/* v1.7.1 · Modern user settings + live AI minutes */
 .settings-dialog{
   width:min(94vw,680px);
   max-width:680px;
@@ -2572,7 +2572,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 @media(prefers-reduced-motion:reduce){.settings-close,.settings-shortcut-card,.settings-usage-meter i{transition:none}}
 
 
-/* v1.6.9 · Compact Hablar + digital learning/pronunciation UI */
+/* v1.7.1 · Compact Hablar + digital learning/pronunciation UI */
 .hero{padding:18px 0 12px}.hero .eyebrow{margin-bottom:5px;font-size:7.5px}.hero h1{font-size:clamp(20px,5.3vw,31px);line-height:1;letter-spacing:-1.35px;white-space:nowrap}.hero-copy{max-width:620px;margin-top:7px;font-size:10.5px;line-height:1.4}
 .mode-panel{padding:11px 12px;border-radius:16px}.mode-head{gap:8px}.mode-head strong{font-size:11px}.mode-head .section-label{font-size:7px;margin-bottom:2px}.mode-dot{width:8px;height:8px}
 .auto-language-panel{grid-template-columns:minmax(0,.8fr) 48px minmax(0,1.2fr);gap:7px;margin-top:9px}.auto-language-card{min-height:58px;padding:9px 10px;border-radius:13px}.auto-language-card small{font-size:7.5px;line-height:1.25}.auto-language-card span{font-size:6.7px}.auto-language-card strong{font-size:10px}.auto-language-icon{width:30px;height:30px;border-radius:9px}.auto-language-flow{min-height:58px;gap:2px}.auto-language-flow b{font-size:5.8px}.partner-language-control select{min-height:35px;font-size:10px}.context-row{grid-template-columns:minmax(0,210px) 1fr;gap:9px;margin-top:9px;padding-top:9px}.context-row label{gap:4px;font-size:7px}.context-row select{min-height:35px;font-size:10px}.context-help{font-size:8px;line-height:1.3}
@@ -2611,7 +2611,7 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 }
 @media(max-width:360px){.hero h1{font-size:16.5px}.conversation-tool strong{font-size:7px}.learn-path-card{min-height:98px}.sound-feedback-compare{grid-template-columns:1fr}}
 
-/* v1.6.9 · Real-life scenario practice + Coach shortcuts */
+/* v1.7.1 · Real-life scenario practice + Coach shortcuts */
 .practice-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:18px 0 4px;padding:5px;border:1px solid var(--line);border-radius:15px;background:var(--card)}
 .practice-mode-switch button{min-height:42px;border:0;border-radius:11px;background:transparent;color:var(--muted);font:800 11px Manrope,sans-serif;letter-spacing:.2px}
 .practice-mode-switch button.is-active{background:var(--surface);color:var(--ink);box-shadow:0 3px 10px rgba(35,49,53,.08)}
@@ -2624,3 +2624,144 @@ body.phrase-practice-open{overflow:hidden}.phrase-practice-player{position:fixed
 .coach-scenario-shortcuts{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.coach-scenario-shortcuts button{display:grid;justify-items:center;gap:4px;min-width:0;min-height:54px;padding:7px 4px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);font-size:8px;font-weight:800}.coach-scenario-shortcuts button span{font-size:16px}.coach-scenario-shortcuts button.is-active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--paper))}
 @media(max-width:760px){.practice-scenario-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.practice-conversation-controls{grid-template-columns:1fr 1fr}.practice-conversation-controls .primary-button{grid-column:1/-1}.coach-scenario-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:520px){.practice-heading h2{font-size:25px}.practice-mode-switch{margin-top:13px}.practice-conversation-intro{display:grid;gap:5px}.practice-conversation-intro p{text-align:left}.practice-scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.practice-scenario-grid button{min-height:59px;padding:8px;grid-template-columns:27px minmax(0,1fr);column-gap:6px}.practice-scenario-grid button>span{width:27px;height:27px;font-size:15px}.practice-conversation-controls{grid-template-columns:1fr;padding:11px}.practice-conversation-controls .primary-button{grid-column:auto}.practice-conversation-hero{grid-template-columns:auto minmax(0,1fr);padding:12px}.practice-conversation-progress{grid-column:1/-1;grid-template-columns:auto auto;justify-content:start;gap:4px;align-items:baseline}.practice-conversation-thread{min-height:210px;padding:10px}.practice-conversation-bubble{max-width:94%}.practice-conversation-bubble.learner{grid-template-columns:50px minmax(0,1fr)}.practice-turn-score{width:50px;height:50px}.practice-conversation-suggestions{grid-template-columns:1fr}.practice-conversation-suggestions button{min-height:47px}.practice-conversation-actions{flex-wrap:wrap}.practice-conversation-actions .text-button{margin-left:0}.practice-conversation-summary>div{grid-template-columns:auto auto auto auto}.coach-scenario-shortcuts{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.coach-scenario-shortcuts button{min-height:50px}}
+
+/* v1.7.1 · Fully multilingual Coach + compact mobile practice + live voice visualizer */
+.coach-language-pair{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--card) 60%,var(--surface))}
+.coach-language-pair label{padding:0!important;border:0!important;background:transparent!important}.coach-language-arrow{display:grid;place-items:center;align-self:center;width:24px;height:24px;margin-bottom:8px;border-radius:999px;background:var(--accent);color:white;font-weight:900;font-size:11px}
+.coach-language-pair select{min-height:38px!important;background:var(--surface)!important;border:1px solid var(--line)!important;padding:0 8px!important;font-size:10.5px!important}
+.voice-input-signal{display:grid;grid-template-columns:7px minmax(74px,1fr) auto;align-items:center;gap:8px;min-height:34px;padding:6px 9px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--card) 72%,var(--surface));overflow:hidden}.voice-input-signal.compact{min-height:30px;padding:4px 8px}.voice-signal-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.42;transition:.18s}.voice-bars{display:flex;align-items:center;justify-content:center;gap:3px;height:20px;overflow:hidden}.voice-bars i{display:block;width:3px;height:5px;border-radius:999px;background:color-mix(in srgb,var(--muted) 55%,transparent);transform-origin:center;transition:height .16s,background .16s}.voice-input-signal small{color:var(--muted);font:800 6px 'DM Mono',monospace;letter-spacing:.8px;white-space:nowrap}.voice-input-signal[data-state="waiting"] .voice-signal-dot,.voice-input-signal[data-state="thinking"] .voice-signal-dot{background:#d28a23;opacity:1;box-shadow:0 0 0 4px rgba(210,138,35,.10)}.voice-input-signal[data-state="listening"]{border-color:color-mix(in srgb,#2f9b77 42%,var(--line));background:color-mix(in srgb,#2f9b77 5%,var(--surface))}.voice-input-signal[data-state="listening"] .voice-signal-dot{background:#2f9b77;opacity:1;box-shadow:0 0 0 4px rgba(47,155,119,.10)}.voice-input-signal[data-state="listening"] .voice-bars i{background:#2f9b77;animation:sbVoiceBar .68s ease-in-out infinite alternate}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(2){animation-delay:-.52s}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(3){animation-delay:-.28s}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(4){animation-delay:-.61s}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(5){animation-delay:-.16s}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(6){animation-delay:-.43s}.voice-input-signal[data-state="listening"] .voice-bars i:nth-child(7){animation-delay:-.08s}.voice-input-signal[data-state="processing"]{border-color:color-mix(in srgb,var(--accent) 38%,var(--line));background:color-mix(in srgb,var(--accent) 5%,var(--surface))}.voice-input-signal[data-state="processing"] .voice-signal-dot{background:var(--accent);opacity:1;animation:sbVoiceDot .85s ease-in-out infinite}.voice-input-signal[data-state="processing"] .voice-bars i{height:3px;background:var(--accent);animation:sbVoiceScan 1s ease-in-out infinite}.voice-input-signal[data-state="thinking"] .voice-bars i:nth-child(odd){height:10px;background:#d28a23}.voice-input-signal[data-state="thinking"] .voice-bars i:nth-child(even){height:4px;background:#d28a23}@keyframes sbVoiceBar{0%{height:4px;opacity:.55}100%{height:19px;opacity:1}}@keyframes sbVoiceScan{0%,100%{transform:translateY(5px);opacity:.35}50%{transform:translateY(-5px);opacity:1}}@keyframes sbVoiceDot{50%{transform:scale(.62);opacity:.55}}
+.practice-actions{align-items:center}.practice-actions .voice-input-signal{grid-column:1/-1}.practice-conversation-response .voice-input-signal{width:100%}.coach-response-box .voice-input-signal{width:100%}.phrase-practice-actions .voice-input-signal{grid-column:1/-1;width:100%}
+.mini-pronunciation-meter{--score:0;position:relative;display:grid;place-items:center;align-content:center;flex:0 0 58px;width:58px;height:58px;border-radius:50%;background:conic-gradient(#2f9b77 calc(var(--score)*1%),var(--line) 0)}.mini-pronunciation-meter:after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--surface)}.mini-pronunciation-meter b,.mini-pronunciation-meter small{position:relative;z-index:1}.mini-pronunciation-meter b{font-size:13px}.mini-pronunciation-meter small{color:var(--muted);font:800 5.5px 'DM Mono',monospace;letter-spacing:.55px}.coach-repeat-result{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px!important}.coach-repeat-copy{display:grid!important;align-items:start!important;justify-content:stretch!important;gap:3px!important}.coach-repeat-copy>span{font-size:6.5px}.coach-repeat-copy>strong{font-size:10px!important;line-height:1.35}.coach-repeat-copy>p{font-size:8.5px!important;line-height:1.35}.coach-repeat-copy>small{font-size:7.5px!important;line-height:1.35}
+.practice-result{gap:9px;padding:15px;border-radius:18px}.practice-result h3{font-size:19px;line-height:1.2;letter-spacing:-.45px}.practice-meaning{font-size:11.5px;line-height:1.4}.pronunciation-box,.alternative-box{padding:10px;border-radius:12px}.pronunciation-box strong,.alternative-box strong{font-size:13px;line-height:1.35}.pronunciation-box p,.alternative-box p{font-size:9.5px;line-height:1.4}.practice-actions{gap:6px}.practice-actions .outline-button,.practice-actions .record-button{min-height:39px;font-size:10px}.practice-score{padding:10px;border-radius:12px}.practice-score .pronunciation-gauge{width:66px;height:66px}.practice-score .pronunciation-gauge strong{font-size:16px!important}.digital-score-line{gap:10px!important}.digital-score-copy>strong{font-size:10.5px!important}.correction-block{gap:5px;margin-top:7px}.correction-block>span{font-size:5.8px!important}.correction-block>p{padding:7px 8px;font-size:8.5px!important;line-height:1.35}.practice-conversation-bubble>strong{font-size:12px}.practice-conversation-bubble>p{font-size:9px}.practice-turn-copy>strong{font-size:10.5px}.practice-turn-copy p{font-size:8.5px}.coach-heading h2{font-size:30px;line-height:1.06}.coach-heading>p:last-child{font-size:10.5px;line-height:1.48}.coach-bubble p{font-size:12px;line-height:1.48}.coach-bubble small{font-size:9px}.coach-turn-feedback{padding:9px 10px;gap:6px}.coach-feedback-main b{font-size:9.5px}.coach-feedback-main p,.coach-turn-feedback>p{font-size:8.5px}.coach-feedback-foot span,.coach-feedback-foot b{font-size:7.5px}.coach-score-gauge{width:40px;height:40px}.coach-score-gauge b{font-size:9px}.coach-summary h3{font-size:17px}.coach-summary>p{font-size:9.5px}.coach-summary-grid b{font-size:8.5px}.phrase-practice-card h2{font-size:clamp(20px,5.6vw,28px)!important}.phrase-practice-meaning{font-size:10.5px!important}.phrase-practice-pronunciation strong{font-size:13px!important}.phrase-practice-score-copy>strong{font-size:9.5px}.phrase-practice-score dl dd{font-size:8.5px!important}
+@media(max-width:620px){.coach-language-pair{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:5px;padding:8px}.coach-language-arrow{width:18px;height:18px;margin-bottom:9px;font-size:9px}.coach-language-pair label{font-size:7px!important;letter-spacing:.35px!important}.coach-language-pair select{min-height:34px!important;padding:0 5px!important;font-size:9px!important}.coach-heading{padding-top:3px}.coach-heading h2{font-size:23px;letter-spacing:-.8px}.coach-heading>p:last-child{font-size:9.5px;margin-top:7px}.coach-feature-strip{gap:4px}.coach-feature-strip span{font-size:7px}.coach-setup{padding:10px;gap:7px}.coach-setup-intro{gap:8px;padding-bottom:8px}.coach-setup-orb{width:34px;height:34px;border-radius:11px}.coach-setup-intro strong{font-size:11px}.coach-setup-intro small{font-size:8px}.coach-scenario-shortcuts button{min-height:43px;font-size:7.3px}.coach-scenario-shortcuts button span{font-size:14px}.coach-setup label{padding:7px!important;font-size:7px!important}.coach-setup select{min-height:31px;font-size:9.5px}.coach-start-button{min-height:42px!important}.coach-session-hero{padding:10px;gap:8px}.coach-persona-avatar{width:38px;height:38px}.coach-session-copy h3{font-size:13px}.coach-session-copy p{font-size:8.5px}.coach-session-stats span strong{font-size:13px}.coach-success-criteria span{font-size:7.5px}.coach-toolbar{gap:5px}.coach-current-focus,.coach-toolbar-actions>span{font-size:7.5px}.coach-thread{min-height:220px;padding:9px;gap:7px}.coach-bubble{max-width:95%;padding:9px 10px;border-radius:14px}.coach-bubble p{font-size:10.5px;line-height:1.42}.coach-bubble small{font-size:8px}.coach-tools{gap:4px}.coach-tools button{min-height:28px;padding:0 7px;font-size:6.8px}.coach-turn-feedback{max-width:94%}.coach-response-box{bottom:72px;padding:8px;gap:6px}.coach-composer-head span{font-size:9px}.coach-composer-head small{font-size:7px}.coach-record-primary{min-height:42px;font-size:10px}.coach-text-fallback input,.coach-text-fallback .outline-button{min-height:38px;font-size:10px}.practice-heading h2{font-size:21px}.practice-heading>p:last-child{font-size:9.5px;line-height:1.4}.practice-form{padding:11px;gap:7px}.practice-form textarea{min-height:72px;font-size:12px}.practice-result{margin-top:11px;padding:11px;gap:7px}.practice-result h3{font-size:16px}.practice-meaning{font-size:10px}.pronunciation-box,.alternative-box{padding:8px}.pronunciation-box strong,.alternative-box strong{font-size:11px}.pronunciation-box p,.alternative-box p{font-size:8.5px}.practice-actions .outline-button,.practice-actions .record-button{min-height:37px;font-size:9px}.practice-score .pronunciation-gauge{width:58px;height:58px}.digital-score-copy>strong{font-size:9.5px!important}.correction-block>p{font-size:8px!important}.voice-input-signal{min-height:30px;padding:4px 7px}.voice-bars{height:17px}.voice-input-signal small{font-size:5.5px}.practice-conversation-thread{min-height:180px;max-height:340px}.practice-conversation-response{padding:9px}.practice-conversation-response>.record-button{min-height:41px;font-size:9.5px}.phrase-practice-card{padding:12px!important}.phrase-practice-card h2{font-size:18px!important}.phrase-practice-score .pronunciation-gauge{width:54px;height:54px}.phrase-practice-score-copy>strong{font-size:8.7px}}
+@media(max-width:390px){.coach-language-pair{grid-template-columns:1fr 14px 1fr}.coach-language-arrow{width:14px;height:14px;font-size:7px}.coach-language-pair select{font-size:8.2px!important}.practice-result h3{font-size:15px}.practice-score .pronunciation-gauge{width:54px;height:54px}.correction-block{grid-template-columns:1fr}.coach-scenario-shortcuts{grid-template-columns:repeat(3,1fr)}.voice-input-signal{grid-template-columns:6px 1fr auto;gap:5px}}
+.voice-input-signal[data-state="listening"][data-reactive="true"] .voice-bars i{animation:none!important;transition:height .07s linear,opacity .07s linear,background .12s ease}
+@media(prefers-reduced-motion:reduce){.voice-input-signal .voice-bars i,.voice-input-signal .voice-signal-dot{animation:none!important}}
+
+
+/* v1.7.1 · Mobile-first compact translation and practice results */
+/* Keep learning content readable on phones without letting one result dominate the viewport. */
+.practice-result,
+.practice-score,
+.phrase-practice-card,
+.phrase-practice-score,
+.sound-feedback-card,
+.coach-turn-feedback,
+.coach-summary {
+  text-wrap: pretty;
+}
+
+/* Result hierarchy: modest primary copy, quiet support copy, compact spacing. */
+.practice-result h3 { font-size:17px; line-height:1.28; letter-spacing:-.25px; }
+.practice-meaning { font-size:11px; line-height:1.45; }
+.pronunciation-box strong,.alternative-box strong { font-size:12px; line-height:1.4; }
+.pronunciation-box p,.alternative-box p { font-size:9.5px; line-height:1.42; }
+.digital-score-copy>strong { font-size:10px!important; line-height:1.38; }
+.digital-score-copy>small { font-size:7.5px; }
+.correction-block>p { font-size:9px!important; line-height:1.4; }
+.practice-conversation-bubble>strong { font-size:11.5px; line-height:1.38; }
+.practice-conversation-bubble>p,.practice-turn-copy p { font-size:9px; line-height:1.4; }
+.practice-turn-copy>strong { font-size:10.5px; line-height:1.38; }
+.coach-bubble p { font-size:11px; line-height:1.45; }
+.coach-bubble small { font-size:8px; line-height:1.35; }
+.coach-feedback-main b { font-size:9px; line-height:1.35; }
+.coach-feedback-main p,.coach-turn-feedback>p { font-size:8.5px; line-height:1.4; }
+.coach-summary h3 { font-size:16px; line-height:1.2; }
+.coach-summary>p { font-size:9.5px; line-height:1.42; }
+.phrase-practice-card h2 { font-size:17px!important; line-height:1.3!important; letter-spacing:-.25px!important; }
+.phrase-practice-meaning { font-size:10px!important; line-height:1.42!important; }
+.phrase-practice-pronunciation strong { font-size:11.5px!important; line-height:1.42!important; }
+.phrase-practice-pronunciation p { font-size:9px!important; line-height:1.4!important; }
+.phrase-practice-score-copy>strong { font-size:9.5px; line-height:1.35; }
+.phrase-practice-score dl dd { font-size:9px!important; line-height:1.4!important; }
+.sound-feedback-card { padding:10px!important; border-radius:15px!important; }
+.sound-feedback-head { gap:8px!important; }
+.sound-feedback-copy strong,.sound-feedback-card h3 { font-size:11px!important; line-height:1.38!important; }
+.sound-feedback-copy p,.sound-feedback-card p { font-size:9px!important; line-height:1.4!important; }
+.sound-feedback-compare strong { font-size:9.5px!important; line-height:1.35!important; }
+.sound-feedback-compare p,.sound-feedback-tip { font-size:8.5px!important; line-height:1.4!important; }
+
+@media (max-width:620px) {
+  /* Phrase quick-practice result */
+  .practice-result { margin-top:9px; padding:9px 10px; gap:6px; border-radius:15px; }
+  .practice-result h3 { margin:0; font-size:14px; line-height:1.32; letter-spacing:-.15px; }
+  .practice-meaning { font-size:10px; line-height:1.4; }
+  .practice-points { font-size:8px; }
+  .pronunciation-box,.alternative-box { padding:7px 8px; border-radius:10px; }
+  .pronunciation-box span,.alternative-box span { font-size:6.5px; letter-spacing:.65px; }
+  .pronunciation-box strong,.alternative-box strong { margin-top:4px; font-size:10.5px; line-height:1.38; }
+  .pronunciation-box p,.alternative-box p { margin-top:4px; font-size:8.5px; line-height:1.38; }
+  .practice-actions { gap:5px; }
+  .practice-actions .outline-button,.practice-actions .record-button { min-height:35px; padding:0 7px; font-size:8.5px; border-radius:10px; }
+
+  /* Pronunciation result */
+  .practice-score { padding:8px; border-radius:10px; }
+  .practice-score .pronunciation-gauge { width:50px; height:50px; }
+  .practice-score .pronunciation-gauge strong { font-size:13px!important; }
+  .practice-score .pronunciation-gauge small { font-size:5px!important; }
+  .digital-score-line { gap:8px!important; }
+  .digital-score-copy>span { font-size:5.5px!important; letter-spacing:.65px!important; }
+  .digital-score-copy>strong { font-size:9px!important; line-height:1.35; }
+  .digital-score-copy>small { font-size:7px!important; }
+  .correction-block { gap:4px; margin-top:5px; }
+  .correction-block>span { font-size:5.5px!important; }
+  .correction-block>p { padding:6px 7px; font-size:8.5px!important; line-height:1.38; border-radius:8px; }
+
+  /* Guided conversation practice */
+  .practice-conversation-bubble { padding:8px 9px!important; border-radius:12px!important; }
+  .practice-conversation-bubble>strong { font-size:10.5px; line-height:1.35; }
+  .practice-conversation-bubble>p { margin-top:3px!important; font-size:8.5px; line-height:1.38; }
+  .practice-turn-copy>strong { font-size:9.5px; }
+  .practice-turn-copy p { font-size:8px; line-height:1.38; }
+
+  /* Coach conversation and result copy */
+  .coach-bubble { padding:8px 9px; border-radius:12px; }
+  .coach-bubble p { font-size:10px; line-height:1.4; }
+  .coach-bubble small { font-size:7.5px; }
+  .coach-turn-feedback { padding:7px 8px; gap:5px; border-radius:11px; }
+  .coach-feedback-main b { font-size:8.5px; }
+  .coach-feedback-main p,.coach-turn-feedback>p { font-size:8px; line-height:1.38; }
+  .coach-feedback-foot span,.coach-feedback-foot b { font-size:7px; }
+  .coach-summary h3 { font-size:14px; }
+  .coach-summary>p { font-size:8.5px; }
+  .coach-summary-grid b { font-size:8px; }
+
+  /* Saved phrase practice */
+  .phrase-practice-card { padding:9px!important; border-radius:15px!important; }
+  .phrase-practice-card h2 { font-size:14px!important; line-height:1.3!important; }
+  .phrase-practice-meaning { font-size:9.5px!important; }
+  .phrase-practice-pronunciation { padding:7px!important; border-radius:10px!important; }
+  .phrase-practice-pronunciation strong { font-size:10.5px!important; }
+  .phrase-practice-pronunciation p { font-size:8.5px!important; }
+  .phrase-practice-score { padding:7px!important; border-radius:10px!important; }
+  .phrase-practice-score .pronunciation-gauge { width:48px; height:48px; }
+  .phrase-practice-score-copy>span { font-size:5.5px!important; }
+  .phrase-practice-score-copy>strong { font-size:8.5px!important; line-height:1.35; }
+  .phrase-practice-score dl { gap:4px!important; }
+  .phrase-practice-score dl dt { font-size:5.5px!important; }
+  .phrase-practice-score dl dd { font-size:8px!important; line-height:1.38!important; }
+
+  /* Sounds / pronunciation lab */
+  .sound-feedback-card { padding:8px!important; border-radius:13px!important; }
+  .sound-feedback-head { grid-template-columns:30px minmax(0,1fr) 50px!important; gap:6px!important; }
+  .sound-feedback-score.pronunciation-gauge { width:50px!important; height:50px!important; }
+  .sound-feedback-score.pronunciation-gauge strong { font-size:12px!important; }
+  .sound-feedback-copy strong,.sound-feedback-card h3 { font-size:10px!important; }
+  .sound-feedback-copy p,.sound-feedback-card p { font-size:8px!important; line-height:1.38!important; }
+  .sound-feedback-compare { gap:5px!important; }
+  .sound-feedback-compare strong { font-size:8.5px!important; }
+  .sound-feedback-tip { padding:6px 7px!important; font-size:8px!important; }
+
+  /* Keep live mic visualization present but visually quiet. */
+  .voice-input-signal { min-height:27px; padding:3px 6px; border-radius:9px; }
+  .voice-bars { height:15px; }
+  .voice-bars i { width:2.5px; }
+  .voice-input-signal small { font-size:5.25px; letter-spacing:.55px; }
+}
+
+@media (max-width:390px) {
+  .practice-result h3,.phrase-practice-card h2 { font-size:13.5px!important; }
+  .coach-bubble p { font-size:9.5px; }
+  .practice-conversation-bubble>strong { font-size:10px; }
+  .correction-block>p,.phrase-practice-score dl dd { font-size:7.8px!important; }
+}

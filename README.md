@@ -1,16 +1,14 @@
-# Sin Barreras v1.6.9
+# Sin Barreras v1.7.1
 
-### Nuevo en 1.6.9
+### Nuevo en 1.7.1
 
-- Límite backend de **150 minutos de voz por usuario y período**.
-- Protección interna de costo para Coach, Cámara, TTS, traducción y otras funciones de IA.
-- Aviso automático al 80 % y bloqueo seguro al llegar al límite.
-- Mi Cuenta muestra consumo, porcentaje utilizado, minutos restantes y fecha de reinicio.
-- Admin Dashboard muestra consumo por usuario, costo estimado, alertas y límites alcanzados.
-- El intérprete manos libres se detiene al alcanzar el límite para evitar ciclos de reintentos.
-- Las conversaciones QR consumen el límite de la cuenta host.
-
-La versión conserva las mejoras de 1.6.4: feedback de pronunciación amigable y multilenguaje, cache privado de IA y cache local de TTS.
+- **Coach multilenguaje completo:** selecciona el idioma del usuario y cualquier idioma objetivo disponible en la app.
+- **Escenarios reales:** tráfico, fast food, farmacia, doctor, trabajo, vivienda, banco, escuela, transporte, DMV, emergencia y más.
+- **Práctica en dos modos:** frase rápida y conversación guiada por escenarios, ambas multilenguaje.
+- **UI móvil más compacta:** resultados, correcciones, medidores y tarjetas ocupan menos espacio en teléfonos.
+- **Entrada de audio visual:** las barras responden al volumen real del micrófono mientras escucha y cambian de estado al pausar o analizar.
+- **Coach Principiante pre-A1/A1:** frases cortas, significado visible y ayuda concreta en cualquier idioma objetivo.
+- Se conservan límites de IA, cache privado/TTS, Google Play Billing, prueba de 7 días, QR, Stripe, AndroidX y correcciones del micrófono Android.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
 

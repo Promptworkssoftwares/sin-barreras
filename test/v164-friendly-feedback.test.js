@@ -40,8 +40,8 @@ test('all pronunciation practice surfaces use the learner-friendly feedback laye
   assert.match(app, /friendlyDifference\(result\)/);
   assert.match(phrase, /friendlyRecognition\(result\)/);
   assert.match(phrase, /friendlyFocus\(result\)/);
-  assert.match(html, /LO QUE LA APP ENTENDIÓ · EN TU IDIOMA/);
-  assert.match(html, /FRASE MODELO CORRECTA/);
+  assert.match(html, /ENTENDÍ/);
+  assert.match(html, /MODELO/);
   assert.match(sw, /learner-feedback\.js/);
 });
 

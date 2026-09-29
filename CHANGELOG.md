@@ -1,11 +1,22 @@
-# Sin Barreras v1.6.9
+# Sin Barreras v1.7.1
 
+## 1.7.1
+- Resultados de traducción y pronunciación rediseñados para móvil: tipografía modesta, tarjetas compactas y menor altura vertical en Práctica, Coach, Frases y Sonidos.
+- Medidores y señal de audio se mantienen visibles sin dominar la pantalla.
+- Sin cambios en lógica de IA, puntuación, Billing, autenticación o backend.
+
+- Coach ahora es realmente multilenguaje: el usuario elige **Mi idioma** y **Idioma que quiero practicar** usando el catálogo completo de Sin Barreras.
+- Todas las líneas del role-play, correcciones, sugerencias, TTS y frases útiles del Coach usan el idioma objetivo; las explicaciones permanecen en el idioma del usuario.
+- Coach Principiante conserva el modo pre-A1/A1 en cualquier idioma, con frases muy cortas, significado visible y respuestas sugeridas.
+- Práctica y Coach usan resultados más compactos y mobile-first, con tipografía reducida, medidores circulares y menos texto vertical.
+- Añadida visualización de entrada de audio con barras reactivas al volumen real del micrófono durante escucha; cambia a estados Pausa y Analizando durante el procesamiento.
+- Frases por partes comparte el mismo feedback visual compacto y la señal de audio reactiva.
 - Práctica ahora ofrece dos modos: Frase rápida y Conversación guiada multilenguaje.
 - Nuevos escenarios esenciales para personas nuevas en el país: parada de tráfico, fast food, farmacia, doctor, trabajo, vivienda, banco, escuela, compras, transporte, DMV y emergencia.
 - Conversación guiada de Práctica usa sesiones cortas de 5–8 turnos, respuestas sugeridas, audio normal/lento, progreso de misión y feedback amigable en el idioma del usuario.
 - Coach amplía sus escenarios con situaciones específicas y accesos rápidos para tráfico, comida rápida, farmacia, trabajo, vivienda y DMV.
 - Escenarios sensibles (tráfico, DMV, salud, farmacia, banco, vivienda y emergencia) se mantienen como práctica de comunicación, sin asesoría legal, médica o financiera.
-- Android actualizado a versionCode 1609 / versionName 1.6.9.
+- Android actualizado a versionCode 1700 / versionName 1.7.1.
 
 # Sin Barreras v1.6.8
 

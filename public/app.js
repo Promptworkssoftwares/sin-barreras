@@ -1,16 +1,16 @@
-import { initLearning } from './learn.js?v=1.6.9';
-import { initSounds } from './sounds.js?v=1.6.9';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.6.9';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.6.9';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.6.9';
-import { initAIStage } from './ai-stage.js?v=1.6.9';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.6.9';
-import { getOrCreateTts } from './tts-cache.js?v=1.6.9';
-import { initPhrasebook } from './phrasebook.js?v=1.6.9';
-import { initPhrasePractice } from './phrase-practice.js?v=1.6.9';
-import { initQrConversation } from './qr-conversation.js?v=1.6.9';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.6.9';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.9';
+import { initLearning } from './learn.js?v=1.7.1';
+import { initSounds } from './sounds.js?v=1.7.1';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.1';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.1';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.1';
+import { initAIStage } from './ai-stage.js?v=1.7.1';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.1';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.1';
+import { initPhrasebook } from './phrasebook.js?v=1.7.1';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.1';
+import { initQrConversation } from './qr-conversation.js?v=1.7.1';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.1';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.1';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -43,10 +43,10 @@ const ui = {
   practiceConversationSetup: $('#practice-conversation-setup'), practiceConversationSession: $('#practice-conversation-session'), practiceConversationNative: $('#practice-conversation-native'), practiceConversationTarget: $('#practice-conversation-target'), practiceConversationLevel: $('#practice-conversation-level'), practiceConversationStart: $('#practice-conversation-start'),
   practiceConversationRole: $('#practice-conversation-role'), practiceConversationTitle: $('#practice-conversation-title'), practiceConversationObjective: $('#practice-conversation-objective'), practiceConversationIcon: $('#practice-conversation-icon'), practiceConversationProgressValue: $('#practice-conversation-progress-value'), practiceConversationProgressBar: $('#practice-conversation-progress-bar'), practiceConversationThread: $('#practice-conversation-thread'), practiceConversationSuggestions: $('#practice-conversation-suggestions'), practiceConversationListen: $('#practice-conversation-listen'), practiceConversationSlow: $('#practice-conversation-slow'), practiceConversationEnd: $('#practice-conversation-end'), practiceConversationRecord: $('#practice-conversation-record'), practiceConversationText: $('#practice-conversation-text'), practiceConversationSend: $('#practice-conversation-send'), practiceConversationSummary: $('#practice-conversation-summary'), practiceConversationNew: $('#practice-conversation-new'),
   practiceResult: $('#practice-result'), practiceEnglish: $('#practice-english'), practiceTargetLabel: $('#practice-target-label'), practiceMeaning: $('#practice-meaning'), practicePronunciation: $('#practice-pronunciation'), practiceTip: $('#practice-tip'),
-  practiceAlternative: $('#practice-alternative'), practiceUsage: $('#practice-usage'), listenPractice: $('#listen-practice'), recordPractice: $('#record-practice'),
+  practiceAlternative: $('#practice-alternative'), practiceUsage: $('#practice-usage'), listenPractice: $('#listen-practice'), recordPractice: $('#record-practice'), practiceVoiceSignal: $('#practice-voice-signal'), practiceConversationVoiceSignal: $('#practice-conversation-voice-signal'),
   practiceScore: $('#practice-score'), practiceScoreMeter: $('#practice-score-meter'), scoreNumber: $('#score-number'), scoreFeedback: $('#score-feedback'), scorePoints: $('#score-points'), heardText: $('#heard-text'), correctedText: $('#corrected-text'), focusText: $('#focus-text'), totalPoints: $('#total-points'),
-  coachView: $('#coach-view'), coachScenario: $('#coach-scenario'), coachLanguage: $('#coach-language'), coachLevel: $('#coach-level'), coachGoal: $('#coach-goal'), coachMode: $('#coach-mode'), startCoach: $('#start-coach'), coachSetup: $('#coach-setup'), coachSession: $('#coach-session'),
-  coachStatus: $('#coach-status'), coachThread: $('#coach-thread'), coachRecord: $('#coach-record'), coachTextInput: $('#coach-text-input'), coachSendText: $('#coach-send-text'), endCoach: $('#end-coach'),
+  coachView: $('#coach-view'), coachScenario: $('#coach-scenario'), coachLanguage: $('#coach-language'), coachTargetLanguage: $('#coach-target-language'), coachLevel: $('#coach-level'), coachGoal: $('#coach-goal'), coachMode: $('#coach-mode'), startCoach: $('#start-coach'), coachSetup: $('#coach-setup'), coachSession: $('#coach-session'),
+  coachStatus: $('#coach-status'), coachThread: $('#coach-thread'), coachRecord: $('#coach-record'), coachVoiceSignal: $('#coach-voice-signal'), coachTextInput: $('#coach-text-input'), coachSendText: $('#coach-send-text'), endCoach: $('#end-coach'),
   coachPersonaRole: $('#coach-persona-role'), coachSessionTitle: $('#coach-session-title'), coachSessionObjective: $('#coach-session-objective'), coachTurnCount: $('#coach-turn-count'), coachProgressValue: $('#coach-progress-value'), coachProgressBar: $('#coach-progress-bar'), coachSuccessCriteria: $('#coach-success-criteria'), coachCurrentFocus: $('#coach-current-focus'), coachSummary: $('#coach-summary'), coachResponseBox: $('#coach-response-box'), newCoachSession: $('#new-coach-session'),
   cameraView: $('#camera-view'), cameraInput: $('#camera-input'), cameraSourceLanguage: $('#camera-source-language'), cameraTargetLanguage: $('#camera-target-language'), cameraSituation: $('#camera-situation'),
   cameraDropzone: $('#camera-dropzone'), cameraPreviewWrap: $('#camera-preview-wrap'), cameraPreview: $('#camera-preview'), removeCameraImage: $('#remove-camera-image'), analyzeImage: $('#analyze-image'),
@@ -98,6 +98,38 @@ let qrConversation = null;
 
 const languageName = (language) => (LANGUAGES[language] || language || 'Idioma').toUpperCase();
 const languageFlag = (language) => ({ es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', ar: 'AR', zh: '中', vi: 'VI', ko: '한', tl: 'TL', ht: 'HT', ru: 'RU', de: 'DE', hi: 'हि', ja: '日', it: 'IT' }[language] || String(language || '↗').toUpperCase().slice(0, 3));
+
+
+const currentCoachTargetLanguage = () => ui.coachTargetLanguage?.value || 'en';
+
+function setVoiceSignal(element, mode = 'ready', label = '', detail = {}) {
+  if (!element) return;
+  element.dataset.state = mode;
+  const copy = element.querySelector('small');
+  const labels = {
+    ready: 'LISTO', waiting: 'HABLA', listening: 'ENTRADA DE AUDIO', thinking: 'PAUSA', processing: 'ANALIZANDO'
+  };
+  if (copy) copy.textContent = label || labels[mode] || labels.ready;
+
+  const bars = [...element.querySelectorAll('.voice-bars i')];
+  const rawVolume = Number(detail?.volume);
+  const hasLiveLevel = mode === 'listening' && Number.isFinite(rawVolume);
+  element.dataset.reactive = hasLiveLevel ? 'true' : 'false';
+  if (!hasLiveLevel) {
+    bars.forEach((bar) => { bar.style.height = ''; bar.style.opacity = ''; });
+    return;
+  }
+
+  const level = Math.max(0.08, Math.min(1, rawVolume * 12));
+  const center = (bars.length - 1) / 2;
+  bars.forEach((bar, index) => {
+    const distance = Math.abs(index - center) / Math.max(1, center);
+    const shape = 1 - (distance * .55);
+    const height = 4 + (level * (5 + shape * 12));
+    bar.style.height = `${Math.round(height)}px`;
+    bar.style.opacity = String(Math.min(1, .48 + level * .52));
+  });
+}
 
 function migrateLocalStorage() {
   if (!localStorage.getItem(HISTORY_KEY)) {
@@ -373,7 +405,11 @@ function populatePartnerLanguageSelect() {
 }
 
 function populatePracticeLanguageSelects() {
-  const selects = [ui.practiceLanguage, ui.practiceTargetLanguage, ui.practiceConversationNative, ui.practiceConversationTarget].filter(Boolean);
+  const selects = [
+    ui.practiceLanguage, ui.practiceTargetLanguage,
+    ui.practiceConversationNative, ui.practiceConversationTarget,
+    ui.coachLanguage, ui.coachTargetLanguage
+  ].filter(Boolean);
   if (!selects.length) return;
   const populate = (select) => {
     const previous = select.value;
@@ -394,10 +430,14 @@ function populatePracticeLanguageSelects() {
   const nativeDefault = LANGUAGES[state.settings.detectedUserLanguage]
     ? state.settings.detectedUserLanguage
     : (browserLanguageHint() || 'es');
+  const targetDefault = nativeDefault === 'en' ? 'es' : 'en';
   if (ui.practiceLanguage) ui.practiceLanguage.value = nativeDefault;
-  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = nativeDefault === 'en' ? 'es' : 'en';
+  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = targetDefault;
   if (ui.practiceConversationNative) ui.practiceConversationNative.value = nativeDefault;
-  if (ui.practiceConversationTarget) ui.practiceConversationTarget.value = nativeDefault === 'en' ? 'es' : 'en';
+  if (ui.practiceConversationTarget) ui.practiceConversationTarget.value = targetDefault;
+  if (ui.coachLanguage) ui.coachLanguage.value = nativeDefault;
+  if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = targetDefault;
+  updateCoachLanguageUI();
 }
 
 function keepPracticeLanguagesDistinct(changed = 'native') {
@@ -414,6 +454,22 @@ function keepPracticeConversationLanguagesDistinct(changed = 'native') {
   const fallback = ui.practiceConversationNative.value === 'en' ? 'es' : 'en';
   if (changed === 'target') ui.practiceConversationNative.value = fallback;
   else ui.practiceConversationTarget.value = fallback;
+}
+
+
+function keepCoachLanguagesDistinct(changed = 'native') {
+  if (!ui.coachLanguage || !ui.coachTargetLanguage) return;
+  if (ui.coachLanguage.value === ui.coachTargetLanguage.value) {
+    const fallback = ui.coachLanguage.value === 'en' ? 'es' : 'en';
+    if (changed === 'target') ui.coachLanguage.value = fallback;
+    else ui.coachTargetLanguage.value = fallback;
+  }
+  updateCoachLanguageUI();
+}
+
+function updateCoachLanguageUI() {
+  const target = currentCoachTargetLanguage();
+  if (ui.coachTextInput) ui.coachTextInput.placeholder = `O escribe tu respuesta en ${LANGUAGES[target] || 'el idioma que practicas'}…`;
 }
 
 function updatePartnerSelectionUI() {
@@ -773,6 +829,7 @@ async function scorePracticeAudio(audio) {
   if (!state.practice) return;
   try {
     if (ui.recordPractice) { ui.recordPractice.disabled = true; ui.recordPractice.textContent = 'Revisando…'; }
+    setVoiceSignal(ui.practiceVoiceSignal, 'processing');
     const form = new FormData();
     form.append('audio', audio, 'practice.webm');
     form.append('targetText', state.practice.targetText || state.practice.english);
@@ -794,6 +851,7 @@ async function scorePracticeAudio(audio) {
     notify(error.message || 'No pudimos revisar tu práctica.');
   } finally {
     if (ui.recordPractice) { ui.recordPractice.disabled = false; ui.recordPractice.textContent = '● Practicar mi voz'; }
+    setVoiceSignal(ui.practiceVoiceSignal, 'ready');
   }
 }
 
@@ -804,14 +862,15 @@ async function togglePracticeRecording() {
   try {
     state.practiceVoiceBusy = true;
     ui.recordPractice?.classList.add('recording');
+    setVoiceSignal(ui.practiceVoiceSignal, 'waiting');
     if (ui.recordPractice) ui.recordPractice.textContent = '● Escuchando… habla y haz una pausa';
     const capture = await createAutoVoiceTurn({
-      onState: (mode) => {
+      onState: (mode, detail = {}) => {
         if (!ui.recordPractice) return;
-        if (mode === 'waiting') ui.recordPractice.textContent = '● Habla cuando estés listo';
-        if (mode === 'listening') ui.recordPractice.textContent = '● Te escucho…';
-        if (mode === 'thinking') ui.recordPractice.textContent = '◌ Esperando por si continúas…';
-        if (mode === 'processing') ui.recordPractice.textContent = '✓ Revisando automáticamente…';
+        if (mode === 'waiting') { ui.recordPractice.textContent = '● Habla cuando estés listo'; setVoiceSignal(ui.practiceVoiceSignal, 'waiting'); }
+        if (mode === 'listening') { ui.recordPractice.textContent = '● Te escucho…'; setVoiceSignal(ui.practiceVoiceSignal, 'listening', '', detail); }
+        if (mode === 'thinking') { ui.recordPractice.textContent = '◌ Esperando por si continúas…'; setVoiceSignal(ui.practiceVoiceSignal, 'thinking'); }
+        if (mode === 'processing') { ui.recordPractice.textContent = '✓ Revisando automáticamente…'; setVoiceSignal(ui.practiceVoiceSignal, 'processing'); }
       }
     });
     state.practiceVoiceCapture = capture;
@@ -982,13 +1041,14 @@ async function togglePracticeConversationRecording() {
   if (!state.practiceConversationActive || state.practiceConversationBusy || state.practiceConversationVoiceCapture) return;
   try {
     ui.practiceConversationRecord?.classList.add('recording');
+    setVoiceSignal(ui.practiceConversationVoiceSignal, 'waiting');
     if (ui.practiceConversationRecord) ui.practiceConversationRecord.textContent = '● Te escucho…';
-    const capture = await createAutoVoiceTurn({ onState: (mode) => {
+    const capture = await createAutoVoiceTurn({ onState: (mode, detail = {}) => {
       if (!ui.practiceConversationRecord) return;
-      if (mode === 'waiting') ui.practiceConversationRecord.textContent = '● Habla cuando estés listo';
-      if (mode === 'listening') ui.practiceConversationRecord.textContent = '● Te escucho…';
-      if (mode === 'thinking') ui.practiceConversationRecord.textContent = '◌ Esperando por si continúas…';
-      if (mode === 'processing') ui.practiceConversationRecord.textContent = '✓ Revisando…';
+      if (mode === 'waiting') { ui.practiceConversationRecord.textContent = '● Habla cuando estés listo'; setVoiceSignal(ui.practiceConversationVoiceSignal, 'waiting'); }
+      if (mode === 'listening') { ui.practiceConversationRecord.textContent = '● Te escucho…'; setVoiceSignal(ui.practiceConversationVoiceSignal, 'listening', '', detail); }
+      if (mode === 'thinking') { ui.practiceConversationRecord.textContent = '◌ Esperando por si continúas…'; setVoiceSignal(ui.practiceConversationVoiceSignal, 'thinking'); }
+      if (mode === 'processing') { ui.practiceConversationRecord.textContent = '✓ Revisando…'; setVoiceSignal(ui.practiceConversationVoiceSignal, 'processing'); }
     }});
     state.practiceConversationVoiceCapture = capture;
     const audio = await capture.promise;
@@ -1000,6 +1060,7 @@ async function togglePracticeConversationRecording() {
     state.practiceConversationVoiceCapture = null;
     ui.practiceConversationRecord?.classList.remove('recording');
     if (ui.practiceConversationRecord && !ui.practiceConversationRecord.disabled) ui.practiceConversationRecord.textContent = '● Responder con mi voz';
+    setVoiceSignal(ui.practiceConversationVoiceSignal, 'ready');
   }
 }
 
@@ -1127,7 +1188,7 @@ function appendCoachCorrection(result = {}) {
   const card = document.createElement('article');
   card.className = `coach-turn-feedback ${needsCorrection ? 'needs-work' : 'good'}`;
   const score = Math.max(0, Math.min(100, Math.round(Number(result.score || 0))));
-  const corrected = String(result.correctedEnglish || '').trim();
+  const corrected = String(result.correctedTarget || result.correctedEnglish || '').trim();
   const explanation = String(result.explanation || '').trim();
   const feedback = String(result.feedback || '').trim();
   const nextFocus = String(result.nextFocus || '').trim();
@@ -1158,7 +1219,7 @@ function updateCoachSessionUI({ progress = state.coachProgress, focus = '' } = {
 function renderCoachSessionHeader(session = {}) {
   if (ui.coachPersonaRole) ui.coachPersonaRole.textContent = String(session.personaRole || 'CONVERSATION PARTNER').toUpperCase();
   if (ui.coachSessionTitle) ui.coachSessionTitle.textContent = session.title || 'Conversación real';
-  if (ui.coachSessionObjective) ui.coachSessionObjective.textContent = session.objective || 'Mantén una conversación natural en inglés.';
+  if (ui.coachSessionObjective) ui.coachSessionObjective.textContent = session.objective || `Mantén una conversación natural en ${LANGUAGES[currentCoachTargetLanguage()] || 'el idioma elegido'}.`;
   if (ui.coachSuccessCriteria) {
     const criteria = Array.isArray(session.successCriteria) ? session.successCriteria.slice(0, 3) : [];
     ui.coachSuccessCriteria.innerHTML = criteria.map((item, index) => `<span><b>${index + 1}</b>${escapeHTML(item)}</span>`).join('');
@@ -1212,8 +1273,9 @@ function renderCoachHelp(article, help) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'coach-reply-option';
-    button.dataset.coachSuggestion = String(reply.english || '');
-    button.innerHTML = `<strong>${escapeHTML(reply.english || '')}</strong><small>${escapeHTML(reply.meaning || '')}</small>`;
+    const replyText = String(reply.text || reply.english || '');
+    button.dataset.coachSuggestion = replyText;
+    button.innerHTML = `<strong>${escapeHTML(replyText)}</strong><small>${escapeHTML(reply.meaning || '')}</small>`;
     list?.appendChild(button);
   });
   panel.classList.remove('is-hidden');
@@ -1235,9 +1297,10 @@ async function loadCoachHelp(article, focus = 'meaning') {
     const help = await request('/api/coach/help', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        englishText: article.dataset.coachText || '',
+        targetText: article.dataset.coachText || '',
         quickMeaning: article.dataset.quickMeaning || '',
         nativeLanguage: ui.coachLanguage?.value || 'es',
+        targetLanguage: currentCoachTargetLanguage(),
         scenario: ui.coachScenario?.value || 'everyday',
         level: ui.coachLevel?.value || 'beginner'
       })
@@ -1286,12 +1349,14 @@ async function practiceCoachPhrase(article, button) {
         form.append('targetText', targetText);
         form.append('originalIntent', targetText);
         form.append('nativeLanguage', ui.coachLanguage?.value || 'es');
+        form.append('targetLanguage', currentCoachTargetLanguage());
         const result = await request('/api/practice/score', { method: 'POST', body: form });
-        if (resultBox) resultBox.innerHTML = `
-          <div><span>QUÉ TAN BIEN SE ENTENDIÓ</span><strong>${Number(result.score || 0)}%</strong></div>
-          <p><b>La app entendió:</b> ${escapeHTML(friendlyRecognition(result))}</p>
-          <p><b>Qué cambiar:</b> ${escapeHTML(friendlyDifference(result))}</p>
-          <small><b>Enfócate en:</b> ${escapeHTML(friendlyFocus(result))}</small>`;
+        if (resultBox) {
+          const score = Math.max(0, Math.min(100, Number(result.score || 0)));
+          resultBox.innerHTML = `
+            <div class="mini-pronunciation-meter" style="--score:${score}"><b>${score}%</b><small>CLARIDAD</small></div>
+            <div class="coach-repeat-copy"><span>RESULTADO</span><strong>${escapeHTML(friendlyDifference(result))}</strong><p>${escapeHTML(friendlyRecognition(result))}</p><small>${escapeHTML(friendlyFocus(result))}</small></div>`;
+        }
       } catch (error) {
         if (resultBox) resultBox.innerHTML = `<span>NO PUDIMOS EVALUAR</span><p>${escapeHTML(error.message || 'Intenta nuevamente.')}</p>`;
       }
@@ -1314,6 +1379,7 @@ async function startCoachSession() {
       body: JSON.stringify({
         scenario: ui.coachScenario?.value || 'everyday',
         nativeLanguage: ui.coachLanguage?.value || 'es',
+        targetLanguage: currentCoachTargetLanguage(),
         level: ui.coachLevel?.value || 'beginner',
         goal: ui.coachGoal?.value || 'confidence',
         supportMode: ui.coachMode?.value || 'guided'
@@ -1321,7 +1387,8 @@ async function startCoachSession() {
     });
     state.coachActive = true;
     state.coachHistory = [];
-    state.coachLastReply = result.replyEnglish;
+    const firstReply = result.replyTarget || result.replyEnglish || '';
+    state.coachLastReply = firstReply;
     state.coachSessionContext = result.session || {};
     state.coachTurnCount = 0;
     state.coachProgress = 0;
@@ -1334,10 +1401,10 @@ async function startCoachSession() {
     ui.coachSession?.classList.remove('is-hidden');
     guidedTop(ui.coachSession, { delay: 70 });
     renderCoachSessionHeader(result.session || {});
-    appendCoachBubble('coach', result.replyEnglish, result.replyMeaning);
+    appendCoachBubble('coach', firstReply, result.replyMeaning);
     if (result.coachTip && ((ui.coachMode?.value || 'guided') === 'guided' || (ui.coachLevel?.value || 'beginner') === 'beginner')) appendCoachBubble('coach-tip', result.coachTip);
     if (ui.coachStatus) ui.coachStatus.textContent = 'CONVERSACIÓN EN CURSO';
-    try { await speakText(result.replyEnglish, 'en', { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
+    try { await speakText(firstReply, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
     guidedScroll(ui.coachResponseBox, { block: 'center', delay: 80 });
   } catch (error) {
     notify(error.message || 'No pudimos iniciar el Coach.');
@@ -1379,6 +1446,7 @@ function resetCoachSession() {
   ui.coachResponseBox?.classList.remove('is-hidden');
   if (ui.coachThread) ui.coachThread.innerHTML = '';
   if (ui.coachRecord) { ui.coachRecord.classList.remove('recording'); ui.coachRecord.innerHTML = '<span>●</span> Responder con mi voz'; ui.coachRecord.disabled = false; }
+  setVoiceSignal(ui.coachVoiceSignal, 'ready');
   guidedTop(ui.coachSetup, { delay: 70 });
 }
 
@@ -1394,6 +1462,7 @@ async function finishCoachSession() {
       body: JSON.stringify({
         scenario: ui.coachScenario?.value || 'everyday',
         nativeLanguage: ui.coachLanguage?.value || 'es',
+        targetLanguage: currentCoachTargetLanguage(),
         level: ui.coachLevel?.value || 'beginner',
         goal: ui.coachGoal?.value || 'confidence',
         session: state.coachSessionContext || {},
@@ -1422,12 +1491,14 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     state.coachBusy = true;
     if (ui.coachStatus) ui.coachStatus.textContent = 'ESCUCHANDO TU RESPUESTA';
     if (ui.coachRecord) ui.coachRecord.disabled = true;
+    setVoiceSignal(ui.coachVoiceSignal, audio ? 'processing' : 'ready', audio ? 'ANALIZANDO RESPUESTA' : 'LISTO');
     if (ui.coachSendText) ui.coachSendText.disabled = true;
     const form = new FormData();
     if (audio) form.append('audio', audio, 'coach.webm');
     if (text.trim()) form.append('text', text.trim());
     form.append('scenario', ui.coachScenario?.value || 'everyday');
     form.append('nativeLanguage', ui.coachLanguage?.value || 'es');
+    form.append('targetLanguage', currentCoachTargetLanguage());
     form.append('level', ui.coachLevel?.value || 'beginner');
     form.append('goal', ui.coachGoal?.value || 'confidence');
     form.append('supportMode', ui.coachMode?.value || 'guided');
@@ -1439,18 +1510,19 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
 
     appendCoachBubble('learner', result.heardText);
     appendCoachCorrection(result);
-    appendCoachBubble('coach', result.replyEnglish, result.replyMeaning);
+    const replyTarget = result.replyTarget || result.replyEnglish || '';
+    appendCoachBubble('coach', replyTarget, result.replyMeaning);
     if ((ui.coachLevel?.value || 'beginner') === 'beginner' && result.beginnerHelp) appendCoachBubble('coach-tip', result.beginnerHelp);
-    state.coachHistory.push({ coach: state.coachLastReply, learner: result.heardText, coachReply: result.replyEnglish });
+    state.coachHistory.push({ coach: state.coachLastReply, learner: result.heardText, coachReply: replyTarget });
     state.coachHistory = state.coachHistory.slice(-24);
-    state.coachLastReply = result.replyEnglish;
+    state.coachLastReply = replyTarget;
     state.coachTurnCount += 1;
     state.coachScores.push(Math.max(0, Math.min(100, Number(result.score || 0))));
     state.coachScores = state.coachScores.slice(-20);
     updateCoachSessionUI({ progress: result.missionProgress, focus: result.nextFocus || result.progressNote || 'Continúa la conversación' });
     if (ui.coachTextInput) ui.coachTextInput.value = '';
     if (ui.coachStatus) ui.coachStatus.textContent = result.missionProgress >= 100 ? 'OBJETIVO COMPLETADO · PUEDES SEGUIR' : 'TU TURNO';
-    try { await speakText(result.replyEnglish, 'en', { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
+    try { await speakText(replyTarget, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
     guidedScroll(ui.coachResponseBox, { block: 'center', delay: 70 });
   } catch (error) {
     notify(error.message || 'No pudimos continuar la conversación.');
@@ -1458,6 +1530,7 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     state.coachBusy = false;
     if (ui.coachRecord) ui.coachRecord.disabled = false;
     if (ui.coachSendText) ui.coachSendText.disabled = false;
+    setVoiceSignal(ui.coachVoiceSignal, 'ready');
   }
 }
 
@@ -1466,21 +1539,25 @@ async function toggleCoachRecording() {
   try {
     state.coachVoiceBusy = true;
     ui.coachRecord?.classList.add('recording');
+    setVoiceSignal(ui.coachVoiceSignal, 'waiting');
     if (ui.coachStatus) ui.coachStatus.textContent = 'ESCUCHANDO';
     if (ui.coachRecord) ui.coachRecord.innerHTML = '<span>●</span> Habla y haz una pausa';
     const capture = await createAutoVoiceTurn({
-      onState: (mode) => {
-        if (mode === 'waiting') { if (ui.coachStatus) ui.coachStatus.textContent = 'HABLA CUANDO ESTÉS LISTO'; }
+      onState: (mode, detail = {}) => {
+        if (mode === 'waiting') { if (ui.coachStatus) ui.coachStatus.textContent = 'HABLA CUANDO ESTÉS LISTO'; setVoiceSignal(ui.coachVoiceSignal, 'waiting'); }
         if (mode === 'listening') {
           if (ui.coachStatus) ui.coachStatus.textContent = 'TE ESCUCHO';
+          setVoiceSignal(ui.coachVoiceSignal, 'listening', '', detail);
           if (ui.coachRecord) ui.coachRecord.innerHTML = '<span>●</span> Te escucho…';
         }
         if (mode === 'thinking') {
           if (ui.coachStatus) ui.coachStatus.textContent = 'PAUSA NATURAL';
+          setVoiceSignal(ui.coachVoiceSignal, 'thinking');
           if (ui.coachRecord) ui.coachRecord.innerHTML = '<span>◌</span> Esperando por si continúas…';
         }
         if (mode === 'processing') {
           if (ui.coachStatus) ui.coachStatus.textContent = 'PROCESANDO TU RESPUESTA';
+          setVoiceSignal(ui.coachVoiceSignal, 'processing');
           if (ui.coachRecord) ui.coachRecord.innerHTML = '<span>✓</span> Entendido';
         }
       }
@@ -1496,6 +1573,7 @@ async function toggleCoachRecording() {
     state.coachVoiceBusy = false;
     ui.coachRecord?.classList.remove('recording');
     if (ui.coachRecord && !state.coachBusy) ui.coachRecord.innerHTML = '<span>●</span> Responder con mi voz';
+    setVoiceSignal(ui.coachVoiceSignal, 'ready');
   }
 }
 
@@ -1911,6 +1989,8 @@ $$('[data-coach-scenario]').forEach((button) => listen(button, 'click', () => {
 listen(ui.coachScenario, 'change', () => {
   $$('[data-coach-scenario]').forEach((item) => item.classList.toggle('is-active', item.dataset.coachScenario === ui.coachScenario?.value));
 });
+listen(ui.coachLanguage, 'change', () => keepCoachLanguagesDistinct('native'));
+listen(ui.coachTargetLanguage, 'change', () => keepCoachLanguagesDistinct('target'));
 
 listen(ui.coachThread, 'click', async (event) => {
   const suggestion = event.target.closest('[data-coach-suggestion]');
@@ -1932,8 +2012,8 @@ listen(ui.coachThread, 'click', async (event) => {
   try {
     if (action === 'meaning') await loadCoachHelp(article, 'meaning');
     else if (action === 'reply') await loadCoachHelp(article, 'reply');
-    else if (action === 'listen') await speakText(text, 'en', { speed: 1 });
-    else if (action === 'slow') await speakText(text, 'en', { speed: 0.72 });
+    else if (action === 'listen') await speakText(text, currentCoachTargetLanguage(), { speed: 1 });
+    else if (action === 'slow') await speakText(text, currentCoachTargetLanguage(), { speed: 0.72 });
     else if (action === 'practice') await practiceCoachPhrase(article, button);
   } catch (error) {
     notify(error.message || 'No pudimos completar esa ayuda.');
@@ -1945,7 +2025,7 @@ listen(ui.coachSummary, 'click', async (event) => {
   if (!phrase) return;
   const text = phrase.dataset.summaryPhrase || '';
   if (!text) return;
-  try { await speakText(text, 'en', { speed: 0.82 }); } catch (error) { notify(error.message); }
+  try { await speakText(text, currentCoachTargetLanguage(), { speed: 0.82 }); } catch (error) { notify(error.message); }
 });
 
 listen(ui.startCoach, 'click', startCoachSession);
@@ -1954,7 +2034,7 @@ listen(ui.newCoachSession, 'click', resetCoachSession);
 listen(ui.coachRecord, 'click', toggleCoachRecording);
 listen(ui.coachSendText, 'click', () => {
   const text = ui.coachTextInput?.value.trim();
-  if (!text) { notify('Escribe una respuesta en inglés.'); return; }
+  if (!text) { notify(`Escribe una respuesta en ${LANGUAGES[currentCoachTargetLanguage()] || 'el idioma que practicas'}.`); return; }
   submitCoachTurn({ text });
 });
 listen(ui.coachTextInput, 'keydown', (event) => {

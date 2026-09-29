@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#d9593d" />
-    <meta name="description" content="Sin Barreras: intérprete de voz, práctica de inglés, coach de conversación y traducción con cámara." />
+    <meta name="description" content="Sin Barreras: intérprete de voz, práctica multilenguaje, coach de conversación y traducción con cámara." />
     <title>Sin Barreras · Comunícate y aprende</title>
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.6.9" />
+    <link rel="stylesheet" href="/styles.css?v=1.7.1" />
   </head>
   <body>
     <main class="app-shell">
@@ -35,7 +35,7 @@
         <div class="mode-head">
           <div>
             <p class="section-label">Conversación automática</p>
-            <strong id="mode-name">AUTO ↔ English · Vida diaria</strong>
+            <strong id="mode-name">AUTO ↔ Selecciona idioma · Vida diaria</strong>
           </div>
           <span class="mode-dot" id="mode-dot" aria-hidden="true"></span>
         </div>
@@ -459,6 +459,7 @@
             <div class="practice-actions">
               <button id="listen-practice" class="outline-button" type="button">◖ Escuchar ejemplo</button>
               <button id="record-practice" class="record-button" type="button">● Practicar mi voz</button>
+              <div id="practice-voice-signal" class="voice-input-signal" aria-hidden="true"><span class="voice-signal-dot"></span><div class="voice-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>LISTO</small></div>
               <button id="report-practice-content" class="outline-button report-ai-button" type="button">⚑ Reportar</button>
             </div>
 
@@ -470,9 +471,9 @@
                 <div class="digital-score-copy"><span>ANÁLISIS DE PRONUNCIACIÓN</span><strong id="score-feedback">Listo para revisar tu pronunciación.</strong><small id="score-points">0 puntos</small></div>
               </div>
               <div class="correction-block">
-                <span>LO QUE LA APP ENTENDIÓ · EN TU IDIOMA</span><p id="heard-text"></p>
-                <span>FRASE MODELO CORRECTA</span><p id="corrected-text"></p>
-                <span>PRÓXIMO PASO</span><p id="focus-text"></p>
+                <span>ENTENDÍ</span><p id="heard-text"></p>
+                <span>MODELO</span><p id="corrected-text"></p>
+                <span>MEJORA</span><p id="focus-text"></p>
               </div>
             </div>
           </article>
@@ -523,6 +524,7 @@
             <div class="practice-conversation-response">
               <span>Tu turno</span><small>Di una respuesta corta. Si necesitas ayuda, toca una sugerencia.</small>
               <button id="practice-conversation-record" class="record-button large" type="button">● Responder con mi voz</button>
+              <div id="practice-conversation-voice-signal" class="voice-input-signal compact" aria-hidden="true"><span class="voice-signal-dot"></span><div class="voice-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>LISTO</small></div>
               <div><input id="practice-conversation-text" type="text" maxlength="700" autocomplete="off" placeholder="O escribe tu respuesta…"><button id="practice-conversation-send" class="outline-button" type="button">Enviar</button></div>
             </div>
             <div id="practice-conversation-summary" class="practice-conversation-summary is-hidden"></div>
@@ -534,8 +536,8 @@
       <section id="coach-view" class="coach-view is-hidden" aria-labelledby="coach-title">
         <div class="section-heading coach-heading">
           <p class="section-label">SIN BARRERAS · CONVERSATION COACH</p>
-          <h2 id="coach-title">Habla inglés en una situación que se siente real.</h2>
-          <p>El Coach mantiene el contexto, recuerda lo que dijiste y reacciona como la otra persona. Usa ayudas cuando las necesites sin romper la conversación.</p>
+          <h2 id="coach-title">Practica conversaciones reales en cualquier idioma.</h2>
+          <p>Elige tu idioma, el idioma que quieres aprender y una situación. El Coach mantiene el contexto y te ayuda sin romper la conversación.</p>
           <div class="coach-feature-strip" aria-label="Funciones del Coach">
             <span><b>01</b> Contexto real</span><span><b>02</b> 12–18 turnos</span><span><b>03</b> Corrección sin cortar</span><span><b>04</b> Ayuda al instante</span>
           </div>
@@ -580,11 +582,15 @@
               </optgroup>
             </select>
           </label>
-          <label>Mi idioma
-            <select id="coach-language">
-              <option value="es" selected>Español</option><option value="pt">Português</option><option value="fr">Français</option><option value="ar">العربية</option><option value="zh">中文 (Mandarín)</option><option value="vi">Tiếng Việt</option><option value="ko">한국어</option><option value="tl">Tagalog</option><option value="ht">Kreyòl ayisyen</option><option value="ru">Русский</option>
-            </select>
-          </label>
+          <div class="coach-language-pair">
+            <label>Mi idioma
+              <select id="coach-language" aria-label="Mi idioma en Coach"></select>
+            </label>
+            <span class="coach-language-arrow" aria-hidden="true">→</span>
+            <label>Idioma que quiero practicar
+              <select id="coach-target-language" aria-label="Idioma que quiero practicar en Coach"></select>
+            </label>
+          </div>
           <label>Nivel
             <select id="coach-level">
               <option value="beginner" selected>Principiante · empezando desde cero</option>
@@ -635,8 +641,9 @@
           <div id="coach-response-box" class="coach-response-box">
             <div class="coach-composer-head"><span>Tu turno</span><small>Responde como lo harías en la vida real. No tiene que ser perfecto.</small></div>
             <button id="coach-record" class="record-button large coach-record-primary" type="button"><span>●</span> Responder con mi voz</button>
+            <div id="coach-voice-signal" class="voice-input-signal" aria-hidden="true"><span class="voice-signal-dot"></span><div class="voice-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>LISTO</small></div>
             <div class="coach-text-fallback">
-              <input id="coach-text-input" type="text" maxlength="700" placeholder="O escribe tu respuesta en inglés…" autocomplete="off" />
+              <input id="coach-text-input" type="text" maxlength="700" placeholder="O escribe tu respuesta en el idioma que practicas…" autocomplete="off" />
               <button id="coach-send-text" class="outline-button" type="button">Enviar</button>
             </div>
           </div>
@@ -825,6 +832,7 @@
             <button id="phrase-practice-listen" type="button">▶ Escuchar</button>
             <button id="phrase-practice-slow" type="button">◷ Más lento</button>
             <button id="phrase-practice-record" class="phrase-practice-record" type="button">● Practicar mi voz</button>
+            <div id="phrase-practice-voice-signal" class="voice-input-signal compact" aria-hidden="true"><span class="voice-signal-dot"></span><div class="voice-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>LISTO</small></div>
           </div>
           <div id="phrase-practice-score" class="phrase-practice-score" hidden>
             <div class="phrase-practice-score-summary">
@@ -832,8 +840,8 @@
               <div class="phrase-practice-score-copy"><span>RESULTADO</span><strong id="phrase-practice-score-feedback">Escucha y repite con calma.</strong></div>
             </div>
             <dl>
-              <div><dt>LO QUE LA APP ENTENDIÓ · EN TU IDIOMA</dt><dd id="phrase-practice-heard"></dd></div>
-              <div><dt>PRÓXIMO PASO</dt><dd id="phrase-practice-focus"></dd></div>
+              <div><dt>ENTENDÍ</dt><dd id="phrase-practice-heard"></dd></div>
+              <div><dt>MEJORA</dt><dd id="phrase-practice-focus"></dd></div>
             </dl>
           </div>
           <div class="phrase-practice-navigation">
@@ -1060,7 +1068,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.6.9"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.6.9"></script>
+    <script src="/play-billing.js?v=1.7.1"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.7.1"></script>
   </body>
 </html>

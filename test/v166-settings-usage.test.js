@@ -7,7 +7,7 @@ const appHtml = read('private/app.html');
 const accountUi = read('public/account-ui.js');
 const styles = read('public/styles.css');
 
-test('v1.6.9 settings shows real voice-minute usage with remaining time and reset date', () => {
+test('v1.7.1 settings shows real voice-minute usage with remaining time and reset date', () => {
   for (const id of [
     'settings-ai-usage',
     'settings-ai-usage-title',
@@ -25,7 +25,7 @@ test('v1.6.9 settings shows real voice-minute usage with remaining time and rese
   assert.match(accountUi, /aria-valuenow/);
 });
 
-test('v1.6.9 settings keeps all existing working preference controls', () => {
+test('v1.7.1 settings keeps all existing working preference controls', () => {
   for (const id of ['translator-voice-select','preview-voice','font-size-select','settings-open-phrasebook','open-history']) {
     assert.match(appHtml, new RegExp(`id="${id}"`));
   }
@@ -33,8 +33,8 @@ test('v1.6.9 settings keeps all existing working preference controls', () => {
   assert.match(appHtml, /class="theme-option" data-theme="dark"/);
 });
 
-test('v1.6.9 settings is responsive and avoids horizontal overflow', () => {
-  assert.match(styles, /v1\.6\.9 · Modern user settings/);
+test('v1.7.1 settings is responsive and avoids horizontal overflow', () => {
+  assert.match(styles, /v1\.7\.1 · Modern user settings/);
   assert.match(styles, /overflow-x:hidden/);
   assert.match(styles, /@media\(max-width:640px\)/);
   assert.match(styles, /settings-shortcuts\{[^}]*grid-template-columns:1fr 1fr/);

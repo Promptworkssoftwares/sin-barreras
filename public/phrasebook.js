@@ -1,5 +1,5 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.6.9';
-import { getOrCreateTts } from './tts-cache.js?v=1.6.9';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.1';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.1';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';

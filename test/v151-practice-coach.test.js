@@ -31,13 +31,13 @@ test('Practice similarity normalization supports non-Latin scripts', () => {
   assert.match(server, /\\p\{N\}/);
 });
 
-test('Beginner Coach is an absolute beginner experience instead of shortened intermediate English', () => {
+test('Beginner Coach is an absolute beginner multilingual experience instead of shortened intermediate dialogue', () => {
   assert.match(appHtml, /Principiante · empezando desde cero/);
   assert.match(appHtml, /frases muy cortas, traducción visible y ayuda para responder/);
   assert.match(server, /ABSOLUTE BEGINNER MODE \(pre-A1\/A1\)/);
-  assert.match(server, /replyEnglish must be ONE very short line of 2-6 words/);
+  assert.match(server, /replyTarget must be ONE very short line of 2-6 words/);
   assert.match(server, /ABSOLUTE BEGINNER MODE OVERRIDES ALL OTHER COMPLEXITY SETTINGS/);
-  assert.match(server, /replyEnglish must be 2-7 words/);
+  assert.match(server, /replyTarget must be 2-7 words/);
   assert.match(server, /Accept one-word or very short learner answers as valid/);
   assert.match(server, /beginnerHelp/);
   assert.match(appJs, /coach-beginner-meaning/);

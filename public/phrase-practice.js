@@ -1,4 +1,4 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.6.9';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.1';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -36,11 +36,35 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     player: $('#phrase-practice-player'), close: $('#phrase-practice-close'), progressBar: $('#phrase-practice-progress-bar'), progressCopy: $('#phrase-practice-progress-copy'), language: $('#phrase-practice-language'),
     loading: $('#phrase-practice-loading'), content: $('#phrase-practice-content'), error: $('#phrase-practice-error'), retry: $('#phrase-practice-retry'),
     sourceFull: $('#phrase-practice-source-full'), targetFull: $('#phrase-practice-target-full'), stepBadge: $('#phrase-practice-step-badge'), meaning: $('#phrase-practice-meaning'), target: $('#phrase-practice-target'), pronunciation: $('#phrase-practice-pronunciation'), tip: $('#phrase-practice-tip'),
-    listen: $('#phrase-practice-listen'), slow: $('#phrase-practice-slow'), record: $('#phrase-practice-record'), score: $('#phrase-practice-score'), scoreMeter: $('#phrase-practice-score-meter'), scoreNumber: $('#phrase-practice-score-number'), scoreFeedback: $('#phrase-practice-score-feedback'), heard: $('#phrase-practice-heard'), focus: $('#phrase-practice-focus'),
+    listen: $('#phrase-practice-listen'), slow: $('#phrase-practice-slow'), record: $('#phrase-practice-record'), voiceSignal: $('#phrase-practice-voice-signal'), score: $('#phrase-practice-score'), scoreMeter: $('#phrase-practice-score-meter'), scoreNumber: $('#phrase-practice-score-number'), scoreFeedback: $('#phrase-practice-score-feedback'), heard: $('#phrase-practice-heard'), focus: $('#phrase-practice-focus'),
     previous: $('#phrase-practice-previous'), next: $('#phrase-practice-next'), complete: $('#phrase-practice-complete'), completeAverage: $('#phrase-practice-complete-average'), completeParts: $('#phrase-practice-complete-parts'), done: $('#phrase-practice-done')
   };
 
   let state = { item: null, lesson: null, steps: [], index: 0, scores: new Map(), voiceCapture: null, voiceBusy: false, completed: false };
+
+  function setVoiceSignal(mode = 'ready', detail = {}) {
+    if (!ui.voiceSignal) return;
+    ui.voiceSignal.dataset.state = mode;
+    const copy = ui.voiceSignal.querySelector('small');
+    const labels = { ready: 'LISTO', waiting: 'HABLA', listening: 'ENTRADA DE AUDIO', thinking: 'PAUSA', processing: 'ANALIZANDO' };
+    if (copy) copy.textContent = labels[mode] || labels.ready;
+    const bars = [...ui.voiceSignal.querySelectorAll('.voice-bars i')];
+    const rawVolume = Number(detail?.volume);
+    const hasLiveLevel = mode === 'listening' && Number.isFinite(rawVolume);
+    ui.voiceSignal.dataset.reactive = hasLiveLevel ? 'true' : 'false';
+    if (!hasLiveLevel) {
+      bars.forEach((bar) => { bar.style.height = ''; bar.style.opacity = ''; });
+      return;
+    }
+    const level = Math.max(0.08, Math.min(1, rawVolume * 12));
+    const center = (bars.length - 1) / 2;
+    bars.forEach((bar, index) => {
+      const distance = Math.abs(index - center) / Math.max(1, center);
+      const shape = 1 - (distance * .55);
+      bar.style.height = `${Math.round(4 + (level * (5 + shape * 12)))}px`;
+      bar.style.opacity = String(Math.min(1, .48 + level * .52));
+    });
+  }
 
   function showPlayer() {
     ui.player?.classList.remove('is-hidden');
@@ -115,6 +139,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
       ui.record.classList.remove('recording');
       ui.record.textContent = '● Practicar mi voz';
     }
+    setVoiceSignal('ready');
     ui.content?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }
 
@@ -178,13 +203,14 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     try {
       state.voiceBusy = true;
       if (ui.record) { ui.record.classList.add('recording'); ui.record.textContent = '● Escuchando…'; }
+      setVoiceSignal('waiting');
       const capture = await createAutoVoiceTurn({
-        onState: (mode) => {
+        onState: (mode, detail = {}) => {
           if (!ui.record) return;
-          if (mode === 'waiting') ui.record.textContent = '● Habla cuando estés listo';
-          if (mode === 'listening') ui.record.textContent = '● Te escucho…';
-          if (mode === 'thinking') ui.record.textContent = '◌ Puedes continuar…';
-          if (mode === 'processing') ui.record.textContent = '✓ Revisando…';
+          if (mode === 'waiting') { ui.record.textContent = '● Habla cuando estés listo'; setVoiceSignal('waiting'); }
+          if (mode === 'listening') { ui.record.textContent = '● Te escucho…'; setVoiceSignal('listening', detail); }
+          if (mode === 'thinking') { ui.record.textContent = '◌ Puedes continuar…'; setVoiceSignal('thinking'); }
+          if (mode === 'processing') { ui.record.textContent = '✓ Revisando…'; setVoiceSignal('processing'); }
         }
       });
       state.voiceCapture = capture;
@@ -208,6 +234,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
       state.voiceCapture = null;
       state.voiceBusy = false;
       if (ui.record) { ui.record.disabled = false; ui.record.classList.remove('recording'); ui.record.textContent = '● Practicar mi voz'; }
+      setVoiceSignal('ready');
     }
   }
 
