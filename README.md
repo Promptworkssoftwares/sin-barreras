@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.13
+# Sin Barreras v1.7.14
+
+### Nuevo en 1.7.14
+
+- Se ven las barras de VOZ AI en Frases guardadas y palabras guardadas.
+- Escuchar indica cuándo prepara la voz y evita la interrupción del reproductor al tocar la pantalla.
 
 ### Nuevo en 1.7.13
 

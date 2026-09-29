@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.13
+# Sin Barreras v1.7.14
+
+## 1.7.14 · Voz AI visible en frases guardadas
+- Definido el color que faltaba para las barras de VOZ AI en los temas claro y oscuro.
+- La preparación de audio se comparte entre el gesto y el clic, y no interrumpe una voz que ya está sonando.
+- Escuchar muestra PREPARANDO VOZ mientras carga el audio y comunica si la voz no está disponible.
+- Android actualizado a versionCode 1714 / versionName 1.7.14.
 
 ## 1.7.13 · Onda real en Frases guardadas y Practicar
 - Restaurada la pantalla Hablar sin la segunda onda añadida por error en la entrega anterior.

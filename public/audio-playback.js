@@ -11,6 +11,7 @@ let currentMeterAnalyser = null;
 let currentMeterFrame = 0;
 let silentObjectUrl = null;
 let unlockStarted = false;
+let unlockPromise = null;
 let unlocked = false;
 let destroyed = false;
 
@@ -178,30 +179,35 @@ async function primeMediaElement() {
   }
 }
 
-export async function unlockAudioPlayback() {
-  if (destroyed) return false;
+export function unlockAudioPlayback() {
+  if (destroyed) return Promise.resolve(false);
+  if (unlockPromise) return unlockPromise;
+  if (unlocked && (!context || context.state === 'running')) return Promise.resolve(true);
   unlockStarted = true;
-  const audioContext = getContext();
-  if (!audioContext) {
-    await primeMediaElement();
-    unlocked = true;
-    return true;
-  }
-
-  try {
-    const resumePromise = audioContext.state === 'running' ? Promise.resolve() : audioContext.resume();
-    createSilentPulse(audioContext);
-    void primeMediaElement();
-    await resumePromise;
-    unlocked = audioContext.state === 'running';
-    return unlocked;
-  } catch {
-    unlocked = false;
-    return false;
-  }
+  unlockPromise = (async () => {
+    const audioContext = getContext();
+    if (!audioContext) {
+      await primeMediaElement();
+      unlocked = true;
+      return true;
+    }
+    try {
+      const resumePromise = audioContext.state === 'running' ? Promise.resolve() : audioContext.resume();
+      createSilentPulse(audioContext);
+      // Finish priming before a phrase can reuse this same media element.
+      await Promise.all([resumePromise, finishCurrentPlayback ? Promise.resolve() : primeMediaElement()]);
+      unlocked = audioContext.state === 'running';
+      return unlocked;
+    } catch {
+      unlocked = false;
+      return false;
+    }
+  })().finally(() => { unlockPromise = null; });
+  return unlockPromise;
 }
 
 async function ensureAudioRunning() {
+  if (unlockPromise) await unlockPromise;
   if (!unlockStarted) await unlockAudioPlayback();
   const audioContext = getContext();
   if (!audioContext) return null;
@@ -327,6 +333,7 @@ export async function playBase64Audio(base64) {
 }
 
 function gestureUnlockHandler() {
+  if (unlocked && (!context || context.state === 'running')) return;
   void unlockAudioPlayback();
 }
 
@@ -354,4 +361,6 @@ export function destroyAudioPlayback() {
   if (context && context.state !== 'closed') context.close().catch(() => {});
   context = null;
   masterGain = null;
+  unlockPromise = null;
+  unlocked = false;
 }

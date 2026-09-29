@@ -1,6 +1,6 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.13';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.13';
-import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.13';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.14';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.14';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.14';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -150,26 +150,35 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
   }
 
   async function playPhrase(item, visualTarget = null) {
-    await unlockAudioPlayback();
-    let audio = await cachedAudio(item.id);
-    if (!audio?.audioBase64) {
-      if (!navigator.onLine) throw new Error('Esta frase todavía no tiene audio guardado en este dispositivo. Conéctate una vez y toca Escuchar.');
-      const result = await getOrCreateTts({
-        text: item.translatedText,
-        language: item.targetLanguage,
-        voice: 'coral',
-        speed: 1,
-        create: () => request('/api/speak', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: item.translatedText, language: item.targetLanguage, voice: 'coral', speed: 1 })
-        })
-      });
-      audio = { audioBase64: result.audioBase64, language: item.targetLanguage };
-      await cacheAudio(item.id, audio.audioBase64, audio.language);
+    if (visualTarget) setLearningAudioWave(visualTarget, { role:'ai', state:'waiting', label:'PREPARANDO VOZ' });
+    try {
+      await unlockAudioPlayback();
+      let audio = await cachedAudio(item.id);
+      if (!audio?.audioBase64) {
+        if (!navigator.onLine) throw new Error('Esta frase todavía no tiene audio guardado en este dispositivo. Conéctate una vez y toca Escuchar.');
+        const result = await getOrCreateTts({
+          text: item.translatedText,
+          language: item.targetLanguage,
+          voice: 'coral',
+          speed: 1,
+          create: () => request('/api/speak', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: item.translatedText, language: item.targetLanguage, voice: 'coral', speed: 1 })
+          })
+        });
+        audio = { audioBase64: result.audioBase64, language: item.targetLanguage };
+        await cacheAudio(item.id, audio.audioBase64, audio.language);
+      }
+      if (typeof audio.audioBase64 !== 'string' || audio.audioBase64.length < 100) {
+        throw new Error('La voz de esta frase no está disponible. Intenta escucharla con conexión.');
+      }
+      const play = () => playBase64Audio(audio.audioBase64);
+      if (visualTarget) await withLearningAudioWave(visualTarget, { role:'ai', state:'playing', label:'REPRODUCIENDO' }, play);
+      else await play();
+    } catch (error) {
+      if (visualTarget) hideLearningAudioWave(0);
+      throw error;
     }
-    const play = () => playBase64Audio(audio.audioBase64);
-    if (visualTarget) await withLearningAudioWave(visualTarget, { role:'ai', state:'playing', label:'REPRODUCIENDO' }, play);
-    else await play();
   }
 
   async function handleAction(event) {

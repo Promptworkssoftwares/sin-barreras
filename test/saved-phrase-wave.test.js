@@ -1,5 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+test('saved phrase AI bars have a defined color in light and dark modes', () => {
+  const css = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8');
+  assert.match(css, /:root\s*\{[^}]*--aqua-strong:\s*#[0-9a-f]+/i);
+  assert.match(css, /body\.dark\s*\{[^}]*--aqua-strong:\s*#[0-9a-f]+/i);
+  assert.match(css, /\.learning-wave-track\[data-wave-role="ai"\] \.learning-wave-bars i\s*\{\s*background:/);
+});
 
 test('Escuchar keeps the saved phrase AI label and moves its bars with measured audio', async () => {
   const previousWindow = globalThis.window;

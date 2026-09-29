@@ -5,6 +5,7 @@ test('AI playback publishes measured bar levels and stops them when the voice en
   const events = [];
   const frames = [];
   const sources = [];
+  let primePlayCount = 0;
   const previousWindow = globalThis.window;
   const previousDocument = globalThis.document;
   const previousCustomEvent = globalThis.CustomEvent;
@@ -46,20 +47,26 @@ test('AI playback publishes measured bar levels and stops them when the voice en
       body: { appendChild() {} },
       createElement() {
         return {
-          style: {}, setAttribute() {}, play: async () => {}, pause() {},
+          style: {}, setAttribute() {}, play: async () => { primePlayCount += 1; }, pause() {},
           removeAttribute() {}, load() {}, currentTime: 0, src: ''
         };
       }
     };
     globalThis.CustomEvent = class { constructor(type, options) { this.type = type; this.detail = options.detail; } };
 
-    const { playBase64Audio, destroyAudioPlayback } = await import('../public/audio-playback.js?meter-test');
+    const { playBase64Audio, unlockAudioPlayback, destroyAudioPlayback } = await import('../public/audio-playback.js?meter-test');
+    const firstUnlock = unlockAudioPlayback();
+    assert.equal(firstUnlock, unlockAudioPlayback(), 'simultaneous gesture and click must share one unlock');
+    await firstUnlock;
+    assert.equal(primePlayCount, 1);
     const done = playBase64Audio('AAAA');
     await new Promise((resolve) => setImmediate(resolve));
     assert.ok(frames.length > 0, 'the analyser must schedule a measured frame');
     frames.shift()();
     const active = events.find((event) => event.playing && event.levels?.length === 15);
     assert.ok(active, 'playback must publish fifteen measured bars');
+    await unlockAudioPlayback();
+    assert.equal(primePlayCount, 1, 'a new touch must not prime over active speech');
     assert.ok(active.levels[0] > 0, 'an audible segment must rise');
     assert.equal(active.levels[10], 0, 'a silent segment must stay at rest');
     sources.at(-1).onended();
