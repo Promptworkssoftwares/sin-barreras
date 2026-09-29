@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.8
+# Sin Barreras v1.7.9
+
+### Nuevo en 1.7.9
+
+- Frases y palabras guardadas con tarjetas compactas, texto resaltado y acciones horizontales.
+- Se conserva la onda dual permanente y reactiva de la versión 1.7.8.
 
 ### Nuevo en 1.7.8
 

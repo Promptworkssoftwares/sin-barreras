@@ -1,4 +1,4 @@
-# Google Play Data Safety — Sin Barreras v1.7.8
+# Google Play Data Safety — Sin Barreras v1.7.9
 
 Use this file as the implementation checklist when completing Play Console. Verify every declaration against the production build and current providers before submission.
 

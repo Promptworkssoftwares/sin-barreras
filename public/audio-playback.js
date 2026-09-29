@@ -4,6 +4,7 @@ let context = null;
 let masterGain = null;
 let currentSource = null;
 let currentMedia = null;
+let finishCurrentPlayback = null;
 let silentObjectUrl = null;
 let unlockStarted = false;
 let unlocked = false;
@@ -139,6 +140,9 @@ async function ensureAudioRunning() {
 }
 
 export function stopAudioPlayback() {
+  const finish = finishCurrentPlayback;
+  finishCurrentPlayback = null;
+  finish?.();
   if (currentSource) {
     try { currentSource.onended = null; } catch { /* no-op */ }
     try { currentSource.stop(0); } catch { /* no-op */ }
@@ -168,12 +172,14 @@ async function playWithWebAudio(base64) {
     const finish = (error = null) => {
       if (settled) return;
       settled = true;
+      if (finishCurrentPlayback === finish) finishCurrentPlayback = null;
       if (currentSource === source) currentSource = null;
       try { source.disconnect(); } catch { /* no-op */ }
       if (error) reject(error);
       else resolve();
     };
     source.onended = () => finish();
+    finishCurrentPlayback = finish;
     try { source.start(0); }
     catch (error) { finish(error); }
   });
@@ -195,18 +201,24 @@ async function playWithMediaElement(base64) {
     const ended = () => {
       if (settled) return;
       settled = true;
+      if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
       cleanup();
       resolve();
     };
     const failed = () => {
       if (settled) return;
       settled = true;
+      if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
       cleanup();
       reject(new Error('No se pudo reproducir la voz.'));
     };
     media.addEventListener('ended', ended, { once: true });
     media.addEventListener('error', failed, { once: true });
+    finishCurrentPlayback = ended;
     media.play().catch((error) => {
+      if (settled) return;
+      settled = true;
+      if (finishCurrentPlayback === ended) finishCurrentPlayback = null;
       cleanup();
       const blocked = new Error('El navegador pausó el audio. Toca la app una vez para reactivarlo.');
       blocked.name = error?.name === 'NotAllowedError' ? 'AudioPlaybackBlockedError' : (error?.name || 'AudioPlaybackError');

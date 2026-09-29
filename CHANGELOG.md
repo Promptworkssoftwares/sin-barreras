@@ -1,4 +1,11 @@
-# Sin Barreras v1.7.8
+# Sin Barreras v1.7.9
+
+## 1.7.9 · Frases y palabras guardadas compactas
+- Tarjetas de Frases Guardadas y Palabras guardadas más pequeñas, con contenido destacado y mejor jerarquía visual.
+- Escuchar, Practicar, Copiar, Compartir y Eliminar se mantienen en una sola línea; las acciones de icono conservan nombres accesibles.
+- Waveform dual de v1.7.8 integrado en una línea compacta dentro de cada tarjeta, con respuesta real del micrófono donde ya se usaba.
+- Al iniciar una nueva reproducción, se completa la reproducción anterior para que sus indicadores vuelvan al estado de reposo.
+- Android actualizado a versionCode 1709 / versionName 1.7.9.
 
 ## 1.7.8 · Waveform futurista de voz AI + voz del usuario
 - Añadido un sistema visual de audio unificado para **Aprender** con dos identidades claras: **VOZ AI** y **TU VOZ**.

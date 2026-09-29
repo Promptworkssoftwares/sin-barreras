@@ -11,6 +11,7 @@ const AUDIO_SURFACE_SELECTOR = [
 ].join(',');
 
 let activeWave = null;
+let activeWaveToken = 0;
 let idleTimer = null;
 let observer = null;
 
@@ -163,6 +164,7 @@ export function setLearningAudioWave(target, { role = 'ai', state = 'playing', l
 
   if (activeWave && activeWave !== wave) resetWave(activeWave);
   activeWave = wave;
+  activeWaveToken += 1;
 
   const safeRole = role === 'user' ? 'user' : 'ai';
   wave.dataset.activeRole = safeRole;
@@ -189,10 +191,12 @@ export function hideLearningAudioWave(delay = 220) {
 
 export async function withLearningAudioWave(target, options, task) {
   setLearningAudioWave(target, { role: 'ai', state: 'playing', ...options });
+  const wave = activeWave;
+  const token = activeWaveToken;
   try {
     return await task();
   } finally {
-    hideLearningAudioWave(180);
+    if (activeWave === wave && activeWaveToken === token) hideLearningAudioWave(180);
   }
 }
 

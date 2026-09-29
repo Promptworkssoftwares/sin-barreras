@@ -1,6 +1,6 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.8';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.8';
-import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.8';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.9';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.9';
+import { withLearningAudioWave } from './learning-audio-wave.js?v=1.7.9';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -87,17 +87,17 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
     if (empty) empty.hidden = items.length > 0;
     if (!list) return;
     list.innerHTML = items.map((item) => `
-      <article class="phrase-card" data-phrase-id="${item.id}">
+      <article class="phrase-card" data-phrase-id="${escapeHtml(item.id)}">
         <div class="phrase-card-top"><span>${PHRASE_CATEGORIES[item.category] || 'General'}</span><small>${item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-US', { month: 'short', day: 'numeric' }) : ''}</small></div>
         <p class="phrase-source">${escapeHtml(item.sourceText)}</p>
-        <p class="phrase-translation">${escapeHtml(item.translatedText)}</p>
+        <p class="phrase-translation" dir="auto"><mark>${escapeHtml(item.translatedText)}</mark></p>
         ${item.practiceCount ? `<span class="phrase-card-progress">✓ ${item.practiceCount} ${item.practiceCount === 1 ? 'práctica' : 'prácticas'}${item.bestScore ? ` · mejor ${item.bestScore}%` : ''}</span>` : ''}
         <div class="phrase-actions">
-          <button type="button" data-action="listen">▶ Escuchar</button>
-          <button type="button" data-action="practice">✦ Practicar por partes</button>
-          <button type="button" data-action="copy">Copiar</button>
-          <button type="button" data-action="share">Compartir</button>
-          <button type="button" data-action="delete" class="danger">Eliminar</button>
+          <button type="button" data-action="listen"><span aria-hidden="true">▶</span> Escuchar</button>
+          <button type="button" data-action="practice" title="Practicar por partes" aria-label="Practicar por partes"><span aria-hidden="true">✦</span> Practicar</button>
+          <button type="button" data-action="copy" title="Copiar frase" aria-label="Copiar frase">⧉</button>
+          <button type="button" data-action="share" title="Compartir frase" aria-label="Compartir frase">↗</button>
+          <button type="button" data-action="delete" class="danger" title="Eliminar frase" aria-label="Eliminar frase">×</button>
         </div>
       </article>`).join('');
   }
@@ -173,13 +173,18 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
   }
 
   async function handleAction(event) {
-    const action = event.target?.dataset?.action;
+    const button = event.target?.closest?.('button[data-action]');
+    const action = button?.dataset?.action;
     if (!action) return;
     const id = event.target.closest('[data-phrase-id]')?.dataset?.phraseId;
     const item = read().find((entry) => entry.id === id);
     if (!item) return;
     try {
-      if (action === 'listen') await playPhrase(item, event.target.closest('[data-action]'));
+      if (action === 'listen') {
+        button.disabled = true;
+        try { await playPhrase(item, button); }
+        finally { button.disabled = false; }
+      }
       if (action === 'practice') onPractice?.(item);
       if (action === 'copy') { await navigator.clipboard.writeText(`${item.sourceText}\n${item.translatedText}`); notify?.('Frase copiada.'); }
       if (action === 'share') {

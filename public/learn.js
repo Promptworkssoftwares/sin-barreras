@@ -1,5 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.8';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.8';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.9';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.9';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
@@ -367,17 +367,17 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (!ui.customList) return;
     ui.customList.innerHTML = words.map((item) => {
       const encodedWord = encodeURIComponent(item.word);
-      return `<article class="saved-word-card" data-custom-word="${encodedWord}">
+      return `<article class="saved-word-card" data-custom-word="${escapeHTML(encodedWord)}">
         <div class="saved-word-copy">
           <span>${escapeHTML(item.situation ? String(item.situation).toUpperCase() : 'DE UNA CONVERSACIÓN')}</span>
-          <strong>${escapeHTML(item.word)}</strong>
+          <strong dir="auto"><mark>${escapeHTML(item.word)}</mark></strong>
           <p>${escapeHTML(item.meaning)}</p>
           ${item.example ? `<small>${escapeHTML(item.example)}${item.exampleMeaning ? ` · ${escapeHTML(item.exampleMeaning)}` : ''}</small>` : ''}
         </div>
         <div class="saved-word-tools">
-          <button type="button" data-custom-action="listen">🔊 Escuchar</button>
-          <button type="button" data-custom-action="practice">▶ Practicar</button>
-          <button type="button" class="saved-word-delete" data-custom-action="delete" aria-label="Eliminar ${escapeHTML(item.word)} de Mis palabras">Eliminar</button>
+          <button type="button" data-custom-action="listen"><span aria-hidden="true">▶</span> Escuchar</button>
+          <button type="button" data-custom-action="practice"><span aria-hidden="true">✦</span> Practicar</button>
+          <button type="button" class="saved-word-delete" data-custom-action="delete" aria-label="Eliminar ${escapeHTML(item.word)} de Mis palabras" title="Eliminar">×</button>
         </div>
       </article>`;
     }).join('');
