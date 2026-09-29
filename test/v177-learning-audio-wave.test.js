@@ -12,13 +12,13 @@ const phrases = read('public/phrase-practice.js');
 const phrasebook = read('public/phrasebook.js');
 const sw = read('public/sw.js');
 
-test('v1.7.7 ships a dedicated dual-voice learning waveform', () => {
+test('v1.7.8 ships a dedicated dual-voice learning waveform', () => {
   assert.match(wave, /BAR_COUNT = 15/);
   assert.match(wave, /VOZ AI/);
   assert.match(wave, /TU VOZ/);
   assert.match(wave, /detail\.volume|numericLevel/);
   assert.match(css, /Futuristic dual-voice waveform for Aprender/);
-  assert.match(css, /learning-audio-wave\[data-role="user"\]/);
+  assert.match(css, /learning-wave-track\[data-wave-role="user"\]/);
 });
 
 test('AI audio in Learn words, lessons, quick phrases and saved phrases uses the waveform', () => {
@@ -44,5 +44,5 @@ test('sound lab distinguishes AI model audio from the learner recording', () => 
 });
 
 test('PWA release caches the learning waveform module for installed app use', () => {
-  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.7/);
+  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.8/);
 });

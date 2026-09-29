@@ -1,12 +1,13 @@
-# Sin Barreras v1.7.7
+# Sin Barreras v1.7.8
 
-### Nuevo en 1.7.7
+### Nuevo en 1.7.8
 
 - **Waveform futurista dual:** VOZ AI y TU VOZ tienen una identidad visual distinta dentro de Aprender.
 - **Tu voz reacciona al micrófono real:** las barras cambian con el nivel capturado mientras practicas pronunciación.
 - **La voz AI también cobra vida:** palabras, Frases rápidas, Frases Guardadas, lecciones, práctica por partes y sonidos muestran un waveform durante el audio.
 - **Comparación A/B moderna:** Sound Lab muestra claramente el modelo AI y tu propia grabación.
 - UI compacta para teléfono; no se reemplazó la lógica de IA, Billing, autenticación, QR ni cache.
+- **Sin auto-zoom en móvil:** selects, inputs y opciones ya no agrandan la pantalla al tocarlos; los gestos manuales de accesibilidad siguen disponibles.
 
 Aplicación SaaS/PWA/Android para interpretación de voz, práctica multilenguaje, AI Coach, cámara, frases offline, modo cara a cara y conversaciones QR entre dos teléfonos.
 

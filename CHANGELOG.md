@@ -1,13 +1,15 @@
-# Sin Barreras v1.7.7
+# Sin Barreras v1.7.8
 
-## 1.7.7 · Waveform futurista de voz AI + voz del usuario
+## 1.7.8 · Waveform futurista de voz AI + voz del usuario
 - Añadido un sistema visual de audio unificado para **Aprender** con dos identidades claras: **VOZ AI** y **TU VOZ**.
 - La voz del usuario usa el nivel real del micrófono para mover el waveform durante pronunciación y respuestas por voz.
 - La voz AI muestra un waveform futurista durante TTS en palabras, lecciones, Frases rápidas, Frases Guardadas, práctica por partes y Sound Lab.
 - Sound Lab diferencia visualmente **VOZ MODELO** de **TU VOZ** al comparar pronunciación.
 - Diseño compacto mobile-first con orb, waveform, glow y estados Reproduciendo / Escuchando / Analizando.
 - El nuevo módulo se incluye en el Service Worker para la experiencia PWA instalada.
-- Android actualizado a versionCode 1707 / versionName 1.7.7.
+- Eliminado el auto-zoom al seleccionar campos/opciones en móvil manteniendo el zoom manual de accesibilidad.
+- Eliminados los efectos `scale/translate` al tocar controles y tarjetas en pantallas táctiles.
+- Android actualizado a versionCode 1708 / versionName 1.7.8.
 
 ## 1.7.6 · Aprender + Práctica unificados
 - Eliminado el tab independiente **Práctica** del menú inferior.
