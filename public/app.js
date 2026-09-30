@@ -1,17 +1,18 @@
-import { initLearning } from './learn.js?v=1.7.14';
-import { initSounds } from './sounds.js?v=1.7.14';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.14';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.14';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.14';
-import { initAIStage } from './ai-stage.js?v=1.7.14';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.14';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.14';
-import { initPhrasebook } from './phrasebook.js?v=1.7.14';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.14';
-import { initQrConversation } from './qr-conversation.js?v=1.7.14';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.14';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.14';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.14';
+import { initLearning } from './learn.js?v=1.7.18';
+import { initImageLearning } from './image-learning.js?v=1.7.18';
+import { initSounds } from './sounds.js?v=1.7.18';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.18';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.18';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.18';
+import { initAIStage } from './ai-stage.js?v=1.7.18';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.18';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.18';
+import { initPhrasebook } from './phrasebook.js?v=1.7.18';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.18';
+import { initQrConversation } from './qr-conversation.js?v=1.7.18';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.18';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.18';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.18';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -37,7 +38,7 @@ const ui = {
   toast: $('#toast'), historyView: $('#history-view'), historyList: $('#history-list'), historyEmpty: $('#history-empty'), clearHistory: $('#clear-history'), openHistory: $('#open-history'),
   phrasebookView: $('#phrasebook-view'), phrasebookBackToLearn: $('#phrasebook-back-to-learn'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
   faceView: $('#face-to-face-view'), openFaceToFace: $('#open-face-to-face'), closeFaceToFace: $('#close-face-to-face'), faceToggleListening: $('#face-toggle-listening'), faceStatus: $('#face-status'), faceStatusDot: $('#face-status-dot'), facePartnerLanguage: $('#face-partner-language'), faceUserLanguage: $('#face-user-language'), facePartnerText: $('#face-partner-text'), faceUserText: $('#face-user-text'), facePartnerRepeat: $('#face-partner-repeat'), faceUserRepeat: $('#face-user-repeat'),
-  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), learnQuickPhrasesBranch: $('#learn-quick-phrases-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
+  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnImagesBranch: $('#learn-images-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), learnQuickPhrasesBranch: $('#learn-quick-phrases-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
   settingsDialog: $('#settings-dialog'), onboardingDialog: $('#onboarding-dialog'), fontSize: $('#font-size-select'), themeButton: $('#theme-button'),
   practiceView: $('#practice-view'), practiceForm: $('#practice-form'), practiceInput: $('#practice-input'), practiceLanguage: $('#practice-language'), practiceTargetLanguage: $('#practice-target-language'), practiceSituation: $('#practice-situation'),
   practicePhraseMode: $('#practice-phrase-mode'), practiceConversationMode: $('#practice-conversation-mode'),
@@ -91,6 +92,7 @@ const state = {
 };
 
 let learning = null;
+let imageLearning = null;
 let sounds = null;
 let aiStageController = null;
 let phrasebook = null;
@@ -289,6 +291,7 @@ function conversationLearningCandidates() {
     const createdAt = item.createdAt || new Date().toISOString();
     grouped.set(key, {
       id: item.id, englishText, meaning, nativeLanguage, situation: item.situation || 'everyday',
+      originalText: item.originalText, translatedText: item.translatedText,
       sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage, count: (previous?.count || 0) + 1,
       createdAt: previous && new Date(previous.createdAt) > new Date(createdAt) ? previous.createdAt : createdAt
     });
@@ -308,7 +311,7 @@ function renderConversationLearning() {
       <div class="conversation-learning-card-top"><span>${escapeHTML(SITUATIONS[item.situation] || 'Vida diaria')}</span>${item.count > 1 ? `<b>${item.count}× usada</b>` : ''}</div>
       <strong>${escapeHTML(item.englishText)}</strong>
       <p>${escapeHTML(item.meaning)}</p>
-      <div><button type="button" data-learning-action="listen">▶ Escuchar</button><button type="button" data-learning-action="practice">✦ Practicar</button><button type="button" data-learning-action="save">★ Guardar frase</button></div>
+      <div><button type="button" data-learning-action="listen">▶ Escuchar</button><button type="button" data-learning-action="practice">✦ Practicar conversación</button><button type="button" data-learning-action="save">★ Guardar frase</button></div>
     </article>`).join('');
 }
 
@@ -327,6 +330,23 @@ function preparePhraseForPractice(item) {
   openLearnPath('quick-phrases');
   guidedScroll(ui.practiceForm, { block: 'center', highlight: true, delay: 90, focus: true });
   notify('Frase cargada en Aprender. Toca “Enseñarme” para practicarla.');
+}
+
+async function practiceConversationFromHistory(item) {
+  if (!item || state.coachBusy) return;
+  const nativeLanguage = LANGUAGES[item.nativeLanguage] && item.nativeLanguage !== 'en' ? item.nativeLanguage : 'es';
+  if (ui.coachLanguage) ui.coachLanguage.value = nativeLanguage;
+  if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = 'en';
+  keepCoachLanguagesDistinct('native');
+  if (ui.coachScenario && [...ui.coachScenario.options].some((option) => option.value === item.situation)) {
+    ui.coachScenario.value = item.situation;
+  } else if (ui.coachScenario) ui.coachScenario.value = 'everyday';
+  $$('[data-coach-scenario]').forEach((button) => button.classList.toggle('is-active', button.dataset.coachScenario === ui.coachScenario?.value));
+  showView('coach');
+  await startCoachSession({ sourceConversation: {
+    originalText: item.originalText, translatedText: item.translatedText,
+    sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage
+  } });
 }
 
 function updateFaceLabels() {
@@ -1375,7 +1395,7 @@ async function practiceCoachPhrase(article, button) {
   }
 }
 
-async function startCoachSession() {
+async function startCoachSession({ sourceConversation = null } = {}) {
   if (state.running) { notify('Pausa la conversación antes de abrir el Coach.'); return; }
   if (state.practiceConversationActive) { notify('Finaliza la conversación de Práctica antes de abrir el Coach.'); return; }
   if (state.coachBusy) return;
@@ -1390,7 +1410,8 @@ async function startCoachSession() {
         targetLanguage: currentCoachTargetLanguage(),
         level: ui.coachLevel?.value || 'beginner',
         goal: ui.coachGoal?.value || 'confidence',
-        supportMode: ui.coachMode?.value || 'guided'
+        supportMode: ui.coachMode?.value || 'guided',
+        ...(sourceConversation ? { sourceConversation } : {})
       })
     });
     state.coachActive = true;
@@ -1705,6 +1726,7 @@ function showLearnHome() {
   ui.learnHome?.classList.remove('is-hidden');
   ui.learnSoundsBranch?.classList.add('is-hidden');
   ui.learnRoutesBranch?.classList.add('is-hidden');
+  ui.learnImagesBranch?.classList.add('is-hidden');
   ui.learnConversationsBranch?.classList.add('is-hidden');
   ui.learnWordsBranch?.classList.add('is-hidden');
   ui.learnQuickPhrasesBranch?.classList.add('is-hidden');
@@ -1719,6 +1741,7 @@ function openLearnPath(path) {
   ui.learnHome?.classList.add('is-hidden');
   ui.learnSoundsBranch?.classList.toggle('is-hidden', path !== 'sounds');
   ui.learnRoutesBranch?.classList.toggle('is-hidden', path !== 'routes');
+  ui.learnImagesBranch?.classList.toggle('is-hidden', path !== 'images');
   ui.learnConversationsBranch?.classList.toggle('is-hidden', path !== 'conversations');
   ui.learnWordsBranch?.classList.toggle('is-hidden', path !== 'words');
   ui.learnQuickPhrasesBranch?.classList.toggle('is-hidden', path !== 'quick-phrases');
@@ -1726,6 +1749,7 @@ function openLearnPath(path) {
   if (path === 'routes' || path === 'words') learning?.render();
   if (path === 'quick-phrases') renderPracticePoints();
   if (path === 'conversations') renderConversationLearning();
+  if (path === 'images') imageLearning?.open();
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
@@ -1783,6 +1807,14 @@ phrasePractice = initPhrasePractice({
     if (result?.averageScore) notify(`Práctica completada · promedio ${result.averageScore}%.`);
     else notify('Práctica completada. Repite la frase cuando quieras.');
   }
+});
+
+imageLearning = initImageLearning({
+  request, speakText, notify,
+  getNativeLanguage: () => state.settings.detectedUserLanguage || state.userLanguage || 'es',
+  onPractice: (item) => phrasePractice?.start(item),
+  onCorrect: (id, language) => learning?.recordImageAnswer(id, language),
+  getProgress: (language) => learning?.imageProgress(language) || []
 });
 
 phrasebook = initPhrasebook({
@@ -1915,7 +1947,7 @@ listen(ui.conversationLearningList, 'click', async (event) => {
   if (!item) return;
   try {
     if (action === 'listen') await speakText(item.englishText, 'en', { visualTarget:event.target.closest('[data-learning-action]'), visualLabel:'VOZ AI' });
-    if (action === 'practice') preparePhraseForPractice(item);
+    if (action === 'practice') await practiceConversationFromHistory(item);
     if (action === 'save') await phrasebook?.savePhrase({
       sourceText: item.meaning, translatedText: item.englishText, sourceLanguage: item.nativeLanguage, targetLanguage: 'en', situation: item.situation
     });
@@ -2051,7 +2083,7 @@ listen(ui.coachSummary, 'click', async (event) => {
   try { await speakText(text, currentCoachTargetLanguage(), { speed: 0.82 }); } catch (error) { notify(error.message); }
 });
 
-listen(ui.startCoach, 'click', startCoachSession);
+listen(ui.startCoach, 'click', () => startCoachSession());
 listen(ui.endCoach, 'click', finishCoachSession);
 listen(ui.newCoachSession, 'click', resetCoachSession);
 listen(ui.coachRecord, 'click', toggleCoachRecording);

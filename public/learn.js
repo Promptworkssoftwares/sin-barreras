@@ -1,5 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.14';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.14';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.18';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.18';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
@@ -336,6 +336,23 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   document.querySelectorAll('[data-learn-icon]').forEach((node) => { node.innerHTML = iconSvg(node.dataset.learnIcon); });
 
   function persist() { saveState(state); render(); }
+
+  function recordImageAnswer(id, language) {
+    const key = `${language}:${id}`;
+    if (!state.imageProgress || typeof state.imageProgress !== 'object') state.imageProgress = {};
+    if (state.imageProgress[key]) return false;
+    state.imageProgress[key] = new Date().toISOString();
+    if (state.daily.date !== todayKey()) state.daily = { date: todayKey(), xp: 0 };
+    state.xp += 3;
+    state.daily.xp += 3;
+    updateStreak(state);
+    persist();
+    return true;
+  }
+
+  function imageProgress(language) {
+    return Object.keys(state.imageProgress || {}).filter((key) => key.startsWith(`${language}:`));
+  }
 
   function renderWords() {
     if (!ui.wordsList) return;
@@ -726,5 +743,5 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   });
 
   render();
-  return { render, startLesson, importFromEnglishText };
+  return { render, startLesson, importFromEnglishText, recordImageAnswer, imageProgress };
 }

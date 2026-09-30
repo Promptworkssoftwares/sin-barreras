@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.7.14" />
+    <link rel="stylesheet" href="/styles.css?v=1.7.18" />
   </head>
   <body>
     <main class="app-shell">
@@ -250,6 +250,17 @@
               <span class="learn-path-arrow">→</span>
             </button>
 
+            <button class="learn-path-card learn-path-images" type="button" data-learn-path="images">
+              <span class="learn-path-visual image-path-visual" aria-hidden="true">▣</span>
+              <span class="learn-path-copy">
+                <small>VER · ESCUCHAR · RECORDAR</small>
+                <strong>Aprender por imágenes</strong>
+                <span>Empieza con pronombres ilustrados y practica en el idioma que elijas.</span>
+              </span>
+              <span class="learn-path-meta"><b>Nivel 1 · Pronombres</b><b>Elige dos idiomas</b></span>
+              <span class="learn-path-arrow">→</span>
+            </button>
+
             <button class="learn-path-card learn-path-saved-phrases" type="button" data-learn-path="saved-phrases">
               <span class="learn-path-visual saved-phrases-visual" aria-hidden="true">★</span>
               <span class="learn-path-copy">
@@ -326,13 +337,40 @@
           </section>
         </section>
 
+        <section id="learn-images-branch" class="learn-branch is-hidden" aria-label="Aprender por imágenes">
+          <div class="learn-branch-topbar">
+            <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
+            <div><span>APRENDER POR IMÁGENES</span><strong>Observa, escucha y practica</strong></div>
+          </div>
+          <div class="image-learning-intro">
+            <div><p id="image-learning-eyebrow" class="section-label">PRONOMBRES · NIVEL 1</p><h3 id="image-learning-title">Aprende pronombres con <em>imágenes.</em></h3><p id="image-learning-description">Elige una categoría, escucha cada ejemplo y luego reconoce su imagen.</p></div>
+            <div class="image-learning-controls">
+              <label>Mi idioma <select id="image-native-language" aria-label="Mi idioma para aprender por imágenes"></select></label>
+              <label>Idioma que quiero aprender <select id="image-target-language" aria-label="Idioma para aprender por imágenes"></select></label>
+              <button id="image-load" class="primary-button" type="button">Preparar categoría</button>
+            </div>
+          </div>
+          <div id="image-topic-picker" class="image-topic-picker" aria-label="Temas de imágenes"></div>
+          <div id="image-level-picker" class="image-level-picker" aria-label="Niveles del tema"></div>
+          <div id="image-category-picker" class="image-category-picker" aria-label="Categorías del nivel"></div>
+          <p id="image-learning-status" class="image-learning-status" role="status" aria-live="polite">Elige una categoría y prepara la lección.</p>
+          <div id="image-learning-cards" class="image-learning-cards"></div>
+          <button id="image-start-quiz" class="primary-button image-start-quiz" type="button" hidden>Practicar con imágenes →</button>
+          <section id="image-learning-quiz" class="image-learning-quiz is-hidden" aria-label="Practicar con imágenes">
+            <div class="image-quiz-heading"><div><small>RECUERDA LA IMAGEN</small><h3>¿Cuál imagen corresponde a <span id="image-quiz-word"></span>?</h3></div><span id="image-quiz-progress"></span></div>
+            <div id="image-quiz-options" class="image-quiz-options"></div>
+            <p id="image-quiz-feedback" role="status" aria-live="polite"></p>
+            <button id="image-quiz-next" class="outline-button" type="button" hidden>Siguiente imagen →</button>
+          </section>
+        </section>
+
         <section id="learn-conversations-branch" class="learn-branch is-hidden" aria-label="Aprender de mis conversaciones">
           <div class="learn-branch-topbar">
             <button class="learn-branch-back" type="button" data-learn-back>← APRENDER</button>
             <div><span>DE MIS CONVERSACIONES</span><strong>Practica lo que realmente necesitas decir</strong></div>
           </div>
           <div class="conversation-learning-hero">
-            <div><p class="section-label">TU HISTORIAL SE VUELVE PRÁCTICA</p><h3>De traducirlo hoy,<br><em>a decirlo tú mañana.</em></h3><p>Sin Barreras encuentra frases útiles de tus conversaciones recientes para escucharlas, guardarlas y convertirlas en ejercicios de frase y pronunciación.</p></div>
+            <div><p class="section-label">TU HISTORIAL SE VUELVE PRÁCTICA</p><h3>De traducirlo hoy,<br><em>a decirlo tú mañana.</em></h3><p>Elige un intercambio de tu historial para escucharlo, guardarlo o practicar una conversación completa con la IA basada en esa situación.</p></div>
             <div class="conversation-learning-stat"><strong id="conversation-learning-count">0</strong><span>frases disponibles</span></div>
           </div>
           <div id="conversation-learning-empty" class="conversation-learning-empty">Usa <strong>Hablar</strong> varias veces y aquí aparecerán frases reales de tus conversaciones.</div>
@@ -1110,7 +1148,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.7.14"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.7.14"></script>
+    <script src="/play-billing.js?v=1.7.18"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.7.18"></script>
   </body>
 </html>

@@ -1,4 +1,33 @@
-# Sin Barreras v1.7.14
+# Sin Barreras v1.7.18
+
+## 1.7.18 · Familia y niveles por tema
+
+- Integradas 19 imágenes de Familia Nivel 1 suministradas por el usuario y optimizadas a WebP.
+- Temas y niveles independientes; Pronombres, Familia y Situaciones comienzan en Nivel 1 y los niveles sin contenido aparecen desactivados.
+- Categorías, traducción contextual para todos los idiomas del catálogo, audio donde está disponible y práctica de reconocimiento visual.
+- Android versionCode 1718 / versionName 1.7.18.
+
+## 1.7.17 · Primer nivel visual de pronombres
+
+- Integradas 34 imágenes del ZIP del usuario, renombradas con rutas seguras y optimizadas como WebP.
+- Nivel 1: personales, de objeto, posesivos, reflexivos, indefinidos, recíprocos y demostrativos adicionales.
+- El backend prepara cada categoría por idioma, valida los IDs y cachea los resultados; se mantiene el nivel de situaciones.
+- Android versionCode 1717 / versionName 1.7.17.
+
+
+## 1.7.16 · Aprender por imágenes
+
+- Nueva ruta visual en Aprender con ocho conceptos ilustrados y vocabulario/frases localizados para dos idiomas seleccionados.
+- Audio y práctica de voz donde el proveedor lo admite; reto visual y progreso con XP en todos los idiomas del catálogo.
+- Traducciones validadas y cacheadas por usuario e idiomas; Android versionCode 1716 / versionName 1.7.16.
+
+
+## 1.7.15 · Conversaciones del historial en el Coach
+
+- «Practicar conversación» inicia una sesión de diálogo contextual desde Aprender de mis conversaciones.
+- La IA conserva el intercambio real y quién dijo la frase durante los turnos siguientes.
+- Android actualizado a versionCode 1715 / versionName 1.7.15.
+
 
 ## 1.7.14 · Voz AI visible en frases guardadas
 - Definido el color que faltaba para las barras de VOZ AI en los temas claro y oscuro.

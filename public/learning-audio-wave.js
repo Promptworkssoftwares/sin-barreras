@@ -7,7 +7,8 @@ const AUDIO_SURFACE_SELECTOR = [
   '.sound-detail',
   '.practice-result',
   '.phrase-practice-card',
-  '.lesson-question-shell'
+  '.lesson-question-shell',
+  '.image-learning-card'
 ].join(',');
 
 let activeWave = null;

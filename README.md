@@ -1,4 +1,28 @@
-# Sin Barreras v1.7.14
+# Sin Barreras v1.7.18
+
+### Nuevo en 1.7.18
+
+- Aprender por imágenes organiza temas y niveles por separado: Pronombres, Familia y Situaciones tienen su propio Nivel 1. Los niveles futuros aparecen como pendientes hasta incorporar sus imágenes.
+- Familia Nivel 1: 19 fotografías optimizadas en cuatro categorías (familia cercana, trato cotidiano, parientes y pareja), con traducción, audio disponible según idioma y reto visual.
+
+### Nuevo en 1.7.17
+
+- Nivel 1 de Aprender por imágenes: Pronombres con 34 imágenes reales suministradas, seis categorías principales y demostrativos como categoría adicional.
+- Nivel 2 conserva las ocho imágenes de situaciones. Cada categoría traduce palabras y frases según la función gramatical, con audio, práctica de voz y reto visual donde hay soporte de voz.
+- Imágenes optimizadas para móvil, aproximadamente 1.7 MB en total.
+
+
+### Nuevo en 1.7.16
+
+- Aprender por imágenes: ocho conceptos visuales, selección de dos idiomas del catálogo y audio/práctica de frases donde el proveedor admite voz.
+- Reto de identificación de imágenes con XP y progreso sincronizado en la cuenta.
+
+
+### Nuevo en 1.7.15
+
+- Aprender de mis conversaciones → Practicar abre una conversación continua con IA basada en el intercambio del historial, en vez de abrir «¿Qué quieres decir?».
+- La escena y los turnos siguientes mantienen el contexto original.
+
 
 ### Nuevo en 1.7.14
 
