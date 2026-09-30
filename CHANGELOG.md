@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.20
+# Sin Barreras v1.7.21
+
+## 1.7.21 · Lecciones visuales resistentes a lecturas incompletas
+
+- Las lecturas latinas incompletas ya no invalidan toda la categoría. Se repara solo lo que falta hasta dos veces y se preservan los IDs, traducciones y audios.
+- La interfaz muestra significados legibles cuando no hay lectura disponible, sin caracteres ilegibles por defecto; el ejercicio de imágenes permanece accesible.
+- Un fallo al guardar caché no bloquea la lección. Android versionCode 1721 / versionName 1.7.21.
 
 ## 1.7.20 · Salida de audio móvil
 

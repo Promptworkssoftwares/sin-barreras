@@ -1,5 +1,5 @@
-import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading } from './image-learning-data.js?v=1.7.20';
-import { LANGUAGE_CATALOG } from './languages.js?v=1.7.20';
+import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading, isLatinImageReading } from './image-learning-data.js?v=1.7.21';
+import { LANGUAGE_CATALOG } from './languages.js?v=1.7.21';
 
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -97,21 +97,26 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     const audioAvailable = IMAGE_AUDIO_LANGUAGES.has(ui.target.value);
     ui.status.textContent = `${items.length} imágenes listas · ${completed} practicadas en ${ui.target.selectedOptions[0]?.textContent || 'este idioma'}.${audioAvailable ? '' : ' Este idioma ofrece aprendizaje visual y texto; la voz no está disponible.'}`;
     const needsReading = imageNeedsLatinReading(ui.target.value);
-    ui.cards.innerHTML = items.map((item) => `
+    ui.cards.innerHTML = items.map((item) => {
+      const wordReadable = !needsReading || isLatinImageReading(item.targetWordLatin);
+      const phraseReadable = !needsReading || isLatinImageReading(item.targetPhraseLatin);
+      return `
       <article class="image-learning-card" data-image-id="${escapeHtml(item.id)}">
         <div class="image-learning-picture${item.imageVariants?.length ? ' has-variants' : ''}"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.nativeWord)}" loading="lazy">${(item.imageVariants || []).map((src) => `<img class="image-variant" src="${escapeHtml(src)}" alt="Otro ejemplo de ${escapeHtml(item.nativeWord)}" loading="lazy">`).join('')}</div>
         <div class="image-learning-copy"><small>Significa: ${escapeHtml(item.nativeWord)}${topic === 'pronouns' && category === 'possessive' ? ` · ${['my', 'his', 'its'].includes(item.id) ? 'acompaña un nombre' : 'reemplaza un nombre'}` : ''}</small>
-          ${needsReading ? '<span class="image-reading-label">ASÍ SE LEE · LETRAS LATINAS</span>' : ''}
-          <h4 lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? item.targetWordLatin : item.targetWord)}</h4>
-          <p lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? item.targetPhraseLatin : item.targetPhrase)}</p>
-          <span>${escapeHtml(item.nativePhrase)}</span>
+          ${needsReading ? `<span class="image-reading-label">${wordReadable ? 'ASÍ SE LEE · LETRAS LATINAS' : 'PALABRA EN TU IDIOMA'}</span>` : ''}
+          <h4 lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? wordReadable ? item.targetWordLatin : item.nativeWord : item.targetWord)}</h4>
+          ${needsReading && !phraseReadable ? '<span class="image-reading-label">FRASE EN TU IDIOMA</span>' : ''}
+          <p lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? phraseReadable ? item.targetPhraseLatin : item.nativePhrase : item.targetPhrase)}</p>
+          <span>${phraseReadable ? escapeHtml(item.nativePhrase) : audioAvailable ? 'Toca ▶ Frase para escuchar cómo se pronuncia.' : 'Abre la escritura original para conocer la frase.'}</span>
           ${needsReading ? `<details class="image-learning-original"><summary>Ver escritura original</summary><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetWord)}</p><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetPhrase)}</p></details>` : ''}</div>
         <div class="image-learning-actions">
-          ${audioAvailable ? `<button type="button" data-image-action="word" aria-label="Escuchar palabra ${escapeHtml(needsReading ? item.targetWordLatin : item.targetWord)}">▶ Palabra</button>
-          <button type="button" data-image-action="phrase" aria-label="Escuchar frase ${escapeHtml(needsReading ? item.targetPhraseLatin : item.targetPhrase)}">▶ Frase</button>
+          ${audioAvailable ? `<button type="button" data-image-action="word" aria-label="Escuchar palabra ${escapeHtml(needsReading ? wordReadable ? item.targetWordLatin : item.nativeWord : item.targetWord)}">▶ Palabra</button>
+          <button type="button" data-image-action="phrase" aria-label="Escuchar frase ${escapeHtml(needsReading ? phraseReadable ? item.targetPhraseLatin : item.nativePhrase : item.targetPhrase)}">▶ Frase</button>
           <button type="button" data-image-action="practice">● Practicar mi voz</button>` : '<span class="image-text-only">Práctica visual y de lectura</span>'}
         </div>
-      </article>`).join('');
+      </article>`;
+    }).join('');
     ui.start.hidden = false;
     renderNavigation();
   }
@@ -132,7 +137,9 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
         body: JSON.stringify({ nativeLanguage, targetLanguage, topic, level, category })
       });
       if (!Array.isArray(result.items) || result.items.length !== group.length) throw new Error('La categoría llegó incompleta. Inténtalo de nuevo.');
-      cached.set(key, result);
+      if (imageNeedsLatinReading(targetLanguage) && result.items.some((item) => !isLatinImageReading(item.targetWordLatin) || !isLatinImageReading(item.targetPhraseLatin))) {
+        cached.delete(key); // A later preparation can repair a temporary reading gap without translating again.
+      } else cached.set(key, result);
       if (selectedKey() !== key) return;
       items = result.items;
       selection = key;
@@ -156,14 +163,15 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
       return;
     }
     answered = false;
-    ui.word.textContent = imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord;
+    ui.word.textContent = imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin || current.nativeWord : current.targetWord;
     ui.word.lang = imageNeedsLatinReading(ui.target.value) ? ui.native.value : ui.target.value;
     ui.progress.textContent = `${index + 1} / ${questions.length}`;
     ui.feedback.textContent = 'Observa las imágenes y elige una.';
     ui.next.hidden = true;
     const distractors = items.length >= 4 ? items : [...items, ...imageTopicItems(topic).map((item) => ({ ...item, nativeWord: item.word }))];
     const choices = shuffle([current, ...shuffle(distractors.filter((item) => item.id !== current.id)).filter((item, position, all) => all.findIndex((other) => other.id === item.id) === position).slice(0, 3)]);
-    ui.options.innerHTML = choices.map((item) => `<button type="button" data-image-choice="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.nativeWord)}"><img src="${escapeHtml(item.image)}" alt=""><span>${escapeHtml(item.nativeWord)}</span></button>`).join('');
+    const meaningOnly = imageNeedsLatinReading(ui.target.value) && !current.targetWordLatin;
+    ui.options.innerHTML = choices.map((item, position) => `<button type="button" data-image-choice="${escapeHtml(item.id)}" aria-label="${meaningOnly ? `Imagen ${position + 1}` : escapeHtml(item.nativeWord)}"><img src="${escapeHtml(item.image)}" alt=""><span>${meaningOnly ? `Imagen ${position + 1}` : escapeHtml(item.nativeWord)}</span></button>`).join('');
   }
 
   ui.native.addEventListener('change', () => languageChanged('native'));
@@ -227,7 +235,9 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     answered = true;
     button.classList.add('is-correct');
     ui.options.querySelectorAll('button').forEach((option) => { option.disabled = true; });
-    ui.feedback.textContent = `¡Correcto! ${imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord} significa ${current.nativeWord}.`;
+    ui.feedback.textContent = imageNeedsLatinReading(ui.target.value) && !current.targetWordLatin
+      ? `¡Correcto! Reconociste la imagen de ${current.nativeWord}.`
+      : `¡Correcto! ${imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord} significa ${current.nativeWord}.`;
     ui.next.hidden = false;
     if (onCorrect?.(current.id, ui.target.value)) renderCards();
   });

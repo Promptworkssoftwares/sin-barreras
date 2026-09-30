@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.20
+# Sin Barreras v1.7.21
+
+### Nuevo en 1.7.21
+
+- La lección por imágenes conserva traducciones y audio aunque la IA entregue una lectura latina defectuosa. El servidor repara automáticamente las lecturas que faltan sin rehacer las traducciones válidas.
+- Si la reparación temporalmente no está disponible, se presenta el significado en el idioma del usuario y el reto visual sigue funcionando; la escritura original continúa opcional.
 
 ### Nuevo en 1.7.20
 

@@ -11,9 +11,6 @@ export function normalizeImageLesson(raw, nativeLanguage, targetLanguage, concep
     if (fields.some((key) => typeof row[key] !== 'string' || !row[key].trim() || row[key].length > 180)) {
       throw new Error('La lección por imágenes está incompleta.');
     }
-    if (imageNeedsLatinReading(targetLanguage) && ['targetWordLatin', 'targetPhraseLatin'].some((key) => !isLatinImageReading(row[key]))) {
-      throw new Error('No pudimos preparar una lectura clara en letras latinas. Inténtalo otra vez.');
-    }
     byId.set(row.id, row);
   }
   return concepts.map((concept) => {
@@ -25,8 +22,39 @@ export function normalizeImageLesson(raw, nativeLanguage, targetLanguage, concep
       targetWord: targetLanguage === 'en' ? concept.word : row.targetWord.trim(),
       nativePhrase: nativeLanguage === 'en' ? concept.phrase : row.nativePhrase.trim(),
       targetPhrase: targetLanguage === 'en' ? concept.phrase : row.targetPhrase.trim(),
-      targetWordLatin: imageNeedsLatinReading(targetLanguage) ? row.targetWordLatin.trim() : '',
-      targetPhraseLatin: imageNeedsLatinReading(targetLanguage) ? row.targetPhraseLatin.trim() : ''
+      targetWordLatin: imageNeedsLatinReading(targetLanguage) && isLatinImageReading(row.targetWordLatin) ? row.targetWordLatin.trim() : '',
+      targetPhraseLatin: imageNeedsLatinReading(targetLanguage) && isLatinImageReading(row.targetPhraseLatin) ? row.targetPhraseLatin.trim() : ''
     };
   });
+}
+
+// A malformed reading must never discard an otherwise valid translated lesson.
+// Repair only the missing readings; IDs and translated words remain untouched.
+export async function completeImageReadings(items, targetLanguage, generate) {
+  if (!imageNeedsLatinReading(targetLanguage)) return items;
+  let completed = items;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const missing = completed.filter((item) => !isLatinImageReading(item.targetWordLatin) || !isLatinImageReading(item.targetPhraseLatin));
+    if (!missing.length) break;
+    let repairs;
+    try { repairs = await generate(missing, attempt); }
+    catch { break; }
+    if (!Array.isArray(repairs)) continue;
+    const expected = new Set(missing.map(({ id }) => id));
+    const byId = new Map();
+    for (const row of repairs) {
+      if (!row || !expected.has(row.id) || byId.has(row.id)) continue;
+      byId.set(row.id, row);
+    }
+    completed = completed.map((item) => {
+      const repair = byId.get(item.id);
+      if (!repair) return item;
+      return {
+        ...item,
+        targetWordLatin: isLatinImageReading(item.targetWordLatin) ? item.targetWordLatin : isLatinImageReading(repair.targetWordLatin) ? repair.targetWordLatin.trim() : '',
+        targetPhraseLatin: isLatinImageReading(item.targetPhraseLatin) ? item.targetPhraseLatin : isLatinImageReading(repair.targetPhraseLatin) ? repair.targetPhraseLatin.trim() : ''
+      };
+    });
+  }
+  return completed;
 }

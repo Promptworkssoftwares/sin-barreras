@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { IMAGE_LESSONS, PRONOUN_LESSONS, PRONOUN_CATEGORIES, FAMILY_LESSONS, FAMILY_CATEGORIES, IMAGE_TOPICS, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading } from '../public/image-learning-data.js';
-import { normalizeImageLesson } from '../server/image-lesson.js';
+import { normalizeImageLesson, completeImageReadings } from '../server/image-lesson.js';
 import { LANGUAGE_CATALOG } from '../public/languages.js';
 
 const records = IMAGE_LESSONS.map(({ id }) => ({ id, nativeWord: `nombre ${id}`, targetWord: `word ${id}`, nativePhrase: `Necesito ${id}`, targetPhrase: `I need ${id}` }));
@@ -21,7 +21,7 @@ test('incomplete, duplicated and oversized model outputs cannot become visual le
   assert.throws(() => normalizeImageLesson(records.map((row, i) => i ? row : { ...row, targetWord: 'x'.repeat(181) }), 'es', 'fr'));
 });
 
-test('Mandarin and Russian lessons require readable Latin text while retaining original speech text', () => {
+test('Mandarin and Russian lessons keep valid translations when a reading is missing or malformed', () => {
   const concepts = imageLessonGroup('pronouns', '1', 'object').filter(({ id }) => id === 'him');
   const row = { id: 'him', nativeWord: 'a él', targetWord: '他', nativePhrase: 'Lo veo.', targetPhrase: '我看见他。', targetWordLatin: 'tā', targetPhraseLatin: 'Wǒ kànjiàn tā.' };
   const chinese = normalizeImageLesson([row], 'es', 'zh', concepts)[0];
@@ -30,13 +30,36 @@ test('Mandarin and Russian lessons require readable Latin text while retaining o
   assert.equal(chinese.targetWordLatin, 'tā');
   assert.equal(chinese.targetPhraseLatin, 'Wǒ kànjiàn tā.');
   assert.equal(chinese.nativeWord, 'a él');
-  assert.throws(() => normalizeImageLesson([{ ...row, targetWordLatin: '他' }], 'es', 'zh', concepts), /lectura clara/);
-  assert.throws(() => normalizeImageLesson([{ ...row, targetPhraseLatin: '' }], 'es', 'zh', concepts), /lectura clara/);
-  assert.throws(() => normalizeImageLesson([{ ...row, targetWordLatin: 'ˈta' }], 'es', 'zh', concepts), /lectura clara/);
+  assert.equal(normalizeImageLesson([{ ...row, targetWordLatin: '他' }], 'es', 'zh', concepts)[0].targetWordLatin, '');
+  assert.equal(normalizeImageLesson([{ ...row, targetPhraseLatin: '' }], 'es', 'zh', concepts)[0].targetPhraseLatin, '');
+  assert.equal(normalizeImageLesson([{ ...row, targetWordLatin: 'ˈta' }], 'es', 'zh', concepts)[0].targetWordLatin, '');
   assert.equal(imageNeedsLatinReading('ru'), true);
   const russian = normalizeImageLesson([{ ...row, targetWord: 'его', targetPhrase: 'Я вижу его.', targetWordLatin: 'yevo', targetPhraseLatin: 'Ya vizhu yevo.' }], 'es', 'ru', concepts)[0];
   assert.equal(russian.targetWordLatin, 'yevo');
   assert.equal(normalizeImageLesson([{ ...row, targetWord: 'him', targetPhrase: 'I see him.' }], 'es', 'en', concepts)[0].targetWordLatin, '');
+});
+
+test('missing readings are repaired automatically without replacing translation or blocking on repair failure', async () => {
+  const concepts = imageLessonGroup('pronouns', '1', 'object').filter(({ id }) => id === 'him');
+  const original = normalizeImageLesson([{
+    id: 'him', nativeWord: 'a él', nativePhrase: 'Lo veo.', targetWord: '他', targetPhrase: '我看见他。',
+    targetWordLatin: '他', targetPhraseLatin: 'Wǒ kànjiàn tā.'
+  }], 'es', 'zh', concepts);
+  let calls = 0;
+  const repaired = await completeImageReadings(original, 'zh', async (missing) => {
+    calls += 1;
+    assert.equal(missing.length, 1);
+    return [{ id: 'him', targetWordLatin: calls === 1 ? '他' : 'tā', targetPhraseLatin: 'incorrect replacement' }];
+  });
+  assert.equal(calls, 2);
+  assert.equal(repaired[0].targetWordLatin, 'tā');
+  assert.equal(repaired[0].targetPhraseLatin, 'Wǒ kànjiàn tā.');
+  assert.equal(repaired[0].targetWord, '他');
+  assert.equal(repaired[0].nativeWord, 'a él');
+  const stillUsable = await completeImageReadings(original, 'zh', async () => { throw new Error('provider unavailable'); });
+  assert.equal(stillUsable[0].targetWordLatin, '');
+  assert.equal(stillUsable[0].targetPhrase, '我看见他。');
+  assert.equal(await completeImageReadings(original, 'en', async () => { throw new Error('should not be called'); }), original);
 });
 
 test('the supplied pronoun images form the first level with six requested groups and demonstratives', () => {

@@ -1,5 +1,6 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.20';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.20';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.21';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.21';
+import { imageNeedsLatinReading } from './image-learning-data.js?v=1.7.21';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -121,8 +122,8 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     if (ui.progressCopy) ui.progressCopy.textContent = `${current} / ${total}`;
     if (ui.language) ui.language.textContent = languageName?.(state.lesson?.targetLanguage) || state.lesson?.targetLanguage || 'IDIOMA';
     if (ui.sourceFull) ui.sourceFull.textContent = state.lesson?.sourceText || '';
-    const readableImage = Boolean(state.item?.fromImage && state.item?.targetReading);
-    if (ui.targetFull) ui.targetFull.textContent = readableImage ? state.item.targetReading : state.lesson?.targetText || '';
+    const readableImage = Boolean(state.item?.fromImage && imageNeedsLatinReading(state.item.targetLanguage));
+    if (ui.targetFull) ui.targetFull.textContent = readableImage ? state.item.targetReading || 'Escucha y practica la frase' : state.lesson?.targetText || '';
     if (ui.originalFull) ui.originalFull.hidden = !readableImage;
     if (ui.originalFullText) ui.originalFullText.textContent = readableImage ? state.lesson?.targetText || '' : '';
     if (ui.stepBadge) ui.stepBadge.textContent = step.kind === 'full' ? 'FRASE COMPLETA' : `PARTE ${step.part} DE ${step.totalParts}`;
