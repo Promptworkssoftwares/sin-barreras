@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.19
+# Sin Barreras v1.7.20
+
+### Nuevo en 1.7.20
+
+- Reproducción móvil de la voz IA mediante el elemento de audio nativo, con onda medida desde el audio real sin redirigir la salida a Web Audio.
+- Si el navegador bloquea el audio automático de una traducción, la conversación se pausa y el usuario puede pulsar Repetir para escucharla.
 
 ### Nuevo en 1.7.19
 

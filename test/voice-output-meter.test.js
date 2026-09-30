@@ -80,3 +80,72 @@ test('AI playback publishes measured bar levels and stops them when the voice en
     globalThis.CustomEvent = previousCustomEvent;
   }
 });
+
+test('mobile voice plays directly through native audio while measuring the real sound without rerouting it', async () => {
+  const previousWindow = globalThis.window;
+  const previousDocument = globalThis.document;
+  const previousCustomEvent = globalThis.CustomEvent;
+  const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  const events = [];
+  const frames = [];
+  const media = {
+    src: '', currentTime: 0, playCount: 0, blockNext: false, style: {}, listeners: new Map(),
+    setAttribute() {}, removeAttribute() { this.src = ''; }, load() {}, pause() {},
+    play() {
+      this.playCount += 1;
+      if (this.blockNext) return Promise.reject(Object.assign(new Error('blocked'), { name: 'NotAllowedError' }));
+      return Promise.resolve();
+    },
+    addEventListener(type, callback) { this.listeners.set(type, callback); },
+    removeEventListener(type) { this.listeners.delete(type); },
+    emit(type) { this.listeners.get(type)?.(); }
+  };
+  let outputSources = 0;
+  class FakeAudioContext {
+    state = 'running'; destination = {}; sampleRate = 22050;
+    createGain() { return { gain: { value: 1 }, connect() {} }; }
+    createBuffer() { return {}; }
+    createBufferSource() { return { connect() {}, start() { outputSources += 1; } }; }
+    decodeAudioData() {
+      const samples = new Float32Array(22050);
+      for (let i = 0; i < samples.length; i += 1) samples[i] = i % 2 ? .6 : -.6;
+      return Promise.resolve({ getChannelData: () => samples, sampleRate: 22050 });
+    }
+    createMediaElementSource() { throw new Error('Native audio must never be rerouted'); }
+    close() { this.state = 'closed'; return Promise.resolve(); }
+  }
+  try {
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { userAgent: 'Android Mobile', maxTouchPoints: 1 } });
+    globalThis.window = {
+      AudioContext: FakeAudioContext,
+      dispatchEvent(event) { events.push(event.detail); },
+      requestAnimationFrame(callback) { frames.push(callback); return frames.length; },
+      cancelAnimationFrame() {}, removeEventListener() {}
+    };
+    globalThis.document = { body: { appendChild() {} }, createElement: () => media };
+    globalThis.CustomEvent = class { constructor(type, options) { this.type = type; this.detail = options.detail; } };
+    const { unlockAudioPlayback, playBase64Audio, destroyAudioPlayback } = await import('../public/audio-playback.js?mobile-audio-test');
+    await unlockAudioPlayback();
+    const playback = playBase64Audio('AAAA');
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(media.playCount, 2, 'one gesture prime and one real voice play');
+    assert.match(media.src, /^blob:/);
+    assert.equal(outputSources, 1, 'Web Audio starts only the silent unlock pulse');
+    media.currentTime = .2;
+    frames.shift()?.();
+    assert.ok(events.some((event) => event.playing && event.levels?.some((level) => level > 0)), 'waveform comes from decoded voice');
+    media.emit('ended');
+    await playback;
+    assert.equal(events.at(-1).playing, false);
+    media.blockNext = true;
+    await assert.rejects(playBase64Audio('AAAA'), { name: 'AudioPlaybackBlockedError' });
+    assert.equal(outputSources, 1, 'a blocked native play must not start sound outside the required tap');
+    destroyAudioPlayback();
+  } finally {
+    if (previousNavigator) Object.defineProperty(globalThis, 'navigator', previousNavigator);
+    else delete globalThis.navigator;
+    globalThis.window = previousWindow;
+    globalThis.document = previousDocument;
+    globalThis.CustomEvent = previousCustomEvent;
+  }
+});

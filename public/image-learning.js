@@ -1,5 +1,5 @@
-import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading } from './image-learning-data.js?v=1.7.19';
-import { LANGUAGE_CATALOG } from './languages.js?v=1.7.19';
+import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading } from './image-learning-data.js?v=1.7.20';
+import { LANGUAGE_CATALOG } from './languages.js?v=1.7.20';
 
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));

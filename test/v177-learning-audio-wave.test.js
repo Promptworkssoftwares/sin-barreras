@@ -44,5 +44,5 @@ test('sound lab distinguishes AI model audio from the learner recording', () => 
 });
 
 test('PWA release caches the learning waveform module for installed app use', () => {
-  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.19/);
+  assert.match(sw, /learning-audio-wave\.js\?v=1\.7\.20/);
 });

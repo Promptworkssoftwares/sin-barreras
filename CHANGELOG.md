@@ -1,4 +1,11 @@
-# Sin Barreras v1.7.19
+# Sin Barreras v1.7.20
+
+## 1.7.20 · Salida de audio móvil
+
+- Móviles y Android WebView reproducen voz IA por el reproductor de audio nativo; la onda se calcula sobre las muestras originales sin silenciar la salida.
+- El audio se sirve al reproductor como Blob, con alternativa de data URL; se gestionan sus recursos al cambiar de voz.
+- Un bloqueo de reproducción automática pausa el intérprete y permite reintentar la traducción con Repetir.
+- Android versionCode 1720 / versionName 1.7.20.
 
 ## 1.7.19 · Lectura clara en idiomas con otros alfabetos
 

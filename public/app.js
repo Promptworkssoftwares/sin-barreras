@@ -1,18 +1,18 @@
-import { initLearning } from './learn.js?v=1.7.19';
-import { initImageLearning } from './image-learning.js?v=1.7.19';
-import { initSounds } from './sounds.js?v=1.7.19';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.19';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.19';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.19';
-import { initAIStage } from './ai-stage.js?v=1.7.19';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.19';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.19';
-import { initPhrasebook } from './phrasebook.js?v=1.7.19';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.19';
-import { initQrConversation } from './qr-conversation.js?v=1.7.19';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.19';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.19';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.19';
+import { initLearning } from './learn.js?v=1.7.20';
+import { initImageLearning } from './image-learning.js?v=1.7.20';
+import { initSounds } from './sounds.js?v=1.7.20';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.20';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.20';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.20';
+import { initAIStage } from './ai-stage.js?v=1.7.20';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.20';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.20';
+import { initPhrasebook } from './phrasebook.js?v=1.7.20';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.20';
+import { initQrConversation } from './qr-conversation.js?v=1.7.20';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.20';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.20';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.20';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -714,6 +714,15 @@ async function interpretAudio(audio, sessionId) {
     await playAudio(result.audioBase64, result.targetLanguage, { resumeConversation: true, sessionId });
   } catch (error) {
     if (error.name === 'AbortError') return;
+    if (error.name === 'AudioPlaybackBlockedError') {
+      state.running = false;
+      state.conversationSession += 1;
+      cleanConversationResources();
+      renderConversationButtonState('idle');
+      setStatus('paused', 'Toca Repetir para escuchar la traducción.');
+      updateWaveVisual(0, false);
+      return;
+    }
     notify(error.message || 'No pudimos traducir este mensaje.');
     if (error.code === 'AI_MONTHLY_LIMIT_REACHED') {
       state.running = false;
@@ -763,19 +772,24 @@ function playAudio(base64, language, { resumeConversation = false, sessionId = s
   const playback = { pause: stopAudioPlayback };
   state.currentAudio = playback;
   setStatus('speaking');
+  let completed = false;
 
   return playBase64Audio(base64)
+    .then(() => { completed = true; })
     .catch((error) => {
       if (error?.name === 'AudioPlaybackBlockedError') {
-        notify('Audio pausado por el navegador. Toca la app una vez y el audio quedará habilitado.');
+        notify(resumeConversation
+          ? 'El celular bloqueó la voz automática. Pausé la conversación: toca Repetir para escuchar la traducción.'
+          : 'El celular bloqueó el audio. Toca Escuchar otra vez.');
       } else {
         notify(error?.message || 'No se pudo reproducir la voz.');
       }
       throw error;
     })
     .finally(() => {
-      if (state.currentAudio === playback) state.currentAudio = null;
-      if (resumeConversation && state.running && sessionId === state.conversationSession) startRecordingSegment(sessionId);
+      const stillCurrent = state.currentAudio === playback;
+      if (stillCurrent) state.currentAudio = null;
+      if (completed && stillCurrent && resumeConversation && state.running && sessionId === state.conversationSession) startRecordingSegment(sessionId);
       else if (!state.running) setStatus('idle');
     });
 }

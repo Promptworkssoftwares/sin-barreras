@@ -4,7 +4,7 @@ let context = null;
 let masterGain = null;
 let currentSource = null;
 let currentMedia = null;
-let mediaMeterSource = null;
+let currentMediaObjectUrl = null;
 let finishCurrentPlayback = null;
 let currentMeterSource = null;
 let currentMeterAnalyser = null;
@@ -13,9 +13,12 @@ let silentObjectUrl = null;
 let unlockStarted = false;
 let unlockPromise = null;
 let unlocked = false;
+let mediaPrimed = false;
 let destroyed = false;
 
 const gestureEvents = ['pointerdown', 'touchstart', 'keydown'];
+const mobilePlayback = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '')
+  || (/Macintosh/i.test(navigator.userAgent || '') && navigator.maxTouchPoints > 1);
 
 function reportPlaybackLevel(level, playing, levels = []) {
   window.dispatchEvent(new CustomEvent('sinbarreras:playback-level', { detail: { level, levels, playing } }));
@@ -73,22 +76,46 @@ function connectPlaybackMeter(source, audioContext, owner = source) {
   currentMeterFrame = window.requestAnimationFrame(tick);
 }
 
-function connectMediaPlaybackMeter(media) {
-  const audioContext = getContext();
-  if (audioContext?.state !== 'running' || !audioContext.createMediaElementSource) {
-    currentMeterSource = media;
-    reportPlaybackLevel(null, true);
-    return;
-  }
+// Decode the same audio only for its waveform. Never connect the media element
+// to Web Audio: doing so reroutes the audible output through a context that can
+// be suspended or inaudible in mobile browsers and Android WebView.
+async function measureMediaPlayback(media, base64) {
+  currentMeterSource = media;
+  reportPlaybackLevel(null, true);
   try {
-    if (!mediaMeterSource) mediaMeterSource = audioContext.createMediaElementSource(media);
-    mediaMeterSource.disconnect();
-    connectPlaybackMeter(mediaMeterSource, audioContext, media);
-  } catch {
-    try { mediaMeterSource?.connect(masterGain || audioContext.destination); } catch { /* no-op */ }
-    currentMeterSource = media;
-    reportPlaybackLevel(null, true);
-  }
+    const audioContext = getContext();
+    if (!audioContext?.decodeAudioData) return;
+    const decoded = await audioContext.decodeAudioData(base64ToArrayBuffer(base64));
+    if (currentMeterSource !== media || !decoded?.getChannelData) return;
+    const samples = decoded.getChannelData(0);
+    const rate = decoded.sampleRate;
+    if (!samples?.length || !rate) return;
+    const previous = new Float32Array(15);
+    let recentPeak = .045;
+    const tick = () => {
+      if (currentMeterSource !== media) return;
+      const start = Math.min(samples.length - 1, Math.max(0, Math.floor((media.currentTime || 0) * rate)));
+      const windowSize = Math.max(15, Math.floor(rate * .09));
+      const levels = Array.from(previous, (_, index) => {
+        const from = Math.min(samples.length - 1, start + Math.floor(index * windowSize / 15));
+        const to = Math.min(samples.length, start + Math.floor((index + 1) * windowSize / 15));
+        let power = 0;
+        let count = 0;
+        for (let sample = from; sample < to; sample += Math.max(1, Math.floor((to - from) / 24))) {
+          power += samples[sample] * samples[sample];
+          count += 1;
+        }
+        const rms = Math.sqrt(power / Math.max(1, count));
+        recentPeak = Math.max(.045, rms, recentPeak * .96);
+        const level = Math.min(1, Math.max(0, (rms - .008) / (recentPeak * .85)));
+        previous[index] = previous[index] * .32 + level * .68;
+        return Number(previous[index].toFixed(3));
+      });
+      reportPlaybackLevel(Math.max(...levels), true, levels);
+      currentMeterFrame = window.requestAnimationFrame(tick);
+    };
+    currentMeterFrame = window.requestAnimationFrame(tick);
+  } catch { /* Native audio remains audible even if waveform decoding fails. */ }
 }
 
 function makeSilentWavBlob() {
@@ -150,10 +177,6 @@ function base64ToArrayBuffer(base64) {
   return bytes.buffer;
 }
 
-function base64ToDataUrl(base64) {
-  return `data:audio/mpeg;base64,${base64}`;
-}
-
 function createSilentPulse(audioContext) {
   const buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate || 22050);
   const source = audioContext.createBufferSource();
@@ -174,15 +197,16 @@ async function primeMediaElement() {
     await media.play();
     media.pause();
     media.currentTime = 0;
+    mediaPrimed = true;
   } catch {
-    // Web Audio is the primary path; this media element is only a compatibility fallback.
+    mediaPrimed = false;
   }
 }
 
 export function unlockAudioPlayback() {
   if (destroyed) return Promise.resolve(false);
   if (unlockPromise) return unlockPromise;
-  if (unlocked && (!context || context.state === 'running')) return Promise.resolve(true);
+  if (unlocked && (!context || context.state === 'running') && (!mobilePlayback || mediaPrimed)) return Promise.resolve(true);
   unlockStarted = true;
   unlockPromise = (async () => {
     const audioContext = getContext();
@@ -196,7 +220,7 @@ export function unlockAudioPlayback() {
       createSilentPulse(audioContext);
       // Finish priming before a phrase can reuse this same media element.
       await Promise.all([resumePromise, finishCurrentPlayback ? Promise.resolve() : primeMediaElement()]);
-      unlocked = audioContext.state === 'running';
+      unlocked = audioContext.state === 'running' && (!mobilePlayback || mediaPrimed);
       return unlocked;
     } catch {
       unlocked = false;
@@ -238,6 +262,8 @@ export function stopAudioPlayback() {
     try { currentMedia.pause(); } catch { /* no-op */ }
     try { currentMedia.removeAttribute('src'); currentMedia.load(); } catch { /* no-op */ }
   }
+  if (currentMediaObjectUrl) URL.revokeObjectURL(currentMediaObjectUrl);
+  currentMediaObjectUrl = null;
 }
 
 async function playWithWebAudio(base64) {
@@ -274,8 +300,8 @@ async function playWithWebAudio(base64) {
 async function playWithMediaElement(base64) {
   const media = getPersistentMediaElement();
   stopAudioPlayback();
-  media.src = base64ToDataUrl(base64);
-  media.currentTime = 0;
+  currentMediaObjectUrl = URL.createObjectURL?.(new Blob([base64ToArrayBuffer(base64)], { type: 'audio/mpeg' })) || null;
+  media.src = currentMediaObjectUrl || `data:audio/mpeg;base64,${base64}`;
   media.load();
 
   return new Promise((resolve, reject) => {
@@ -303,8 +329,8 @@ async function playWithMediaElement(base64) {
     media.addEventListener('ended', ended, { once: true });
     media.addEventListener('error', failed, { once: true });
     finishCurrentPlayback = ended;
-    media.play().then(() => {
-      if (!settled) connectMediaPlaybackMeter(media);
+    Promise.resolve(media.play()).then(() => {
+      if (!settled) void measureMediaPlayback(media, base64);
     }).catch((error) => {
       if (settled) return;
       settled = true;
@@ -320,6 +346,13 @@ async function playWithMediaElement(base64) {
 
 export async function playBase64Audio(base64) {
   if (!base64) throw new Error('No recibimos audio para reproducir.');
+  if (mobilePlayback) {
+    try { return await playWithMediaElement(base64); }
+    catch (mediaError) {
+      if (mediaError?.name === 'AudioPlaybackBlockedError') throw mediaError;
+      return playWithWebAudio(base64);
+    }
+  }
   try {
     return await playWithWebAudio(base64);
   } catch (webAudioError) {
@@ -333,7 +366,7 @@ export async function playBase64Audio(base64) {
 }
 
 function gestureUnlockHandler() {
-  if (unlocked && (!context || context.state === 'running')) return;
+  if (unlocked && (!context || context.state === 'running') && (!mobilePlayback || mediaPrimed)) return;
   void unlockAudioPlayback();
 }
 
@@ -356,11 +389,10 @@ export function destroyAudioPlayback() {
   silentObjectUrl = null;
   if (currentMedia?.isConnected) currentMedia.remove();
   currentMedia = null;
-  try { mediaMeterSource?.disconnect(); } catch { /* no-op */ }
-  mediaMeterSource = null;
   if (context && context.state !== 'closed') context.close().catch(() => {});
   context = null;
   masterGain = null;
   unlockPromise = null;
   unlocked = false;
+  mediaPrimed = false;
 }

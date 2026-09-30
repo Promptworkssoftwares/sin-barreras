@@ -1957,7 +1957,7 @@ html[data-theme="dark"] .nav-item.is-active {
   box-shadow: 0 10px 24px rgba(53,32,22,.05), inset 0 1px 0 rgba(255,255,255,.88);
   backdrop-filter: blur(8px);
 }
-.status-copy { color: #617193; }
+.status-copy { color: #617203; }
 .stage-helper { color: #819092; }
 .sound-waves {
   width: min(100%, 292px);
