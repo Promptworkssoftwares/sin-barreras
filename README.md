@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.18
+# Sin Barreras v1.7.19
+
+### Nuevo en 1.7.19
+
+- Aprender por imágenes muestra el significado en el idioma del usuario y la lectura con letras latinas para mandarín, ruso y otros idiomas con escritura no latina.
+- La escritura original se puede consultar bajo demanda. Audio y práctica de voz conservan el texto original del idioma elegido.
 
 ### Nuevo en 1.7.18
 

@@ -1,5 +1,5 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.18';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.18';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.19';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.19';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -18,7 +18,7 @@ function safeCacheWrite(items) {
 }
 
 function lessonKey(item = {}) {
-  return [item.id, item.sourceLanguage, item.targetLanguage, item.sourceText, item.translatedText].join('|');
+  return [item.id, item.sourceLanguage, item.targetLanguage, item.sourceText, item.translatedText, item.targetReading || ''].join('|');
 }
 
 function cachedLesson(item) {
@@ -36,7 +36,8 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
   const ui = {
     player: $('#phrase-practice-player'), close: $('#phrase-practice-close'), progressBar: $('#phrase-practice-progress-bar'), progressCopy: $('#phrase-practice-progress-copy'), language: $('#phrase-practice-language'),
     loading: $('#phrase-practice-loading'), content: $('#phrase-practice-content'), error: $('#phrase-practice-error'), retry: $('#phrase-practice-retry'),
-    sourceFull: $('#phrase-practice-source-full'), targetFull: $('#phrase-practice-target-full'), stepBadge: $('#phrase-practice-step-badge'), meaning: $('#phrase-practice-meaning'), target: $('#phrase-practice-target'), pronunciation: $('#phrase-practice-pronunciation'), tip: $('#phrase-practice-tip'),
+    sourceFull: $('#phrase-practice-source-full'), targetFull: $('#phrase-practice-target-full'), originalFull: $('#phrase-practice-original-full'), originalFullText: $('#phrase-practice-original-full-text'),
+    stepBadge: $('#phrase-practice-step-badge'), meaning: $('#phrase-practice-meaning'), target: $('#phrase-practice-target'), originalStep: $('#phrase-practice-original-step'), originalStepText: $('#phrase-practice-original-step-text'), pronunciation: $('#phrase-practice-pronunciation'), tip: $('#phrase-practice-tip'),
     listen: $('#phrase-practice-listen'), slow: $('#phrase-practice-slow'), record: $('#phrase-practice-record'), voiceSignal: $('#phrase-practice-voice-signal'), score: $('#phrase-practice-score'), scoreMeter: $('#phrase-practice-score-meter'), scoreNumber: $('#phrase-practice-score-number'), scoreFeedback: $('#phrase-practice-score-feedback'), heard: $('#phrase-practice-heard'), focus: $('#phrase-practice-focus'),
     previous: $('#phrase-practice-previous'), next: $('#phrase-practice-next'), complete: $('#phrase-practice-complete'), completeAverage: $('#phrase-practice-complete-average'), completeParts: $('#phrase-practice-complete-parts'), done: $('#phrase-practice-done')
   };
@@ -120,11 +121,18 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     if (ui.progressCopy) ui.progressCopy.textContent = `${current} / ${total}`;
     if (ui.language) ui.language.textContent = languageName?.(state.lesson?.targetLanguage) || state.lesson?.targetLanguage || 'IDIOMA';
     if (ui.sourceFull) ui.sourceFull.textContent = state.lesson?.sourceText || '';
-    if (ui.targetFull) ui.targetFull.textContent = state.lesson?.targetText || '';
+    const readableImage = Boolean(state.item?.fromImage && state.item?.targetReading);
+    if (ui.targetFull) ui.targetFull.textContent = readableImage ? state.item.targetReading : state.lesson?.targetText || '';
+    if (ui.originalFull) ui.originalFull.hidden = !readableImage;
+    if (ui.originalFullText) ui.originalFullText.textContent = readableImage ? state.lesson?.targetText || '' : '';
     if (ui.stepBadge) ui.stepBadge.textContent = step.kind === 'full' ? 'FRASE COMPLETA' : `PARTE ${step.part} DE ${step.totalParts}`;
     if (ui.meaning) ui.meaning.textContent = step.meaning || '';
-    if (ui.target) ui.target.textContent = step.targetText || '';
-    if (ui.pronunciation) ui.pronunciation.textContent = step.pronunciation || '';
+    if (ui.target) ui.target.textContent = readableImage ? step.pronunciation || '' : step.targetText || '';
+    if (ui.originalStep) ui.originalStep.hidden = !readableImage;
+    if (ui.originalStepText) ui.originalStepText.textContent = readableImage ? step.targetText || '' : '';
+    if (ui.pronunciation) { ui.pronunciation.textContent = readableImage ? '' : step.pronunciation || ''; ui.pronunciation.hidden = readableImage; }
+    const pronunciationLabel = ui.pronunciation?.previousElementSibling;
+    if (pronunciationLabel) pronunciationLabel.textContent = readableImage ? 'CONSEJO PARA TU VOZ' : 'PRONUNCIACIÓN FÁCIL';
     if (ui.tip) ui.tip.textContent = step.tip || '';
     if (ui.previous) ui.previous.disabled = state.index === 0;
     if (ui.next) ui.next.textContent = state.index === total - 1 ? 'TERMINAR PRÁCTICA →' : 'SIGUIENTE PARTE →';

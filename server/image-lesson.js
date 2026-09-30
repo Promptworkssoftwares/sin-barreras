@@ -1,4 +1,4 @@
-import { IMAGE_LESSONS } from '../public/image-learning-data.js';
+import { IMAGE_LESSONS, imageNeedsLatinReading, isLatinImageReading } from '../public/image-learning-data.js';
 
 export function normalizeImageLesson(raw, nativeLanguage, targetLanguage, concepts = IMAGE_LESSONS) {
   if (!Array.isArray(raw) || raw.length !== concepts.length) throw new Error('No pudimos preparar todas las imágenes. Inténtalo otra vez.');
@@ -11,6 +11,9 @@ export function normalizeImageLesson(raw, nativeLanguage, targetLanguage, concep
     if (fields.some((key) => typeof row[key] !== 'string' || !row[key].trim() || row[key].length > 180)) {
       throw new Error('La lección por imágenes está incompleta.');
     }
+    if (imageNeedsLatinReading(targetLanguage) && ['targetWordLatin', 'targetPhraseLatin'].some((key) => !isLatinImageReading(row[key]))) {
+      throw new Error('No pudimos preparar una lectura clara en letras latinas. Inténtalo otra vez.');
+    }
     byId.set(row.id, row);
   }
   return concepts.map((concept) => {
@@ -21,7 +24,9 @@ export function normalizeImageLesson(raw, nativeLanguage, targetLanguage, concep
       nativeWord: nativeLanguage === 'en' ? concept.word : row.nativeWord.trim(),
       targetWord: targetLanguage === 'en' ? concept.word : row.targetWord.trim(),
       nativePhrase: nativeLanguage === 'en' ? concept.phrase : row.nativePhrase.trim(),
-      targetPhrase: targetLanguage === 'en' ? concept.phrase : row.targetPhrase.trim()
+      targetPhrase: targetLanguage === 'en' ? concept.phrase : row.targetPhrase.trim(),
+      targetWordLatin: imageNeedsLatinReading(targetLanguage) ? row.targetWordLatin.trim() : '',
+      targetPhraseLatin: imageNeedsLatinReading(targetLanguage) ? row.targetPhraseLatin.trim() : ''
     };
   });
 }

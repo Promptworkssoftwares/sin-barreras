@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { IMAGE_LESSONS, PRONOUN_LESSONS, PRONOUN_CATEGORIES, FAMILY_LESSONS, FAMILY_CATEGORIES, IMAGE_TOPICS, imageLessonGroup, IMAGE_AUDIO_LANGUAGES } from '../public/image-learning-data.js';
+import { IMAGE_LESSONS, PRONOUN_LESSONS, PRONOUN_CATEGORIES, FAMILY_LESSONS, FAMILY_CATEGORIES, IMAGE_TOPICS, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading } from '../public/image-learning-data.js';
 import { normalizeImageLesson } from '../server/image-lesson.js';
 import { LANGUAGE_CATALOG } from '../public/languages.js';
 
@@ -19,6 +19,24 @@ test('incomplete, duplicated and oversized model outputs cannot become visual le
   assert.throws(() => normalizeImageLesson(records.slice(1), 'es', 'fr'));
   assert.throws(() => normalizeImageLesson([records[0], ...records.slice(0, -1)], 'es', 'fr'));
   assert.throws(() => normalizeImageLesson(records.map((row, i) => i ? row : { ...row, targetWord: 'x'.repeat(181) }), 'es', 'fr'));
+});
+
+test('Mandarin and Russian lessons require readable Latin text while retaining original speech text', () => {
+  const concepts = imageLessonGroup('pronouns', '1', 'object').filter(({ id }) => id === 'him');
+  const row = { id: 'him', nativeWord: 'a él', targetWord: '他', nativePhrase: 'Lo veo.', targetPhrase: '我看见他。', targetWordLatin: 'tā', targetPhraseLatin: 'Wǒ kànjiàn tā.' };
+  const chinese = normalizeImageLesson([row], 'es', 'zh', concepts)[0];
+  assert.equal(chinese.targetWord, '他');
+  assert.equal(chinese.targetPhrase, '我看见他。');
+  assert.equal(chinese.targetWordLatin, 'tā');
+  assert.equal(chinese.targetPhraseLatin, 'Wǒ kànjiàn tā.');
+  assert.equal(chinese.nativeWord, 'a él');
+  assert.throws(() => normalizeImageLesson([{ ...row, targetWordLatin: '他' }], 'es', 'zh', concepts), /lectura clara/);
+  assert.throws(() => normalizeImageLesson([{ ...row, targetPhraseLatin: '' }], 'es', 'zh', concepts), /lectura clara/);
+  assert.throws(() => normalizeImageLesson([{ ...row, targetWordLatin: 'ˈta' }], 'es', 'zh', concepts), /lectura clara/);
+  assert.equal(imageNeedsLatinReading('ru'), true);
+  const russian = normalizeImageLesson([{ ...row, targetWord: 'его', targetPhrase: 'Я вижу его.', targetWordLatin: 'yevo', targetPhraseLatin: 'Ya vizhu yevo.' }], 'es', 'ru', concepts)[0];
+  assert.equal(russian.targetWordLatin, 'yevo');
+  assert.equal(normalizeImageLesson([{ ...row, targetWord: 'him', targetPhrase: 'I see him.' }], 'es', 'en', concepts)[0].targetWordLatin, '');
 });
 
 test('the supplied pronoun images form the first level with six requested groups and demonstratives', () => {

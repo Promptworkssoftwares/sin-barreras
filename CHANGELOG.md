@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.18
+# Sin Barreras v1.7.19
+
+## 1.7.19 · Lectura clara en idiomas con otros alfabetos
+
+- Lectura latina validada para palabras y frases en Aprender por imágenes; significado visible en el idioma nativo y escritura original opcional.
+- Reto visual y práctica de voz desde imágenes muestran lectura legible; voz IA sigue usando la escritura original.
+- Nuevas claves de caché para generar las lecturas en lecciones nuevas y Android versionCode 1719 / versionName 1.7.19.
 
 ## 1.7.18 · Familia y niveles por tema
 

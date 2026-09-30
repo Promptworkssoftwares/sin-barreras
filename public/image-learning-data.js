@@ -120,3 +120,11 @@ export function imageLessonGroup(topic = 'pronouns', level = '1', category = 'pe
 // Audio and transcription are offered only for languages listed by the speech provider.
 // The visual/text lesson still works for every language in the application catalog.
 export const IMAGE_AUDIO_LANGUAGES = new Set('af ar hy az be bs bg ca zh hr cs da nl en et fi fr gl de el he hi hu is id it ja kn kk ko lv lt mk ms mr mi ne no fa pl pt ro ru sr sk sl es sw sv tl ta th tr uk ur vi cy'.split(' '));
+
+// Lessons for these languages show a Latin-letter reading while keeping the
+// original writing for speech synthesis and an optional learner reference.
+export const IMAGE_ROMANIZED_LANGUAGES = new Set('am ar as ba be bg bn bo el fa gu he hi hy ja ka kk km kn ko lo mk ml mn mr my ne pa ps ru sa sd si sr ta te tg th tt uk ur yi zh'.split(' '));
+export const imageNeedsLatinReading = (language) => IMAGE_ROMANIZED_LANGUAGES.has(language);
+export const isLatinImageReading = (value) => typeof value === 'string' && Boolean(value.trim())
+  && value.length <= 240 && !/[\u0250-\u02AF\u1D00-\u1DFFˈˌ]/u.test(value)
+  && /^[\p{Script=Latin}\p{Mark}0-9\s.,!?;:'"()\-–—]+$/u.test(value.trim());
