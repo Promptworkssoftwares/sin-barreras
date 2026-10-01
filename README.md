@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.22
+# Sin Barreras v1.7.23
+
+### Nuevo en 1.7.23
+
+- Las cabeceras superiores de Hablar, Aprender, Coach y Cámara usan la misma escala de texto y estilo, también en móvil y modo oscuro.
+- Los textos introductorios se muestran completos y las funciones de cada pantalla continúan debajo de la cabecera.
 
 ### Nuevo en 1.7.22
 

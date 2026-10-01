@@ -1,4 +1,4 @@
-import { getMicrophoneStream } from './microphone.js?v=1.7.22';
+import { getMicrophoneStream } from './microphone.js?v=1.7.23';
 
 const DEFAULTS = Object.freeze({
   thinkingAfterMs: 420,

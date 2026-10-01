@@ -1,6 +1,6 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.22';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.22';
-import { imageNeedsLatinReading } from './image-learning-data.js?v=1.7.22';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.23';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
+import { imageNeedsLatinReading } from './image-learning-data.js?v=1.7.23';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 

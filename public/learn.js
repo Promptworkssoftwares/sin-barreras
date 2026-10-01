@@ -1,5 +1,5 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.22';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.22';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.23';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;

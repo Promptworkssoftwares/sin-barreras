@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.22
+# Sin Barreras v1.7.23
+
+## 1.7.23 · Cabeceras consistentes con Hablar
+
+- Aprender, Coach y Cámara comparten los tamaños, colores, tipografía y espaciado de la cabecera de Hablar en escritorio y móvil.
+- Las cabeceras de Coach y Cámara ya no añaden una tarjeta de fondo distinta; el texto introductorio de Hablar se muestra completo en móvil.
+- Android versionCode 1723 / versionName 1.7.23.
 
 ## 1.7.22 · Cabeceras de Aprender, Coach y Cámara
 
