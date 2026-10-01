@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.21
+# Sin Barreras v1.7.22
+
+### Nuevo en 1.7.22
+
+- Textos de introducción más pequeños en Aprender, Coach y Cámara, con encabezados de estilo y color coherente.
+- Coach organiza la selección de situaciones y la preparación de la conversación en tarjetas más claras, también en pantallas móviles.
 
 ### Nuevo en 1.7.21
 

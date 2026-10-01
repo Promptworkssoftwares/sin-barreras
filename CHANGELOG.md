@@ -1,4 +1,10 @@
-# Sin Barreras v1.7.21
+# Sin Barreras v1.7.22
+
+## 1.7.22 · Cabeceras de Aprender, Coach y Cámara
+
+- Descripciones introductorias más compactas con tamaños definidos en las tres pantallas.
+- Coach y Cámara usan la misma tipografía y paleta que Aprender; Coach presenta las funciones y situaciones en una jerarquía visual más clara.
+- Se conserva el tamaño mínimo de 16 px en los selectores móviles para evitar el zoom automático de iOS. Android versionCode 1722 / versionName 1.7.22.
 
 ## 1.7.21 · Lecciones visuales resistentes a lecturas incompletas
 

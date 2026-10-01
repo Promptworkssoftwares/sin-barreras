@@ -1,15 +1,15 @@
-const CACHE = 'sin-barreras-v1.7.21';
+const CACHE = 'sin-barreras-v1.7.22';
 const ASSETS = [
-  '/', '/manifest.webmanifest', '/css/landing.css?v=1.7.21', '/js/landing.js?v=1.7.21',
-  '/styles.css?v=1.7.21', '/app-bootstrap.js?v=1.7.21', '/cloud.js?v=1.7.21', '/account-ui.js?v=1.7.21',
-  '/app.js?v=1.7.21', '/image-learning.js?v=1.7.21', '/image-learning-data.js?v=1.7.21', '/learning-audio-wave.js?v=1.7.21', '/learner-feedback.js?v=1.7.21', '/phrasebook.js?v=1.7.21', '/phrase-practice.js?v=1.7.21', '/qr-conversation.js?v=1.7.21', '/ai-stage.js?v=1.7.21', '/audio-playback.js?v=1.7.21', '/tts-cache.js?v=1.7.21', '/navigation-flow.js?v=1.7.21', '/play-billing.js?v=1.7.21', '/languages.js?v=1.7.21', '/learn.js?v=1.7.21', '/sounds.js?v=1.7.21', '/voice-turn.js?v=1.7.21', '/icons/icon-192.png', '/icons/icon-512.png',
+  '/', '/manifest.webmanifest', '/css/landing.css?v=1.7.22', '/js/landing.js?v=1.7.22',
+  '/styles.css?v=1.7.22', '/app-bootstrap.js?v=1.7.22', '/cloud.js?v=1.7.22', '/account-ui.js?v=1.7.22',
+  '/app.js?v=1.7.22', '/image-learning.js?v=1.7.22', '/image-learning-data.js?v=1.7.22', '/learning-audio-wave.js?v=1.7.22', '/learner-feedback.js?v=1.7.22', '/phrasebook.js?v=1.7.22', '/phrase-practice.js?v=1.7.22', '/qr-conversation.js?v=1.7.22', '/ai-stage.js?v=1.7.22', '/audio-playback.js?v=1.7.22', '/tts-cache.js?v=1.7.22', '/navigation-flow.js?v=1.7.22', '/play-billing.js?v=1.7.22', '/languages.js?v=1.7.22', '/learn.js?v=1.7.22', '/sounds.js?v=1.7.22', '/voice-turn.js?v=1.7.22', '/icons/icon-192.png', '/icons/icon-512.png',
     '/assets/sin-barreras-logo-full.png', '/assets/sin-barreras-logo-dark.png',
   '/assets/learn/everyday.png', '/assets/learn/work.png', '/assets/learn/construction.png', '/assets/learn/medical.png',
   '/assets/learn/shopping.png', '/assets/learn/restaurant.png', '/assets/learn/interview.png', '/assets/learn/school.png',
   '/assets/footer-menu-v1413/hablar.png', '/assets/footer-menu-v1413/hablar-active.png', '/assets/footer-menu-v1413/aprender.png', '/assets/footer-menu-v1413/aprender-active.png',
   '/assets/footer-menu-v1413/coach.png', '/assets/footer-menu-v1413/coach-active.png',
   '/assets/footer-menu-v1413/camara.png', '/assets/footer-menu-v1413/camara-active.png',
-  '/offline-phrases.html', '/css/offline-phrases.css?v=1.7.21', '/js/offline-phrases.js?v=1.7.21', '/css/room.css?v=1.7.21', '/js/join-conversation.js?v=1.7.21'
+  '/offline-phrases.html', '/css/offline-phrases.css?v=1.7.22', '/js/offline-phrases.js?v=1.7.22', '/css/room.css?v=1.7.22', '/js/join-conversation.js?v=1.7.22'
 ];
 const PRIVATE_PREFIXES = ['/admin', '/api/', '/auth/', '/billing/', '/reset-password', '/account-deletion', '/change-password', '/join/'];
 

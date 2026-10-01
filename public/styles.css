@@ -4117,3 +4117,96 @@ textarea,
   .phrase-card>.learning-audio-wave .learning-wave-track>small,
   .saved-word-card>.learning-audio-wave .learning-wave-track>small{font-size:5px}
 }
+
+/* v1.7.22 · Compact editorial introductions and clearer Coach setup */
+.learn-home-copy .learn-home-description{
+  max-width:490px;margin:10px 0 0;color:var(--muted);
+  font-size:11px;line-height:1.58;letter-spacing:0;
+}
+.coach-view,.camera-view{padding-top:22px}
+.coach-heading,.camera-heading{
+  position:relative;max-width:none;padding:21px 22px 19px;
+  border:1px solid color-mix(in srgb,var(--aqua-strong) 17%,var(--line));
+  border-radius:22px;
+  background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--aqua) 21%,transparent),transparent 46%),var(--surface);
+  box-shadow:0 14px 35px rgba(19,36,39,.055);
+}
+.coach-heading::before,.camera-heading::before{
+  content:'';position:absolute;top:0;left:22px;width:58px;height:3px;
+  border-radius:0 0 4px 4px;background:var(--accent);
+}
+.coach-heading .section-label,.camera-heading .section-label{margin-bottom:9px;color:var(--accent);font-size:9px}
+.coach-heading h2,.camera-heading h2{
+  max-width:530px;margin:0;color:var(--ink);
+  font-size:clamp(27px,5.6vw,37px);font-weight:800;line-height:1.12;letter-spacing:-1.3px;
+}
+.coach-heading h2 em,.camera-heading h2 em{
+  color:var(--accent);font-family:'Playfair Display',serif;font-weight:600;
+}
+.coach-heading .coach-heading-description,.camera-heading .camera-heading-description{
+  max-width:520px;margin:10px 0 0;color:var(--muted);
+  font-family:Manrope,Arial,sans-serif;font-size:11px;line-height:1.58;letter-spacing:0;
+}
+.coach-feature-strip,.camera-flow-strip{margin-top:14px}
+.coach-feature-strip span,.camera-flow-strip span{
+  border-color:color-mix(in srgb,var(--aqua-strong) 16%,var(--line));
+  color:var(--ink);background:var(--paper);font-size:9px;
+}
+.coach-feature-strip b{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.coach-setup{
+  margin-top:14px;gap:14px;padding:18px;border-radius:22px;
+  border-color:color-mix(in srgb,var(--aqua-strong) 16%,var(--line));
+}
+.coach-setup-intro{padding-bottom:15px}
+.coach-setup-intro strong{color:var(--ink);font-size:16px}
+.coach-setup-intro small{max-width:490px;font-size:10px;line-height:1.5}
+.coach-scenario-picker{gap:11px;padding:14px;border-radius:17px}
+.coach-scenario-picker-head span{font-size:9px}
+.coach-scenario-picker-head small{font-size:9px;line-height:1.4}
+.coach-scenario-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.coach-scenario-grid button{min-height:64px;padding:9px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.coach-scenario-grid button:hover{transform:translateY(-2px);border-color:var(--accent)}
+.coach-scenario-grid button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.coach-scenario-grid button b{font-size:10px}
+.coach-scenario-grid button small{font-size:8px}
+.coach-setup>label{gap:7px;color:var(--muted);font-size:10px}
+.coach-setup select{font-size:12px}
+.coach-language-pair{padding:13px;border-radius:16px}
+.coach-start-button{min-height:49px;border-radius:13px}
+.camera-panel{margin-top:14px}
+.camera-helper-text{font-size:10px;line-height:1.5}
+.dark .coach-heading,.dark .camera-heading{
+  border-color:var(--line);
+  background:radial-gradient(circle at 100% 0%,rgba(37,93,89,.24),transparent 48%),var(--surface);
+}
+.dark .coach-feature-strip span,.dark .camera-flow-strip span{background:var(--paper);border-color:var(--line)}
+@media(max-width:620px){
+  .learn-home-copy .learn-home-description{max-width:100%;margin-top:8px;font-size:10.5px;line-height:1.55}
+  .coach-view,.camera-view{padding-top:12px}
+  .coach-heading,.camera-heading{padding:17px 15px 15px;border-radius:19px}
+  .coach-heading::before,.camera-heading::before{left:15px}
+  .coach-heading h2,.camera-heading h2{font-size:clamp(23px,6.6vw,29px);line-height:1.13;letter-spacing:-.9px}
+  .coach-heading .coach-heading-description,.camera-heading .camera-heading-description{
+    margin-top:8px;font-size:10.5px;line-height:1.55;
+  }
+  .coach-feature-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:12px}
+  .coach-feature-strip span{min-height:32px;padding:5px 7px;font-size:8px}
+  .coach-setup{margin-top:11px;padding:12px;gap:11px;border-radius:18px}
+  .coach-setup-intro{gap:9px;padding-bottom:12px}
+  .coach-setup-intro strong{font-size:13px}
+  .coach-setup-intro small{font-size:9px}
+  .coach-scenario-picker{gap:9px;padding:10px}
+  .coach-scenario-picker-head span{font-size:8px}
+  .coach-scenario-picker-head small{font-size:8px}
+  .coach-scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .coach-scenario-grid button{min-height:57px;padding:8px}
+  .coach-scenario-grid button b{font-size:9px}
+  .coach-scenario-grid button small{font-size:7.5px}
+  .coach-view .coach-setup>label{padding:10px!important;font-size:9px!important}
+  .coach-view .coach-setup select{min-height:40px;font-size:16px!important}
+  .coach-view .coach-language-pair label{font-size:9px!important}
+  .coach-view .coach-language-pair select{min-height:40px!important;font-size:16px!important}
+  .camera-flow-strip{gap:5px;margin-top:12px}
+  .camera-flow-strip span{min-height:30px;padding:0 8px;font-size:8px}
+  .camera-panel{margin-top:11px}
+}
