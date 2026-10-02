@@ -1,4 +1,5 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.23';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.25';
+import { tUi } from './ui-i18n.js?v=1.7.25';
 
 export function initQrConversation({ notify, request, languages, createAutoVoiceTurn, getDefaults } = {}) {
   const dialog = document.querySelector('#qr-conversation-dialog');
@@ -76,12 +77,12 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
     const mine = turn.speaker === 'host';
     const article = document.createElement('article');
     article.className = `qr-turn ${mine ? 'mine' : 'theirs'}`;
-    const label=document.createElement('span'); label.textContent=mine?'TÚ':'OTRA PERSONA';
+    const label=document.createElement('span'); label.textContent=tUi(mine?'TÚ':'OTRA PERSONA');
     const original=document.createElement('p'); original.textContent=turn.originalText;
     const translated=document.createElement('strong'); translated.textContent=turn.translatedText;
     article.append(label,original,translated);
     if(!mine){
-      const report=document.createElement('button'); report.type='button'; report.className='qr-report-message'; report.textContent='⚑ Reportar mensaje';
+      const report=document.createElement('button'); report.type='button'; report.className='qr-report-message'; report.textContent=tUi('⚑ Reportar mensaje');
       report.addEventListener('click',()=>reportContent(`${turn.originalText}\n${turn.translatedText}`).catch(err=>notify?.(err.message)));
       article.append(report);
     }
@@ -222,7 +223,7 @@ export function initQrConversation({ notify, request, languages, createAutoVoice
   endButton?.addEventListener('click', endRoom);
   reportParticipant?.addEventListener('click',()=>reportContent('').catch(err=>notify?.(err.message)));
   blockParticipant?.addEventListener('click',async()=>{
-    if(!room || !confirm('¿Bloquear a la otra persona y terminar esta conversación?')) return;
+    if(!room || !confirm(tUi('¿Bloquear a la otra persona y terminar esta conversación?'))) return;
     try{
       await request(`/api/public/conversations/${encodeURIComponent(room.code)}/block`,{method:'POST',headers:{'Content-Type':'application/json','X-SB-Conversation-Token':room.hostToken},body:JSON.stringify({role:'host',reason:reportReason?.value || 'other'})});
       notify?.('Participante bloqueado.');

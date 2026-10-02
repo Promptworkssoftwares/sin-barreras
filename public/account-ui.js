@@ -1,3 +1,5 @@
+import { getUiLocale, tUi } from './ui-i18n.js?v=1.7.25';
+
 const $ = (selector) => document.querySelector(selector);
 
 async function jsonRequest(url, options = {}) {
@@ -40,13 +42,15 @@ export function initAccountUI() {
   const settingsUsageRemaining = $('#settings-ai-remaining');
   const settingsUsageReset = $('#settings-ai-reset');
   const settingsUsageNote = $('#settings-ai-usage-note');
+  let latestQuota = null;
 
   function formatResetDate(value) {
     const date = value ? new Date(value) : null;
-    return date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString('es-US', { month:'short', day:'numeric' }) : '—';
+    return date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString(getUiLocale() === 'en' ? 'en-US' : 'es-US', { month:'short', day:'numeric' }) : '—';
   }
 
   function renderAiUsage(quota = {}) {
+    latestQuota = quota;
     const used = Number(quota.voiceMinutesUsed || 0);
     const limit = Number(quota.minutesLimit || 0);
     const hasVoiceLimit = Number.isFinite(limit) && limit > 0;
@@ -140,17 +144,19 @@ export function initAccountUI() {
   if (button) button.textContent = (user.name || user.email || 'SB').slice(0, 1).toUpperCase();
   if (name) name.textContent = user.name || 'Usuario de Sin Barreras';
   if (email) email.textContent = user.email;
-  if (plan) {
+  function renderPlan() {
+    if (!plan) return;
     if (user.role === 'owner') plan.textContent = 'OWNER · ACCESO TOTAL';
     else if (user.freeAccess) plan.textContent = 'ACCESO GRATUITO OTORGADO';
     else if (user.subscriptionStatus === 'trialing') {
       const end = user.currentPeriodEnd ? new Date(user.currentPeriodEnd) : null;
-      const when = end && !Number.isNaN(end.getTime()) ? end.toLocaleDateString('es-US', { month:'short', day:'numeric', year:'numeric' }) : '';
-      plan.textContent = `PRUEBA GRATIS${when ? ` · HASTA ${when.toUpperCase()}` : ''}`;
+      const when = end && !Number.isNaN(end.getTime()) ? end.toLocaleDateString(getUiLocale() === 'en' ? 'en-US' : 'es-US', { month:'short', day:'numeric', year:'numeric' }) : '';
+      plan.textContent = `${tUi('PRUEBA GRATIS')}${when ? ` · ${tUi('HASTA')} ${when.toUpperCase()}` : ''}`;
     }
     else if (user.subscriptionStatus === 'active') plan.textContent = 'PLAN SIN BARRERAS · $5.99/MES';
     else plan.textContent = 'SIN SUSCRIPCIÓN ACTIVA';
   }
+  renderPlan();
   if (admin && user.role !== 'owner') admin.remove();
   else if (admin) admin.hidden = false;
   if (deleteButton) deleteButton.hidden = user.role === 'owner';
@@ -159,6 +165,7 @@ export function initAccountUI() {
   button?.addEventListener('click', () => { dialog?.showModal(); void loadAiUsage(); });
   settingsButton?.addEventListener('click', () => { void loadAiUsage(); });
   window.addEventListener('sinbarreras:ai-quota', (event) => renderAiUsage(event.detail || {}));
+  window.addEventListener('sinbarreras:ui-locale', () => { renderPlan(); if (latestQuota) renderAiUsage(latestQuota); });
   manage?.addEventListener('click', async () => {
     try {
       manage.disabled = true;
@@ -193,8 +200,8 @@ export function initAccountUI() {
     event.preventDefault();
     const confirmation = String(deleteConfirmation?.value || '').trim().toUpperCase();
     const submit = $('#delete-account-confirm');
-    if (confirmation !== 'ELIMINAR') {
-      if (deleteStatus) deleteStatus.textContent = 'Escribe ELIMINAR para confirmar.';
+    if (confirmation !== (getUiLocale() === 'en' ? 'DELETE' : 'ELIMINAR')) {
+      if (deleteStatus) deleteStatus.textContent = tUi('Escribe ELIMINAR para confirmar.');
       return;
     }
     try {

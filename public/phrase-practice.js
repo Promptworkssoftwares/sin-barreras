@@ -1,6 +1,7 @@
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.23';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
-import { imageNeedsLatinReading } from './image-learning-data.js?v=1.7.23';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.25';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.25';
+import { imageNeedsLatinReading } from './image-learning-data.js?v=1.7.25';
+import { tUi } from './ui-i18n.js?v=1.7.25';
 const LESSON_CACHE_KEY = 'sinBarreras.phraseLessons.v1';
 const MAX_CACHED_LESSONS = 40;
 
@@ -261,7 +262,7 @@ export function initPhrasePractice({ request, notify, createAutoVoiceTurn, speak
     const results = [...state.scores.values()];
     const average = results.length ? Math.round(results.reduce((sum, item) => sum + (Number(item.score) || 0), 0) / results.length) : 0;
     if (ui.completeAverage) ui.completeAverage.textContent = results.length ? `${average}%` : '—';
-    if (ui.completeParts) ui.completeParts.textContent = `${results.length} de ${state.steps.length}`;
+    if (ui.completeParts) ui.completeParts.textContent = `${results.length} ${tUi('de')} ${state.steps.length}`;
     if (ui.progressBar) ui.progressBar.style.width = '100%';
     if (ui.progressCopy) ui.progressCopy.textContent = `${state.steps.length} / ${state.steps.length}`;
     onComplete?.(state.item, { averageScore: average, practicedSteps: results.length, totalSteps: state.steps.length });

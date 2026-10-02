@@ -1,18 +1,20 @@
-import { initLearning } from './learn.js?v=1.7.23';
-import { initImageLearning } from './image-learning.js?v=1.7.23';
-import { initSounds } from './sounds.js?v=1.7.23';
-import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.23';
-import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.23';
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.23';
-import { initAIStage } from './ai-stage.js?v=1.7.23';
-import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.23';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.23';
-import { initPhrasebook } from './phrasebook.js?v=1.7.23';
-import { initPhrasePractice } from './phrase-practice.js?v=1.7.23';
-import { initQrConversation } from './qr-conversation.js?v=1.7.23';
-import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.23';
-import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.23';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
+import { initLearning } from './learn.js?v=1.7.25';
+import { initImageLearning } from './image-learning.js?v=1.7.25';
+import { initSounds } from './sounds.js?v=1.7.25';
+import { LANGUAGE_CATALOG, LANGUAGES, POPULAR_PARTNER_CODES } from './languages.js?v=1.7.25';
+import { createAutoVoiceTurn } from './voice-turn.js?v=1.7.25';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.25';
+import { initAIStage } from './ai-stage.js?v=1.7.25';
+import { installAudioUnlock, unlockAudioPlayback, playBase64Audio, stopAudioPlayback, destroyAudioPlayback } from './audio-playback.js?v=1.7.25';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.25';
+import { initPhrasebook } from './phrasebook.js?v=1.7.25';
+import { initPhrasePractice } from './phrase-practice.js?v=1.7.25';
+import { initQrConversation } from './qr-conversation.js?v=1.7.25';
+import { getMicrophoneStream, microphoneErrorMessage } from './microphone.js?v=1.7.25';
+import { friendlyRecognition, friendlyDifference, friendlyFocus } from './learner-feedback.js?v=1.7.25';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.25';
+import { getUiLocale, tUi } from './ui-i18n.js?v=1.7.25';
+import { learningPair, learningConversations, dailyLearningAction } from './learning-profile.js?v=1.7.25';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -38,7 +40,7 @@ const ui = {
   toast: $('#toast'), historyView: $('#history-view'), historyList: $('#history-list'), historyEmpty: $('#history-empty'), clearHistory: $('#clear-history'), openHistory: $('#open-history'),
   phrasebookView: $('#phrasebook-view'), phrasebookBackToLearn: $('#phrasebook-back-to-learn'), openPhrasebook: $('#open-phrasebook'), settingsOpenPhrasebook: $('#settings-open-phrasebook'), saveCurrentTranslation: $('#save-current-translation'),
   faceView: $('#face-to-face-view'), openFaceToFace: $('#open-face-to-face'), closeFaceToFace: $('#close-face-to-face'), faceToggleListening: $('#face-toggle-listening'), faceStatus: $('#face-status'), faceStatusDot: $('#face-status-dot'), facePartnerLanguage: $('#face-partner-language'), faceUserLanguage: $('#face-user-language'), facePartnerText: $('#face-partner-text'), faceUserText: $('#face-user-text'), facePartnerRepeat: $('#face-partner-repeat'), faceUserRepeat: $('#face-user-repeat'),
-  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnImagesBranch: $('#learn-images-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), learnQuickPhrasesBranch: $('#learn-quick-phrases-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
+  learnView: $('#learn-view'), learnHome: $('#learn-home'), learnNativeLanguage: $('#learn-native-language'), learnTargetLanguage: $('#learn-target-language'), learnTodayTitle: $('#learn-today-title'), learnTodayDescription: $('#learn-today-description'), learnTodayButton: $('#learn-today-button'), learnTodayEyebrow: $('#learn-today-eyebrow'), learnSoundsBranch: $('#learn-sounds-branch'), learnRoutesBranch: $('#learn-routes-branch'), learnImagesBranch: $('#learn-images-branch'), learnConversationsBranch: $('#learn-conversations-branch'), learnWordsBranch: $('#learn-words-branch'), learnQuickPhrasesBranch: $('#learn-quick-phrases-branch'), conversationLearningList: $('#conversation-learning-list'), conversationLearningEmpty: $('#conversation-learning-empty'), conversationLearningCount: $('#conversation-learning-count'), learnFromTranslation: $('#learn-from-translation'),
   settingsDialog: $('#settings-dialog'), onboardingDialog: $('#onboarding-dialog'), fontSize: $('#font-size-select'), themeButton: $('#theme-button'),
   practiceView: $('#practice-view'), practiceForm: $('#practice-form'), practiceInput: $('#practice-input'), practiceLanguage: $('#practice-language'), practiceTargetLanguage: $('#practice-target-language'), practiceSituation: $('#practice-situation'),
   practicePhraseMode: $('#practice-phrase-mode'), practiceConversationMode: $('#practice-conversation-mode'),
@@ -87,7 +89,7 @@ const state = {
   settings: { theme: 'light', fontSize: 'normal', translatorVoice: 'coral', detectedUserLanguage: null },
   practice: null, practiceRecorder: null, practiceStream: null, practiceChunks: [], practiceVoiceCapture: null, practiceVoiceBusy: false,
   practiceMode: 'phrase', practiceConversationScenario: 'traffic', practiceConversationActive: false, practiceConversationBusy: false, practiceConversationVoiceCapture: null, practiceConversationHistory: [], practiceConversationSessionData: null, practiceConversationLastLine: '', practiceConversationTurnCount: 0, practiceConversationProgress: 0, practiceConversationScores: [],
-  coachActive: false, coachHistory: [], coachLastReply: '', coachSessionContext: null, coachTurnCount: 0, coachProgress: 0, coachScores: [], coachRecorder: null, coachStream: null, coachChunks: [], coachBusy: false, coachVoiceCapture: null, coachVoiceBusy: false, coachPhraseRecorder: null, coachPhraseStream: null, coachPhraseChunks: [],
+  coachActive: false, coachPaused: false, coachSummaryPending: false, coachHistory: [], coachLastReply: '', coachSessionContext: null, coachTurnCount: 0, coachProgress: 0, coachScores: [], coachRecorder: null, coachStream: null, coachChunks: [], coachBusy: false, coachVoiceCapture: null, coachVoiceBusy: false, coachPhraseRecorder: null, coachPhraseStream: null, coachPhraseChunks: [],
   cameraFile: null, cameraPreviewUrl: null, cameraResult: null
 };
 
@@ -104,6 +106,7 @@ const languageFlag = (language) => ({ es: 'ES', en: 'EN', pt: 'PT', fr: 'FR', ar
 
 
 const currentCoachTargetLanguage = () => ui.coachTargetLanguage?.value || 'en';
+const currentLearningPair = () => learningPair(state.settings, browserLanguageHint() || 'es');
 
 function setVoiceSignal(element, mode = 'ready', label = '', detail = {}) {
   if (!element) return;
@@ -246,10 +249,10 @@ function renderHistory() {
   ui.clearHistory.hidden = items.length === 0;
   ui.historyList.innerHTML = items.map((item) => `
     <article class="history-item" data-id="${escapeHTML(item.id)}">
-      <div class="history-meta"><span>${languageName(item.sourceLanguage)} → ${languageName(item.targetLanguage)}${item.situation ? ` · ${escapeHTML(SITUATIONS[item.situation] || item.situation)}` : ''}</span><time>${new Date(item.createdAt).toLocaleString('es-US', { dateStyle: 'medium', timeStyle: 'short' })}</time></div>
+      <div class="history-meta"><span>${languageName(item.sourceLanguage)} → ${languageName(item.targetLanguage)}${item.situation ? ` · ${escapeHTML(tUi(SITUATIONS[item.situation] || item.situation))}` : ''}</span><time>${new Date(item.createdAt).toLocaleString(getUiLocale() === 'en' ? 'en-US' : 'es-US', { dateStyle: 'medium', timeStyle: 'short' })}</time></div>
       <p class="history-original">${escapeHTML(item.originalText)}</p>
       <p class="history-translation">${escapeHTML(item.translatedText)}</p>
-      <div class="history-actions"><button type="button" data-action="speak">Escuchar</button><button type="button" data-action="learn">Practicar</button><button type="button" data-action="save">★ Guardar</button><button type="button" data-action="copy">Copiar</button><button type="button" data-action="share">Compartir</button><button type="button" data-action="delete">Eliminar</button></div>
+      <div class="history-actions"><button type="button" data-action="speak">${tUi('Escuchar')}</button><button type="button" data-action="learn">${tUi('Practicar')}</button><button type="button" data-action="save">${tUi('★ Guardar')}</button><button type="button" data-action="copy">${tUi('Copiar')}</button><button type="button" data-action="share">${tUi('Compartir')}</button><button type="button" data-action="delete">${tUi('Eliminar')}</button></div>
     </article>`).join('');
 }
 
@@ -279,51 +282,46 @@ function saveInterpretation(result) {
 
 
 function conversationLearningCandidates() {
-  const grouped = new Map();
-  for (const item of readHistory()) {
-    const englishText = item.sourceLanguage === 'en' ? item.originalText : item.targetLanguage === 'en' ? item.translatedText : '';
-    if (!englishText) continue;
-    const meaning = item.sourceLanguage === 'en' ? item.translatedText : item.originalText;
-    const nativeLanguage = item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage;
-    const key = englishText.toLowerCase().replace(/\s+/g, ' ').trim();
-    if (!key) continue;
-    const previous = grouped.get(key);
-    const createdAt = item.createdAt || new Date().toISOString();
-    grouped.set(key, {
-      id: item.id, englishText, meaning, nativeLanguage, situation: item.situation || 'everyday',
-      originalText: item.originalText, translatedText: item.translatedText,
-      sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage, count: (previous?.count || 0) + 1,
-      createdAt: previous && new Date(previous.createdAt) > new Date(createdAt) ? previous.createdAt : createdAt
-    });
-  }
-  return [...grouped.values()]
-    .sort((a, b) => (b.count - a.count) || (new Date(b.createdAt) - new Date(a.createdAt)))
-    .slice(0, 16);
+  const { nativeLanguage, targetLanguage } = currentLearningPair();
+  return learningConversations(readHistory(), nativeLanguage, targetLanguage);
 }
 
 function renderConversationLearning() {
   if (!ui.conversationLearningList || !ui.conversationLearningEmpty) return;
   const items = conversationLearningCandidates();
+  const { nativeLanguage, targetLanguage } = currentLearningPair();
   ui.conversationLearningEmpty.hidden = items.length > 0;
+  ui.conversationLearningEmpty.innerHTML = `${tUi('Todavía no hay conversaciones entre')} ${escapeHTML(LANGUAGES[nativeLanguage])} ${getUiLocale() === 'en' ? 'and' : 'y'} ${escapeHTML(LANGUAGES[targetLanguage])}. ${tUi('Usa Hablar con esos idiomas y vuelve aquí para practicarlas.')}`;
   if (ui.conversationLearningCount) ui.conversationLearningCount.textContent = String(items.length);
   ui.conversationLearningList.innerHTML = items.map((item) => `
     <article class="conversation-learning-card" data-learning-id="${escapeHTML(item.id)}">
-      <div class="conversation-learning-card-top"><span>${escapeHTML(SITUATIONS[item.situation] || 'Vida diaria')}</span>${item.count > 1 ? `<b>${item.count}× usada</b>` : ''}</div>
-      <strong>${escapeHTML(item.englishText)}</strong>
+      <div class="conversation-learning-card-top"><span>${escapeHTML(tUi(SITUATIONS[item.situation] || 'Vida diaria'))}</span>${item.count > 1 ? `<b>${item.count}× ${tUi('usada')}</b>` : ''}</div>
+      <strong lang="${escapeHTML(item.targetLanguage)}" dir="auto">${escapeHTML(item.targetText)}</strong>
       <p>${escapeHTML(item.meaning)}</p>
-      <div><button type="button" data-learning-action="listen">▶ Escuchar</button><button type="button" data-learning-action="practice">✦ Practicar conversación</button><button type="button" data-learning-action="save">★ Guardar frase</button></div>
+      <div><button type="button" data-learning-action="listen">${tUi('▶ Escuchar')}</button><button type="button" data-learning-action="practice">${tUi('✦ Practicar conversación')}</button><button type="button" data-learning-action="save">${tUi('★ Guardar frase')}</button></div>
     </article>`).join('');
+}
+
+function updateLearnFromTranslationAction(result = state.currentResult) {
+  if (!ui.learnFromTranslation) return;
+  const { nativeLanguage, targetLanguage } = currentLearningPair();
+  const matches = result && ((result.sourceLanguage === nativeLanguage && result.targetLanguage === targetLanguage)
+    || (result.sourceLanguage === targetLanguage && result.targetLanguage === nativeLanguage));
+  ui.learnFromTranslation.classList.toggle('is-hidden', !matches);
+  ui.learnFromTranslation.textContent = tUi(nativeLanguage === 'es' && targetLanguage === 'en'
+    ? '＋ Guardar en Mis palabras' : '✦ Practicar esta conversación');
 }
 
 function preparePhraseForPractice(item) {
   if (!item) return;
-  const englishText = item.englishText || (item.sourceLanguage === 'en' ? item.originalText : item.targetLanguage === 'en' ? item.translatedText : '');
-  const meaning = item.meaning || (item.sourceLanguage === 'en' ? item.translatedText : item.originalText);
-  const nativeLanguage = item.nativeLanguage || (item.sourceLanguage === 'en' ? item.targetLanguage : item.sourceLanguage) || state.userLanguage || state.userLanguageHint || 'es';
-  if (!englishText || !meaning) { notify('Esta conversación no contiene una frase en inglés para practicar.'); return; }
+  const pair = currentLearningPair();
+  const nativeLanguage = item.sourceLanguage === pair.nativeLanguage || item.targetLanguage === pair.nativeLanguage ? pair.nativeLanguage : item.sourceLanguage;
+  const targetLanguage = item.sourceLanguage === nativeLanguage ? item.targetLanguage : item.sourceLanguage;
+  const meaning = item.sourceLanguage === nativeLanguage ? item.originalText : item.translatedText;
+  if (!LANGUAGES[nativeLanguage] || !LANGUAGES[targetLanguage] || !meaning) { notify(tUi('Esta conversación no contiene una frase válida para practicar.')); return; }
   if (ui.practiceInput) ui.practiceInput.value = meaning;
   if (ui.practiceLanguage && LANGUAGES[nativeLanguage]) ui.practiceLanguage.value = nativeLanguage;
-  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = nativeLanguage === 'en' ? 'es' : 'en';
+  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = targetLanguage;
   keepPracticeLanguagesDistinct('native');
   if (ui.practiceSituation) ui.practiceSituation.value = item.situation || 'everyday';
   showView('learn');
@@ -334,9 +332,13 @@ function preparePhraseForPractice(item) {
 
 async function practiceConversationFromHistory(item) {
   if (!item || state.coachBusy) return;
-  const nativeLanguage = LANGUAGES[item.nativeLanguage] && item.nativeLanguage !== 'en' ? item.nativeLanguage : 'es';
-  if (ui.coachLanguage) ui.coachLanguage.value = nativeLanguage;
-  if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = 'en';
+  if (state.coachActive) {
+    showView('coach');
+    notify(tUi('Ya tienes una conversación en curso. Puedes continuarla o finalizarla antes de iniciar otra.'));
+    return;
+  }
+  if (ui.coachLanguage) ui.coachLanguage.value = item.nativeLanguage;
+  if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = item.targetLanguage;
   keepCoachLanguagesDistinct('native');
   if (ui.coachScenario && [...ui.coachScenario.options].some((option) => option.value === item.situation)) {
     ui.coachScenario.value = item.situation;
@@ -345,7 +347,7 @@ async function practiceConversationFromHistory(item) {
   showView('coach');
   await startCoachSession({ sourceConversation: {
     originalText: item.originalText, translatedText: item.translatedText,
-    sourceLanguage: item.sourceLanguage, targetLanguage: item.targetLanguage
+    sourceLanguage: item.sourceLanguage, targetLanguage: item.translatedLanguage
   } });
 }
 
@@ -459,10 +461,7 @@ function populatePracticeLanguageSelects() {
   };
   selects.forEach(populate);
 
-  const nativeDefault = LANGUAGES[state.settings.detectedUserLanguage]
-    ? state.settings.detectedUserLanguage
-    : (browserLanguageHint() || 'es');
-  const targetDefault = nativeDefault === 'en' ? 'es' : 'en';
+  const { nativeLanguage: nativeDefault, targetLanguage: targetDefault } = currentLearningPair();
   if (ui.practiceLanguage) ui.practiceLanguage.value = nativeDefault;
   if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = targetDefault;
   if (ui.practiceConversationNative) ui.practiceConversationNative.value = nativeDefault;
@@ -470,6 +469,93 @@ function populatePracticeLanguageSelects() {
   if (ui.coachLanguage) ui.coachLanguage.value = nativeDefault;
   if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = targetDefault;
   updateCoachLanguageUI();
+}
+
+function populateLearningLanguageSelects() {
+  for (const select of [ui.learnNativeLanguage, ui.learnTargetLanguage]) {
+    if (!select) continue;
+    select.replaceChildren(...LANGUAGE_CATALOG.slice()
+      .sort((a, b) => a.apiName.localeCompare(b.apiName))
+      .map(({ code, label }) => {
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = label;
+        return option;
+      }));
+  }
+  const pair = currentLearningPair();
+  if (state.settings.learningNativeLanguage !== pair.nativeLanguage || state.settings.learningTargetLanguage !== pair.targetLanguage) {
+    state.settings.learningNativeLanguage = pair.nativeLanguage;
+    state.settings.learningTargetLanguage = pair.targetLanguage;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+    window.SinBarrerasCloud?.queueSync?.();
+  }
+  imageLearning?.setLanguagePair?.(pair);
+  renderLearnHomeFlow();
+}
+
+function renderLearnHomeFlow() {
+  const { nativeLanguage, targetLanguage } = currentLearningPair();
+  const hasSpanishEnglishPath = nativeLanguage === 'es' && targetLanguage === 'en';
+  if (ui.learnNativeLanguage) ui.learnNativeLanguage.value = nativeLanguage;
+  if (ui.learnTargetLanguage) ui.learnTargetLanguage.value = targetLanguage;
+  $$('[data-english-track]').forEach((card) => { card.hidden = !hasSpanishEnglishPath; });
+  const englishNote = $('#learn-english-note');
+  if (englishNote) englishNote.hidden = hasSpanishEnglishPath;
+
+  const recommendation = learning?.getRecommendation?.() || { dueCount: 0 };
+  const candidates = conversationLearningCandidates();
+  const action = dailyLearningAction({ nativeLanguage, targetLanguage, dueCount: recommendation.dueCount, conversationCount: candidates.length, coachActive: state.coachActive });
+  if (ui.learnTodayEyebrow) ui.learnTodayEyebrow.textContent = tUi('TU SIGUIENTE PASO');
+  if (ui.learnTodayButton) ui.learnTodayButton.dataset.action = action;
+  if (action === 'resume') {
+    if (ui.learnTodayTitle) ui.learnTodayTitle.textContent = tUi('Tu conversación sigue esperándote');
+    if (ui.learnTodayDescription) ui.learnTodayDescription.textContent = tUi('Vuelve a Coach y continúa desde tu último turno.');
+    if (ui.learnTodayButton) ui.learnTodayButton.textContent = tUi('VOLVER A COACH →');
+  } else if (action === 'review') {
+    if (ui.learnTodayTitle) ui.learnTodayTitle.textContent = tUi('Repasa lo que aprendiste');
+    if (ui.learnTodayDescription) ui.learnTodayDescription.textContent = `${recommendation.dueCount} ${tUi(recommendation.dueCount === 1 ? 'palabra lista para repasar' : 'palabras listas para repasar')}`;
+    if (ui.learnTodayButton) ui.learnTodayButton.textContent = tUi('REPASAR AHORA →');
+  } else if (action === 'course') {
+    if (ui.learnTodayTitle) ui.learnTodayTitle.textContent = `${tUi(recommendation.courseTitle || 'Vida diaria')} · ${tUi('Nivel')} ${recommendation.levelNumber || 1}`;
+    if (ui.learnTodayDescription) ui.learnTodayDescription.textContent = tUi('Continúa tu ruta de inglés donde la dejaste.');
+    if (ui.learnTodayButton) ui.learnTodayButton.textContent = tUi('CONTINUAR MI APRENDIZAJE →');
+  } else if (action === 'conversation') {
+    if (ui.learnTodayTitle) ui.learnTodayTitle.textContent = tUi('Practica una conversación tuya');
+    if (ui.learnTodayDescription) ui.learnTodayDescription.textContent = `${candidates.length} ${tUi(candidates.length === 1 ? 'frase disponible' : 'frases disponibles')} · ${LANGUAGES[targetLanguage]}`;
+    if (ui.learnTodayButton) ui.learnTodayButton.textContent = tUi('PRACTICAR EN COACH →');
+  } else {
+    if (ui.learnTodayTitle) ui.learnTodayTitle.textContent = tUi('Aprende tu primera frase útil');
+    if (ui.learnTodayDescription) ui.learnTodayDescription.textContent = `${tUi('Empieza con una frase en')} ${LANGUAGES[targetLanguage]}.`;
+    if (ui.learnTodayButton) ui.learnTodayButton.textContent = tUi('APRENDER UNA FRASE →');
+  }
+}
+
+function saveLearningPair(changed) {
+  let nativeLanguage = ui.learnNativeLanguage?.value;
+  let targetLanguage = ui.learnTargetLanguage?.value;
+  if (!LANGUAGES[nativeLanguage] || !LANGUAGES[targetLanguage]) return;
+  if (nativeLanguage === targetLanguage) {
+    const previous = currentLearningPair();
+    if (changed === 'target') nativeLanguage = previous.targetLanguage;
+    else targetLanguage = previous.nativeLanguage;
+  }
+  state.settings.learningNativeLanguage = nativeLanguage;
+  state.settings.learningTargetLanguage = targetLanguage;
+  const pair = currentLearningPair();
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+  window.SinBarrerasCloud?.queueSync?.();
+  if (!state.coachActive && !state.coachBusy && !ui.coachSetup?.classList.contains('is-hidden')) {
+    if (ui.coachLanguage) ui.coachLanguage.value = pair.nativeLanguage;
+    if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = pair.targetLanguage;
+    updateCoachLanguageUI();
+  }
+  if (ui.practiceLanguage) ui.practiceLanguage.value = pair.nativeLanguage;
+  if (ui.practiceTargetLanguage) ui.practiceTargetLanguage.value = pair.targetLanguage;
+  imageLearning?.setLanguagePair?.(pair);
+  renderLearnHomeFlow();
+  renderConversationLearning();
+  updateLearnFromTranslationAction();
 }
 
 function keepPracticeLanguagesDistinct(changed = 'native') {
@@ -501,7 +587,9 @@ function keepCoachLanguagesDistinct(changed = 'native') {
 
 function updateCoachLanguageUI() {
   const target = currentCoachTargetLanguage();
-  if (ui.coachTextInput) ui.coachTextInput.placeholder = `O escribe tu respuesta en ${LANGUAGES[target] || 'el idioma que practicas'}…`;
+  if (ui.coachTextInput) ui.coachTextInput.placeholder = getUiLocale() === 'en'
+    ? `Or type your reply in ${LANGUAGES[target] || 'the language you practice'}…`
+    : `O escribe tu respuesta en ${LANGUAGES[target] || 'el idioma que practicas'}…`;
 }
 
 function updatePartnerSelectionUI() {
@@ -528,8 +616,10 @@ function renderAutomaticLanguageState() {
   const userName = state.userLanguage ? LANGUAGES[state.userLanguage] : 'AUTO · Detectando';
   const partnerName = LANGUAGES[state.partnerLanguage] || 'Selecciona un idioma';
   if (ui.myLanguageName) ui.myLanguageName.textContent = userName;
-  if (ui.autoLanguageCopy) ui.autoLanguageCopy.textContent = state.partnerLanguage ? `Idioma elegido manualmente: ${partnerName}. Tu idioma se reconoce automáticamente.` : 'Selecciona manualmente el idioma de la otra persona. No se elegirá automáticamente.';
-  if (ui.modeName) ui.modeName.textContent = `${state.userLanguage ? userName : 'TU IDIOMA · AUTO'} ↔ ${partnerName} · ${SITUATIONS[state.situation] || 'Vida diaria'}`;
+  if (ui.autoLanguageCopy) ui.autoLanguageCopy.textContent = state.partnerLanguage
+    ? getUiLocale() === 'en' ? `Chosen language: ${partnerName}. Your language is recognized automatically.` : `Idioma elegido manualmente: ${partnerName}. Tu idioma se reconoce automáticamente.`
+    : tUi('Selecciona manualmente el idioma de la otra persona. No se elegirá automáticamente.');
+  if (ui.modeName) ui.modeName.textContent = `${state.userLanguage ? userName : tUi('TU IDIOMA · AUTO')} ↔ ${state.partnerLanguage ? partnerName : tUi('Selecciona un idioma')} · ${tUi(SITUATIONS[state.situation] || 'Vida diaria')}`;
 }
 
 function persistConversationSettings() {
@@ -761,8 +851,7 @@ function showInterpretation(result) {
   state.currentLanguage = result.targetLanguage;
   state.currentTranslation = result.translatedText;
   state.currentResult = result;
-  const hasEnglish = result.sourceLanguage === 'en' || result.targetLanguage === 'en';
-  ui.learnFromTranslation?.classList.toggle('is-hidden', !hasEnglish);
+  updateLearnFromTranslationAction(result);
   renderFaceToFace(result);
   if (!state.faceToFace) guidedScroll($('.translation-grid'), { block: 'center', highlight: false, delay: 90 });
 }
@@ -1194,7 +1283,7 @@ function appendCoachBubble(role, content, meta = '') {
   if (!ui.coachThread) return null;
   const article = document.createElement('article');
   article.className = `coach-bubble ${role}`;
-  const label = role === 'coach' ? 'COACH' : role === 'coach-tip' ? 'PISTA' : 'TÚ';
+  const label = role === 'coach' ? 'COACH' : role === 'coach-tip' ? tUi('PISTA') : tUi('TÚ');
 
   if (role === 'coach') {
     const beginnerMode = (ui.coachLevel?.value || 'beginner') === 'beginner';
@@ -1203,13 +1292,13 @@ function appendCoachBubble(role, content, meta = '') {
     article.innerHTML = `
       <span>${label}</span>
       <p>${escapeHTML(content)}</p>
-      ${beginnerMode && meta ? `<small class="coach-beginner-meaning"><b>Significa:</b> ${escapeHTML(meta)}</small>` : ''}
-      <div class="coach-tools" aria-label="Herramientas para entender y practicar esta frase">
-        <button type="button" data-coach-action="meaning">¿Qué significa?</button>
-        <button type="button" data-coach-action="listen">🔊 Escuchar</button>
-        <button type="button" data-coach-action="slow">🐢 Más lento</button>
-        <button type="button" data-coach-action="reply">💡 Ayúdame a responder</button>
-        <button type="button" data-coach-action="practice">🎤 Repetir frase</button>
+      ${beginnerMode && meta ? `<small class="coach-beginner-meaning"><b>${tUi('Significa:')}</b> ${escapeHTML(meta)}</small>` : ''}
+      <div class="coach-tools" aria-label="${tUi('Herramientas para entender y practicar esta frase')}">
+        <button type="button" data-coach-action="meaning">${tUi('¿Qué significa?')}</button>
+        <button type="button" data-coach-action="listen">${tUi('🔊 Escuchar')}</button>
+        <button type="button" data-coach-action="slow">${tUi('🐢 Más lento')}</button>
+        <button type="button" data-coach-action="reply">${tUi('💡 Ayúdame a responder')}</button>
+        <button type="button" data-coach-action="practice">${tUi('🎤 Repetir frase')}</button>
       </div>
       <div class="coach-inline-help is-hidden" data-coach-help></div>
       <div class="coach-repeat-result is-hidden" data-coach-repeat-result></div>`;
@@ -1236,13 +1325,13 @@ function appendCoachCorrection(result = {}) {
   const nextFocus = String(result.nextFocus || '').trim();
 
   card.innerHTML = needsCorrection ? `
-    <div class="coach-feedback-headline"><span>${beginnerMode ? 'PEQUEÑA AYUDA' : 'MICRO-FEEDBACK'}</span><div class="coach-score-gauge" style="--score:${score}"><b>${score}%</b></div></div>
+    <div class="coach-feedback-headline"><span>${tUi(beginnerMode ? 'PEQUEÑA AYUDA' : 'MICRO-FEEDBACK')}</span><div class="coach-score-gauge" style="--score:${score}"><b>${score}%</b></div></div>
     <div class="coach-feedback-main">
-      <div><small>UNA FORMA MÁS NATURAL</small><b>${escapeHTML(corrected)}</b></div>
+      <div><small>${tUi('UNA FORMA MÁS NATURAL')}</small><b>${escapeHTML(corrected)}</b></div>
       ${explanation ? `<p>${escapeHTML(explanation)}</p>` : ''}
     </div>
     <div class="coach-feedback-foot"><span>${escapeHTML(feedback || 'Sigue hablando; el objetivo es comunicarte con claridad.')}</span>${nextFocus ? `<b>${escapeHTML(nextFocus)}</b>` : ''}</div>` : `
-    <div class="coach-feedback-headline"><span>BIEN DICHO</span><div class="coach-score-gauge" style="--score:${score}"><b>${score}%</b></div></div>
+    <div class="coach-feedback-headline"><span>${tUi('BIEN DICHO')}</span><div class="coach-score-gauge" style="--score:${score}"><b>${score}%</b></div></div>
     <p>${escapeHTML(feedback || 'Tu respuesta fue clara y natural. Continúa la conversación.')}</p>`;
 
   ui.coachThread.appendChild(card);
@@ -1275,15 +1364,15 @@ function renderCoachSummary(summary = {}) {
   const improve = Array.isArray(summary.improve) ? summary.improve.slice(0, 3) : [];
   const phrases = Array.isArray(summary.usefulPhrases) ? summary.usefulPhrases.slice(0, 3) : [];
   ui.coachSummary.innerHTML = `
-    <div class="coach-summary-head"><span>SESIÓN COMPLETADA</span><strong>${Math.round(Number(summary.overallScore || 0))}%</strong></div>
+    <div class="coach-summary-head"><span>${tUi('SESIÓN COMPLETADA')}</span><strong>${Math.round(Number(summary.overallScore || 0))}%</strong></div>
     <h3>${escapeHTML(summary.title || 'Buen trabajo. Terminaste una conversación completa.')}</h3>
     <p>${escapeHTML(summary.summary || 'Cada conversación te da más confianza para responder en situaciones reales.')}</p>
     <div class="coach-summary-grid">
-      <div><span>LO QUE HICISTE BIEN</span>${strengths.map((item) => `<b>✓ ${escapeHTML(item)}</b>`).join('')}</div>
-      <div><span>PRÓXIMO ENFOQUE</span>${improve.map((item) => `<b>→ ${escapeHTML(item)}</b>`).join('')}</div>
+      <div><span>${tUi('LO QUE HICISTE BIEN')}</span>${strengths.map((item) => `<b>✓ ${escapeHTML(item)}</b>`).join('')}</div>
+      <div><span>${tUi('PRÓXIMO ENFOQUE')}</span>${improve.map((item) => `<b>→ ${escapeHTML(item)}</b>`).join('')}</div>
     </div>
-    ${phrases.length ? `<div class="coach-summary-phrases"><span>FRASES PARA QUEDARTE</span>${phrases.map((item) => `<button type="button" data-summary-phrase="${escapeHTML(item)}">${escapeHTML(item)}</button>`).join('')}</div>` : ''}
-    <div class="coach-summary-next"><span>SIGUIENTE PASO</span><strong>${escapeHTML(summary.nextPractice || 'Repite la misma situación e intenta responder con menos ayuda.')}</strong></div>`;
+    ${phrases.length ? `<div class="coach-summary-phrases"><span>${tUi('FRASES PARA QUEDARTE')}</span>${phrases.map((item) => `<button type="button" data-summary-phrase="${escapeHTML(item)}">${escapeHTML(item)}</button>`).join('')}</div>` : ''}
+    <div class="coach-summary-next"><span>${tUi('SIGUIENTE PASO')}</span><strong>${escapeHTML(summary.nextPractice || 'Repite la misma situación e intenta responder con menos ayuda.')}</strong></div>`;
   ui.coachSummary.classList.remove('is-hidden');
 }
 
@@ -1294,22 +1383,22 @@ function renderCoachHelp(article, help) {
   const replies = Array.isArray(help.suggestedReplies) ? help.suggestedReplies.slice(0, 3) : [];
   panel.innerHTML = `
     <div class="coach-help-section coach-help-meaning">
-      <span>QUÉ SIGNIFICA</span>
+      <span>${tUi('QUÉ SIGNIFICA')}</span>
       <strong>${escapeHTML(help.meaning || article.dataset.quickMeaning || '')}</strong>
       ${help.explanation ? `<p>${escapeHTML(help.explanation)}</p>` : ''}
     </div>
     <div class="coach-help-grid">
       <div class="coach-help-section">
-        <span>PRONUNCIACIÓN FÁCIL</span>
+        <span>${tUi('PRONUNCIACIÓN FÁCIL')}</span>
         <strong>${escapeHTML(help.pronunciation || '')}</strong>
       </div>
       <div class="coach-help-section">
-        <span>CLAVE PARA ENTENDERLO</span>
+        <span>${tUi('CLAVE PARA ENTENDERLO')}</span>
         <p>${escapeHTML(help.grammarTip || 'Escucha la frase completa y responde a la idea principal.')}</p>
       </div>
     </div>
-    ${keywords.length ? `<div class="coach-help-section"><span>PALABRAS CLAVE</span><div class="coach-keywords">${keywords.map((item) => `<b>${escapeHTML(item.word || '')}<small>${escapeHTML(item.meaning || '')}</small></b>`).join('')}</div></div>` : ''}
-    ${replies.length ? `<div class="coach-help-section coach-help-replies"><span>PUEDES RESPONDER ASÍ</span><div class="coach-reply-options"></div></div>` : ''}`;
+    ${keywords.length ? `<div class="coach-help-section"><span>${tUi('PALABRAS CLAVE')}</span><div class="coach-keywords">${keywords.map((item) => `<b>${escapeHTML(item.word || '')}<small>${escapeHTML(item.meaning || '')}</small></b>`).join('')}</div></div>` : ''}
+    ${replies.length ? `<div class="coach-help-section coach-help-replies"><span>${tUi('PUEDES RESPONDER ASÍ')}</span><div class="coach-reply-options"></div></div>` : ''}`;
   const list = panel.querySelector('.coach-reply-options');
   replies.forEach((reply) => {
     const button = document.createElement('button');
@@ -1381,6 +1470,8 @@ async function practiceCoachPhrase(article, button) {
       button.textContent = '🎤 Repetir frase';
       state.coachPhraseStream?.getTracks().forEach((track) => track.stop());
       state.coachPhraseStream = null;
+      if (state.coachPhraseRecorder !== recorder) return;
+      state.coachPhraseRecorder = null;
       const audio = new Blob(state.coachPhraseChunks, { type: recorder.mimeType || 'audio/webm' });
       if (audio.size < 1000) { notify('Habla un poco más tiempo e inténtalo de nuevo.'); return; }
       const resultBox = article.querySelector('[data-coach-repeat-result]');
@@ -1410,9 +1501,11 @@ async function practiceCoachPhrase(article, button) {
 }
 
 async function startCoachSession({ sourceConversation = null } = {}) {
+  if (state.coachActive) { showView('coach'); notify(tUi('Ya tienes una conversación en curso. Finalízala antes de comenzar otra.')); return; }
   if (state.running) { notify('Pausa la conversación antes de abrir el Coach.'); return; }
   if (state.practiceConversationActive) { notify('Finaliza la conversación de Práctica antes de abrir el Coach.'); return; }
   if (state.coachBusy) return;
+  state.coachPaused = false;
   try {
     state.coachBusy = true;
     if (ui.startCoach) { ui.startCoach.disabled = true; ui.startCoach.innerHTML = '<span>…</span> Preparando conversación'; }
@@ -1429,6 +1522,7 @@ async function startCoachSession({ sourceConversation = null } = {}) {
       })
     });
     state.coachActive = true;
+    state.coachSummaryPending = false;
     state.coachHistory = [];
     const firstReply = result.replyTarget || result.replyEnglish || '';
     state.coachLastReply = firstReply;
@@ -1442,17 +1536,21 @@ async function startCoachSession({ sourceConversation = null } = {}) {
     ui.coachResponseBox?.classList.remove('is-hidden');
     ui.coachSetup?.classList.add('is-hidden');
     ui.coachSession?.classList.remove('is-hidden');
-    guidedTop(ui.coachSession, { delay: 70 });
+    updateCoachNavigation();
+    if (!state.coachPaused) guidedTop(ui.coachSession, { delay: 70 });
     renderCoachSessionHeader(result.session || {});
     appendCoachBubble('coach', firstReply, result.replyMeaning);
     if (result.coachTip && ((ui.coachMode?.value || 'guided') === 'guided' || (ui.coachLevel?.value || 'beginner') === 'beginner')) appendCoachBubble('coach-tip', result.coachTip);
-    if (ui.coachStatus) ui.coachStatus.textContent = 'CONVERSACIÓN EN CURSO';
-    try { await speakText(firstReply, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
-    guidedScroll(ui.coachResponseBox, { block: 'center', delay: 80 });
+    if (ui.coachStatus) ui.coachStatus.textContent = state.coachPaused ? 'SESIÓN PAUSADA' : 'CONVERSACIÓN EN CURSO';
+    if (!state.coachPaused) {
+      try { await speakText(firstReply, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { if (!state.coachPaused) notify(error.message); }
+      if (!state.coachPaused) guidedScroll(ui.coachResponseBox, { block: 'center', delay: 80 });
+    }
   } catch (error) {
     notify(error.message || 'No pudimos iniciar el Coach.');
   } finally {
     state.coachBusy = false;
+    if (!state.coachActive) state.coachPaused = false;
     if (ui.startCoach) { ui.startCoach.disabled = false; ui.startCoach.innerHTML = '<span>▶</span> Empezar conversación'; }
   }
 }
@@ -1472,9 +1570,30 @@ function stopCoachMedia() {
   state.coachPhraseRecorder = null;
 }
 
+function updateCoachNavigation() {
+  const button = $('[data-view="coach"]');
+  button?.classList.toggle('has-active-session', state.coachActive);
+  if (button) button.setAttribute('aria-label', state.coachActive ? tUi('Coach · conversación en curso') : tUi('Abrir Coach'));
+}
+
+function pauseCoachSession() {
+  if (!state.coachActive && !state.coachBusy) return;
+  state.coachPaused = true;
+  stopCoachMedia();
+  if (state.coachActive && ui.coachStatus) ui.coachStatus.textContent = 'SESIÓN PAUSADA';
+}
+
+function resumeCoachSession() {
+  if (!state.coachActive && !state.coachBusy) return;
+  state.coachPaused = false;
+  if (state.coachActive && ui.coachStatus && !state.coachBusy) ui.coachStatus.textContent = state.coachSummaryPending ? 'RESUMEN PENDIENTE · PUEDES REINTENTAR' : 'CONVERSACIÓN EN CURSO';
+}
+
 function resetCoachSession() {
   stopCoachMedia();
   state.coachActive = false;
+  state.coachPaused = false;
+  state.coachSummaryPending = false;
   state.coachBusy = false;
   state.coachHistory = [];
   state.coachLastReply = '';
@@ -1482,8 +1601,14 @@ function resetCoachSession() {
   state.coachTurnCount = 0;
   state.coachProgress = 0;
   state.coachScores = [];
+  updateCoachNavigation();
+  if (ui.endCoach) ui.endCoach.textContent = tUi('Finalizar sesión');
   ui.coachSession?.classList.add('is-hidden');
   ui.coachSetup?.classList.remove('is-hidden');
+  const pair = currentLearningPair();
+  if (ui.coachLanguage) ui.coachLanguage.value = pair.nativeLanguage;
+  if (ui.coachTargetLanguage) ui.coachTargetLanguage.value = pair.targetLanguage;
+  updateCoachLanguageUI();
   ui.coachSummary?.classList.add('is-hidden');
   ui.newCoachSession?.classList.add('is-hidden');
   ui.coachResponseBox?.classList.remove('is-hidden');
@@ -1494,7 +1619,7 @@ function resetCoachSession() {
 }
 
 async function finishCoachSession() {
-  if (!state.coachActive || state.coachBusy) { resetCoachSession(); return; }
+  if (!state.coachActive || state.coachBusy) return;
   try {
     state.coachBusy = true;
     stopCoachMedia();
@@ -1514,14 +1639,19 @@ async function finishCoachSession() {
       })
     });
     state.coachActive = false;
+    state.coachPaused = false;
+    state.coachSummaryPending = false;
+    updateCoachNavigation();
     ui.coachResponseBox?.classList.add('is-hidden');
     renderCoachSummary(summary);
     ui.newCoachSession?.classList.remove('is-hidden');
     if (ui.coachStatus) ui.coachStatus.textContent = 'SESIÓN COMPLETADA';
-    guidedTop(ui.coachSummary, { delay: 90 });
+    if (!ui.coachView?.classList.contains('is-hidden')) guidedTop(ui.coachSummary, { delay: 90 });
   } catch (error) {
     notify(error.message || 'No pudimos preparar el resumen.');
-    resetCoachSession();
+    state.coachSummaryPending = true;
+    if (ui.coachStatus) ui.coachStatus.textContent = 'RESUMEN PENDIENTE · PUEDES REINTENTAR';
+    if (ui.endCoach) ui.endCoach.textContent = tUi('Reintentar resumen');
   } finally {
     state.coachBusy = false;
     if (ui.endCoach) ui.endCoach.disabled = false;
@@ -1562,11 +1692,15 @@ async function submitCoachTurn({ audio = null, text = '' } = {}) {
     state.coachTurnCount += 1;
     state.coachScores.push(Math.max(0, Math.min(100, Number(result.score || 0))));
     state.coachScores = state.coachScores.slice(-20);
+    state.coachSummaryPending = false;
     updateCoachSessionUI({ progress: result.missionProgress, focus: result.nextFocus || result.progressNote || 'Continúa la conversación' });
     if (ui.coachTextInput) ui.coachTextInput.value = '';
-    if (ui.coachStatus) ui.coachStatus.textContent = result.missionProgress >= 100 ? 'OBJETIVO COMPLETADO · PUEDES SEGUIR' : 'TU TURNO';
-    try { await speakText(replyTarget, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { notify(error.message); }
-    guidedScroll(ui.coachResponseBox, { block: 'center', delay: 70 });
+    if (ui.endCoach) ui.endCoach.textContent = tUi('Finalizar sesión');
+    if (ui.coachStatus) ui.coachStatus.textContent = state.coachPaused ? 'SESIÓN PAUSADA' : result.missionProgress >= 100 ? 'OBJETIVO COMPLETADO · PUEDES SEGUIR' : 'TU TURNO';
+    if (!state.coachPaused) {
+      try { await speakText(replyTarget, currentCoachTargetLanguage(), { speed: (ui.coachLevel?.value || 'beginner') === 'beginner' ? 0.84 : 1 }); } catch (error) { if (!state.coachPaused) notify(error.message); }
+      if (!state.coachPaused) guidedScroll(ui.coachResponseBox, { block: 'center', delay: 70 });
+    }
   } catch (error) {
     notify(error.message || 'No pudimos continuar la conversación.');
   } finally {
@@ -1605,6 +1739,7 @@ async function toggleCoachRecording() {
         }
       }
     });
+    if (state.coachPaused) { capture.cancel?.(); return; }
     state.coachVoiceCapture = capture;
     const audio = await capture.promise;
     state.coachVoiceCapture = null;
@@ -1744,12 +1879,19 @@ function showLearnHome() {
   ui.learnConversationsBranch?.classList.add('is-hidden');
   ui.learnWordsBranch?.classList.add('is-hidden');
   ui.learnQuickPhrasesBranch?.classList.add('is-hidden');
+  renderLearnHomeFlow();
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
 function openLearnPath(path) {
   if (path === 'saved-phrases') {
     showView('phrasebook');
+    return;
+  }
+  const { nativeLanguage, targetLanguage } = currentLearningPair();
+  if (['routes', 'sounds', 'words'].includes(path) && !(nativeLanguage === 'es' && targetLanguage === 'en')) {
+    notify(tUi('Estas lecciones enseñan inglés desde el español. Elige español e inglés para abrirlas.'));
+    showLearnHome();
     return;
   }
   ui.learnHome?.classList.add('is-hidden');
@@ -1773,7 +1915,8 @@ function showView(view) {
   if (view !== 'practice') { state.practiceVoiceCapture?.cancel?.(); state.practiceVoiceCapture = null; state.practiceVoiceBusy = false; if (state.practiceConversationActive) resetPracticeConversation({ scroll: false }); }
   const secondary = view !== 'conversation';
   if (secondary && state.running) toggleConversation();
-  if (view !== 'coach' && state.coachActive) resetCoachSession();
+  if (view !== 'coach') pauseCoachSession();
+  else resumeCoachSession();
   ui.shell?.classList.toggle('secondary-view', secondary);
   ui.historyView?.classList.toggle('is-hidden', view !== 'history');
   ui.phrasebookView?.classList.toggle('is-hidden', view !== 'phrasebook');
@@ -1786,7 +1929,7 @@ function showView(view) {
   if (view === 'history') renderHistory();
   if (view === 'phrasebook') phrasebook?.render();
   if (view === 'practice') renderPracticePoints();
-  if (view === 'learn') { learning?.render(); sounds?.render(); if (enteringLearn) showLearnHome(); }
+  if (view === 'learn') { learning?.render(); sounds?.render(); if (enteringLearn) showLearnHome(); else renderLearnHomeFlow(); }
   window.scrollTo?.({ top: 0, behavior: 'smooth' });
 }
 
@@ -1825,7 +1968,8 @@ phrasePractice = initPhrasePractice({
 
 imageLearning = initImageLearning({
   request, speakText, notify,
-  getNativeLanguage: () => state.settings.detectedUserLanguage || state.userLanguage || 'es',
+  getNativeLanguage: () => currentLearningPair().nativeLanguage,
+  getLearningPair: currentLearningPair,
   onPractice: (item) => phrasePractice?.start(item),
   onCorrect: (id, language) => learning?.recordImageAnswer(id, language),
   getProgress: (language) => learning?.imageProgress(language) || []
@@ -1852,6 +1996,21 @@ qrConversation = initQrConversation({
 
 $$('[data-learn-path]').forEach((button) => listen(button, 'click', () => openLearnPath(button.dataset.learnPath)));
 $$('[data-learn-back]').forEach((button) => listen(button, 'click', showLearnHome));
+listen(ui.learnNativeLanguage, 'change', () => saveLearningPair('native'));
+listen(ui.learnTargetLanguage, 'change', () => saveLearningPair('target'));
+listen(ui.learnTodayButton, 'click', async () => {
+  const action = ui.learnTodayButton.dataset.action;
+  if (action === 'resume') { showView('coach'); return; }
+  if (action === 'review' || action === 'course') { learning?.startRecommended?.(); return; }
+  if (action === 'conversation') {
+    const [item] = conversationLearningCandidates();
+    if (item) { await practiceConversationFromHistory(item); return; }
+    renderLearnHomeFlow();
+  }
+  openLearnPath('quick-phrases');
+  guidedScroll(ui.practiceForm, { block: 'center', delay: 90, focus: true });
+});
+listen(window, 'sinbarreras:learning-progress', renderLearnHomeFlow);
 listen(ui.phrasebookBackToLearn, 'click', () => showView('learn'));
 $$('[data-practice-destination]').forEach((button) => listen(button, 'click', () => {
   const destination = button.dataset.practiceDestination;
@@ -1931,6 +2090,13 @@ listen(ui.repeatButton, 'click', async () => {
 listen(ui.learnFromTranslation, 'click', async () => {
   const result = state.currentResult;
   if (!result || !learning) return;
+  if (!(currentLearningPair().nativeLanguage === 'es' && currentLearningPair().targetLanguage === 'en')) {
+    const { nativeLanguage, targetLanguage } = currentLearningPair();
+    const [item] = learningConversations([result], nativeLanguage, targetLanguage);
+    if (item) await practiceConversationFromHistory(item);
+    else { showView('learn'); openLearnPath('conversations'); }
+    return;
+  }
   const englishText = result.sourceLanguage === 'en' ? result.originalText : result.targetLanguage === 'en' ? result.translatedText : '';
   if (!englishText) { notify('Esta conversación no contiene texto en inglés para aprender.'); return; }
   const originalLabel = ui.learnFromTranslation.textContent;
@@ -1960,10 +2126,10 @@ listen(ui.conversationLearningList, 'click', async (event) => {
   const item = conversationLearningCandidates().find((entry) => entry.id === id);
   if (!item) return;
   try {
-    if (action === 'listen') await speakText(item.englishText, 'en', { visualTarget:event.target.closest('[data-learning-action]'), visualLabel:'VOZ AI' });
+    if (action === 'listen') await speakText(item.targetText, item.targetLanguage, { visualTarget:event.target.closest('[data-learning-action]'), visualLabel:'VOZ AI' });
     if (action === 'practice') await practiceConversationFromHistory(item);
     if (action === 'save') await phrasebook?.savePhrase({
-      sourceText: item.meaning, translatedText: item.englishText, sourceLanguage: item.nativeLanguage, targetLanguage: 'en', situation: item.situation
+      sourceText: item.meaning, translatedText: item.targetText, sourceLanguage: item.nativeLanguage, targetLanguage: item.targetLanguage, situation: item.situation
     });
   } catch (error) { notify(error.message || 'No pudimos completar la acción.'); }
 });
@@ -1995,6 +2161,19 @@ listen(ui.historyList, 'click', async (event) => {
 });
 
 listen($('#settings-button'), 'click', () => ui.settingsDialog?.showModal());
+window.addEventListener('sinbarreras:ui-locale', (event) => {
+  state.settings.uiLocale = event.detail.locale;
+  updateConversationSettings();
+  renderHistory();
+  renderConversationLearning();
+  renderLearnHomeFlow();
+  updateLearnFromTranslationAction();
+  updateCoachNavigation();
+  phrasebook?.render();
+  if (!ui.learnView?.classList.contains('is-hidden')) learning?.render();
+  if (!ui.learnView?.classList.contains('is-hidden')) sounds?.render();
+  if (!ui.learnView?.classList.contains('is-hidden')) imageLearning?.open();
+});
 listen(ui.openHistory, 'click', () => {
   ui.settingsDialog?.close();
   showView('history');
@@ -2137,6 +2316,7 @@ window.addEventListener('beforeunload', () => {
 
 migrateLocalStorage();
 try { state.settings = { ...state.settings, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { /* use defaults */ }
+state.settings.uiLocale = getUiLocale();
 // The other person's language is intentionally never restored from storage.
 // It must be selected manually for each app session.
 delete state.settings.partnerLanguage;
@@ -2147,6 +2327,7 @@ if (!TTS_VOICES.has(state.settings.translatorVoice)) state.settings.translatorVo
 delete state.settings.primaryLanguage;
 populatePartnerLanguageSelect();
 populatePracticeLanguageSelects();
+populateLearningLanguageSelects();
 applySettings();
 updateConversationSettings();
 updatePartnerSelectionUI();

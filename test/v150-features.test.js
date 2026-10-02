@@ -34,14 +34,14 @@ test('v1.5 Face-to-Face is a real two-person conversation surface', () => {
   assert.match(styles, /\.face-to-face-view/);
 });
 
-test('v1.5 can learn and practice English from real conversation history', () => {
+test('Learn connects real conversation history to the selected language pair', () => {
   assert.match(appHtml, /data-learn-path="conversations"/);
   assert.match(appHtml, /id="learn-conversations-branch"/);
   assert.match(appHtml, /id="conversation-learning-list"/);
   assert.match(appJs, /function conversationLearningCandidates\(\)/);
   assert.match(appJs, /function renderConversationLearning\(\)/);
   assert.match(appJs, /function preparePhraseForPractice\(item\)/);
-  assert.match(appJs, /count: \(previous\?\.count \|\| 0\) \+ 1/);
+  assert.match(appJs, /learningConversations\(readHistory\(\), nativeLanguage, targetLanguage\)/);
   assert.match(appJs, /openLearnPath\(path\)/);
 });
 

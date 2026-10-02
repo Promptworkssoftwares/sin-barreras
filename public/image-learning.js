@@ -1,5 +1,6 @@
-import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading, isLatinImageReading } from './image-learning-data.js?v=1.7.23';
-import { LANGUAGE_CATALOG } from './languages.js?v=1.7.23';
+import { IMAGE_TOPICS, imageTopicItems, imageLessonGroup, IMAGE_AUDIO_LANGUAGES, imageNeedsLatinReading, isLatinImageReading } from './image-learning-data.js?v=1.7.25';
+import { LANGUAGE_CATALOG } from './languages.js?v=1.7.25';
+import { getUiLocale, tUi } from './ui-i18n.js?v=1.7.25';
 
 const $ = (selector) => document.querySelector(selector);
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -13,7 +14,7 @@ function shuffle(values) {
   return result;
 }
 
-export function initImageLearning({ request, speakText, notify, getNativeLanguage, onPractice, onCorrect, getProgress } = {}) {
+export function initImageLearning({ request, speakText, notify, getNativeLanguage, getLearningPair, onPractice, onCorrect, getProgress } = {}) {
   const ui = {
     native: $('#image-native-language'), target: $('#image-target-language'), load: $('#image-load'),
     topics: $('#image-topic-picker'), levels: $('#image-level-picker'), categories: $('#image-category-picker'),
@@ -27,9 +28,11 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
   const languageOptions = LANGUAGE_CATALOG.map(({ code, label }) => `<option value="${escapeHtml(code)}">${escapeHtml(label)}</option>`).join('');
   ui.native.innerHTML = languageOptions;
   ui.target.innerHTML = languageOptions;
-  const native = getNativeLanguage?.() || 'es';
+  const pair = getLearningPair?.();
+  const native = pair?.nativeLanguage || getNativeLanguage?.() || 'es';
   ui.native.value = LANGUAGE_CATALOG.some((entry) => entry.code === native) ? native : 'es';
-  ui.target.value = ui.native.value === 'en' ? 'es' : 'en';
+  ui.target.value = pair?.targetLanguage && pair.targetLanguage !== ui.native.value
+    ? pair.targetLanguage : ui.native.value === 'en' ? 'es' : 'en';
 
   let items = [];
   let topic = 'pronouns';
@@ -50,20 +53,24 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     const levelConcepts = (number) => imageTopicItems(topic).filter((item) => (item.level || '1') === String(number));
     ui.topics.innerHTML = IMAGE_TOPICS.map((entry) => {
       const concepts = imageTopicItems(entry.id);
-      return `<button type="button" data-image-topic="${entry.id}" aria-pressed="${topic === entry.id}"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(entry.description)}</span><small>${progressCount(concepts)}/${concepts.length} imágenes practicadas</small></button>`;
+      return `<button type="button" data-image-topic="${entry.id}" aria-pressed="${topic === entry.id}"><strong>${escapeHtml(tUi(entry.label))}</strong><span>${escapeHtml(tUi(entry.description))}</span><small>${progressCount(concepts)}/${concepts.length} ${tUi('imágenes practicadas')}</small></button>`;
     }).join('');
     ui.levels.innerHTML = [1, 2, 3, 4].map((number) => {
       const entry = currentTopic.levels.find((item) => item.id === String(number));
-      return `<button type="button" data-image-level="${number}" aria-pressed="${level === String(number)}" ${entry ? '' : 'disabled'}><small>NIVEL ${number}</small><strong>${escapeHtml(entry?.label || currentTopic.planned[number - 2])}</strong><span>${entry ? `${progressCount(levelConcepts(number))}/${levelConcepts(number).length} imágenes practicadas` : 'Próximamente · sin imágenes todavía'}</span></button>`;
+      return `<button type="button" data-image-level="${number}" aria-pressed="${level === String(number)}" ${entry ? '' : 'disabled'}><small>${tUi('NIVEL')} ${number}</small><strong>${escapeHtml(tUi(entry?.label || currentTopic.planned[number - 2]))}</strong><span>${entry ? `${progressCount(levelConcepts(number))}/${levelConcepts(number).length} ${tUi('imágenes practicadas')}` : tUi('Próximamente · sin imágenes todavía')}</span></button>`;
     }).join('');
-    ui.eyebrow.textContent = `${currentTopic.label.toUpperCase()} · NIVEL ${level}`;
-    ui.title.innerHTML = `Aprende ${escapeHtml(currentTopic.label.toLowerCase())} con <em>imágenes.</em>`;
-    ui.description.textContent = `Explora ${currentLevel.label.toLowerCase()}, escucha los ejemplos y luego reconoce cada imagen.`;
+    ui.eyebrow.textContent = `${tUi(currentTopic.label).toUpperCase()} · ${tUi('NIVEL')} ${level}`;
+    ui.title.innerHTML = getUiLocale() === 'en'
+      ? `Learn ${escapeHtml(tUi(currentTopic.label).toLowerCase())} with <em>images.</em>`
+      : `Aprende ${escapeHtml(currentTopic.label.toLowerCase())} con <em>imágenes.</em>`;
+    ui.description.textContent = getUiLocale() === 'en'
+      ? `Explore ${tUi(currentLevel.label).toLowerCase()}, listen to examples and identify each image.`
+      : `Explora ${currentLevel.label.toLowerCase()}, escucha los ejemplos y luego reconoce cada imagen.`;
     ui.categories.hidden = !currentLevel.categories.length;
     ui.categories.innerHTML = currentLevel.categories.map((entry) => {
       const concepts = imageLessonGroup(topic, level, entry.id);
       const count = concepts.filter((item) => completed.has(`${ui.target.value}:${item.id}`)).length;
-      return `<button type="button" data-image-category="${entry.id}" aria-pressed="${category === entry.id}"><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(entry.description)}</span><small>${count}/${concepts.length}</small></button>`;
+      return `<button type="button" data-image-category="${entry.id}" aria-pressed="${category === entry.id}"><strong>${escapeHtml(tUi(entry.label))}</strong><span>${escapeHtml(tUi(entry.description))}</span><small>${count}/${concepts.length}</small></button>`;
     }).join('');
   }
 
@@ -73,8 +80,8 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     questions = [];
     ui.cards.innerHTML = (imageLessonGroup(topic, level, category) || []).map((item, position) => `
       <article class="image-learning-preview">
-        <div class="image-learning-picture${item.imageVariants?.length ? ' has-variants' : ''}"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.word)}" loading="lazy">${(item.imageVariants || []).map((src) => `<img class="image-variant" src="${escapeHtml(src)}" alt="Otro ejemplo de ${escapeHtml(item.word)}" loading="lazy">`).join('')}</div>
-        <strong>Imagen ${position + 1} · prepara la traducción</strong>
+        <div class="image-learning-picture${item.imageVariants?.length ? ' has-variants' : ''}"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.word)}" loading="lazy">${(item.imageVariants || []).map((src) => `<img class="image-variant" src="${escapeHtml(src)}" alt="${tUi('Otro ejemplo de')} ${escapeHtml(item.word)}" loading="lazy">`).join('')}</div>
+        <strong>${tUi('Imagen')} ${position + 1} · ${tUi('prepara la traducción')}</strong>
       </article>`).join('');
     ui.quiz.classList.add('is-hidden');
     ui.start.hidden = true;
@@ -95,25 +102,27 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     const progress = new Set(getProgress?.(ui.target.value) || []);
     const completed = items.filter((item) => progress.has(`${ui.target.value}:${item.id}`)).length;
     const audioAvailable = IMAGE_AUDIO_LANGUAGES.has(ui.target.value);
-    ui.status.textContent = `${items.length} imágenes listas · ${completed} practicadas en ${ui.target.selectedOptions[0]?.textContent || 'este idioma'}.${audioAvailable ? '' : ' Este idioma ofrece aprendizaje visual y texto; la voz no está disponible.'}`;
+    ui.status.textContent = getUiLocale() === 'en'
+      ? `${items.length} images ready · ${completed} practiced in ${ui.target.selectedOptions[0]?.textContent || 'this language'}.${audioAvailable ? '' : ' This language supports images and text; voice is unavailable.'}`
+      : `${items.length} imágenes listas · ${completed} practicadas en ${ui.target.selectedOptions[0]?.textContent || 'este idioma'}.${audioAvailable ? '' : ' Este idioma ofrece aprendizaje visual y texto; la voz no está disponible.'}`;
     const needsReading = imageNeedsLatinReading(ui.target.value);
     ui.cards.innerHTML = items.map((item) => {
       const wordReadable = !needsReading || isLatinImageReading(item.targetWordLatin);
       const phraseReadable = !needsReading || isLatinImageReading(item.targetPhraseLatin);
       return `
       <article class="image-learning-card" data-image-id="${escapeHtml(item.id)}">
-        <div class="image-learning-picture${item.imageVariants?.length ? ' has-variants' : ''}"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.nativeWord)}" loading="lazy">${(item.imageVariants || []).map((src) => `<img class="image-variant" src="${escapeHtml(src)}" alt="Otro ejemplo de ${escapeHtml(item.nativeWord)}" loading="lazy">`).join('')}</div>
-        <div class="image-learning-copy"><small>Significa: ${escapeHtml(item.nativeWord)}${topic === 'pronouns' && category === 'possessive' ? ` · ${['my', 'his', 'its'].includes(item.id) ? 'acompaña un nombre' : 'reemplaza un nombre'}` : ''}</small>
-          ${needsReading ? `<span class="image-reading-label">${wordReadable ? 'ASÍ SE LEE · LETRAS LATINAS' : 'PALABRA EN TU IDIOMA'}</span>` : ''}
+        <div class="image-learning-picture${item.imageVariants?.length ? ' has-variants' : ''}"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.nativeWord)}" loading="lazy">${(item.imageVariants || []).map((src) => `<img class="image-variant" src="${escapeHtml(src)}" alt="${tUi('Otro ejemplo de')} ${escapeHtml(item.nativeWord)}" loading="lazy">`).join('')}</div>
+        <div class="image-learning-copy"><small>${tUi('Significa:')} ${escapeHtml(item.nativeWord)}${topic === 'pronouns' && category === 'possessive' ? ` · ${tUi(['my', 'his', 'its'].includes(item.id) ? 'acompaña un nombre' : 'reemplaza un nombre')}` : ''}</small>
+          ${needsReading ? `<span class="image-reading-label">${tUi(wordReadable ? 'ASÍ SE LEE · LETRAS LATINAS' : 'PALABRA EN TU IDIOMA')}</span>` : ''}
           <h4 lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? wordReadable ? item.targetWordLatin : item.nativeWord : item.targetWord)}</h4>
-          ${needsReading && !phraseReadable ? '<span class="image-reading-label">FRASE EN TU IDIOMA</span>' : ''}
+          ${needsReading && !phraseReadable ? `<span class="image-reading-label">${tUi('FRASE EN TU IDIOMA')}</span>` : ''}
           <p lang="${needsReading ? escapeHtml(ui.native.value) : escapeHtml(ui.target.value)}">${escapeHtml(needsReading ? phraseReadable ? item.targetPhraseLatin : item.nativePhrase : item.targetPhrase)}</p>
-          <span>${phraseReadable ? escapeHtml(item.nativePhrase) : audioAvailable ? 'Toca ▶ Frase para escuchar cómo se pronuncia.' : 'Abre la escritura original para conocer la frase.'}</span>
-          ${needsReading ? `<details class="image-learning-original"><summary>Ver escritura original</summary><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetWord)}</p><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetPhrase)}</p></details>` : ''}</div>
+          <span>${phraseReadable ? escapeHtml(item.nativePhrase) : tUi(audioAvailable ? 'Toca ▶ Frase para escuchar cómo se pronuncia.' : 'Abre la escritura original para conocer la frase.')}</span>
+          ${needsReading ? `<details class="image-learning-original"><summary>${tUi('Ver escritura original')}</summary><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetWord)}</p><p lang="${escapeHtml(ui.target.value)}" dir="auto">${escapeHtml(item.targetPhrase)}</p></details>` : ''}</div>
         <div class="image-learning-actions">
-          ${audioAvailable ? `<button type="button" data-image-action="word" aria-label="Escuchar palabra ${escapeHtml(needsReading ? wordReadable ? item.targetWordLatin : item.nativeWord : item.targetWord)}">▶ Palabra</button>
-          <button type="button" data-image-action="phrase" aria-label="Escuchar frase ${escapeHtml(needsReading ? phraseReadable ? item.targetPhraseLatin : item.nativePhrase : item.targetPhrase)}">▶ Frase</button>
-          <button type="button" data-image-action="practice">● Practicar mi voz</button>` : '<span class="image-text-only">Práctica visual y de lectura</span>'}
+          ${audioAvailable ? `<button type="button" data-image-action="word" aria-label="${tUi('Escuchar palabra')} ${escapeHtml(needsReading ? wordReadable ? item.targetWordLatin : item.nativeWord : item.targetWord)}">${tUi('▶ Palabra')}</button>
+          <button type="button" data-image-action="phrase" aria-label="${tUi('Escuchar frase')} ${escapeHtml(needsReading ? phraseReadable ? item.targetPhraseLatin : item.nativePhrase : item.targetPhrase)}">${tUi('▶ Frase')}</button>
+          <button type="button" data-image-action="practice">${tUi('● Practicar mi voz')}</button>` : `<span class="image-text-only">${tUi('Práctica visual y de lectura')}</span>`}
         </div>
       </article>`;
     }).join('');
@@ -236,13 +245,23 @@ export function initImageLearning({ request, speakText, notify, getNativeLanguag
     button.classList.add('is-correct');
     ui.options.querySelectorAll('button').forEach((option) => { option.disabled = true; });
     ui.feedback.textContent = imageNeedsLatinReading(ui.target.value) && !current.targetWordLatin
-      ? `¡Correcto! Reconociste la imagen de ${current.nativeWord}.`
-      : `¡Correcto! ${imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord} significa ${current.nativeWord}.`;
+      ? getUiLocale() === 'en' ? `Correct! You recognized the image of ${current.nativeWord}.` : `¡Correcto! Reconociste la imagen de ${current.nativeWord}.`
+      : getUiLocale() === 'en' ? `Correct! ${imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord} means ${current.nativeWord}.` : `¡Correcto! ${imageNeedsLatinReading(ui.target.value) ? current.targetWordLatin : current.targetWord} significa ${current.nativeWord}.`;
     ui.next.hidden = false;
     if (onCorrect?.(current.id, ui.target.value)) renderCards();
   });
   ui.next.addEventListener('click', () => { if (!answered) return; index += 1; renderQuestion(); });
   renderNavigation();
   invalidate();
-  return { open() { if (items.length && selection === selectedKey()) renderCards(); else renderNavigation(); } };
+  return {
+    open() { if (items.length && selection === selectedKey()) renderCards(); else { renderNavigation(); invalidate(); } },
+    setLanguagePair({ nativeLanguage, targetLanguage } = {}) {
+      if (!LANGUAGE_CATALOG.some((entry) => entry.code === nativeLanguage && nativeLanguage !== targetLanguage)
+        || !LANGUAGE_CATALOG.some((entry) => entry.code === targetLanguage)) return;
+      if (ui.native.value === nativeLanguage && ui.target.value === targetLanguage) return;
+      ui.native.value = nativeLanguage;
+      ui.target.value = targetLanguage;
+      languageChanged('target');
+    }
+  };
 }

@@ -1,6 +1,7 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.23';
-import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.23';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.25';
+import { friendlyRecognition, friendlyFocus } from './learner-feedback.js?v=1.7.25';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.25';
+import { tUi } from './ui-i18n.js?v=1.7.25';
 
 const SOUND_STATE_KEY = 'sinBarreras.sounds.v1';
 
@@ -523,16 +524,16 @@ export function initSounds({ notify, speakText, request, getNativeLanguage, crea
     const levelEntry = entry.levels?.[level.id] || {};
     ui.detail.innerHTML = `<div class="sound-detail-top">
       <div class="sound-detail-symbol"><span>/${escapeHtml(selected.symbol)}/</span><small>${selected.group === 'vowels' ? 'VOCAL' : 'CONSONANTE'}</small></div>
-      <div class="sound-detail-copy"><span>NIVEL ${level.id} · ${escapeHtml(level.label).toUpperCase()}</span><h4>${escapeHtml(level.model)}</h4><p>${escapeHtml(selected.cue)}</p></div>
+      <div class="sound-detail-copy"><span>${tUi('NIVEL')} ${level.id} · ${escapeHtml(tUi(level.label)).toUpperCase()}</span><h4>${escapeHtml(level.model)}</h4><p>${escapeHtml(tUi(selected.cue))}</p></div>
       <span class="sound-mastery"><strong>${progress}%</strong><small>dominio</small></span>
     </div>
     ${soundLevelsMarkup(selected)}
     ${challengeMarkup(selected)}
     <div class="sound-current-target">
-      <div><span>OBJETIVO DE ESTE NIVEL</span><strong>${escapeHtml(level.model)}</strong><p>${escapeHtml(level.description)}</p></div>
+      <div><span>OBJETIVO DE ESTE NIVEL</span><strong>${escapeHtml(level.model)}</strong><p>${escapeHtml(tUi(level.description))}</p></div>
       <span class="sound-level-score">${Math.min(Number(levelEntry.successes || 0), SOUND_LEVEL_SUCCESSES)}/${SOUND_LEVEL_SUCCESSES}<small>aciertos</small></span>
     </div>
-    <div class="sound-tip"><span>CÓMO HACER EL SONIDO</span><p>${escapeHtml(selected.tip)}</p></div>
+    <div class="sound-tip"><span>CÓMO HACER EL SONIDO</span><p>${escapeHtml(tUi(selected.tip))}</p></div>
     <div class="sound-actions">
       <button type="button" data-sound-action="listen">▶ Escuchar modelo</button>
       <button type="button" data-sound-action="slow">◷ Más lento</button>

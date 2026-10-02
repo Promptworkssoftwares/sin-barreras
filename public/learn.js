@@ -1,5 +1,6 @@
-import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.23';
-import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
+import { guidedScroll, guidedTop } from './navigation-flow.js?v=1.7.25';
+import { setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.25';
+import { getUiLocale, tUi } from './ui-i18n.js?v=1.7.25';
 
 const LEARN_STATE_KEY = 'sinBarreras.learn.v1';
 const DAILY_XP_GOAL = 50;
@@ -233,7 +234,11 @@ function readState() {
   }
 }
 
-function saveState(state) { localStorage.setItem(LEARN_STATE_KEY, JSON.stringify(state)); window.SinBarrerasCloud?.queueSync?.(); }
+function saveState(state) {
+  localStorage.setItem(LEARN_STATE_KEY, JSON.stringify(state));
+  window.SinBarrerasCloud?.queueSync?.();
+  window.dispatchEvent(new Event('sinbarreras:learning-progress'));
+}
 
 function updateStreak(state) {
   const today = todayKey();
@@ -369,7 +374,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     ui.wordsList.innerHTML = learned.length ? learned.slice(0, 12).map((item) => `
       <button class="learn-word-row" type="button" data-speak-word="${encodeURIComponent(item.word)}">
         <span class="learn-word-emoji">${iconSvg(item.courseIcon, 'sb-line-icon word-row-icon')}</span>
-        <span><strong>${escapeHTML(item.word)}</strong><small>${escapeHTML(item.meaning)} · ${escapeHTML(item.courseTitle)}</small></span>
+        <span><strong>${escapeHTML(item.word)}</strong><small>${escapeHTML(item.meaning)} · ${escapeHTML(tUi(item.courseTitle))}</small></span>
         <span class="mastery-ring" style="--mastery:${Math.max(5, item.mastery)}%"><b>${item.mastery}%</b></span>
       </button>`).join('') : `<div class="learn-empty"><span>${iconSvg('memory')}</span><strong>Tus palabras aparecerán aquí</strong><p>Completa un nivel o guarda vocabulario desde una traducción.</p></div>`;
   }
@@ -386,15 +391,15 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
       const encodedWord = encodeURIComponent(item.word);
       return `<article class="saved-word-card" data-custom-word="${escapeHTML(encodedWord)}">
         <div class="saved-word-copy">
-          <span>${escapeHTML(item.situation ? String(item.situation).toUpperCase() : 'DE UNA CONVERSACIÓN')}</span>
+          <span>${escapeHTML(item.situation ? String(item.situation).toUpperCase() : tUi('DE UNA CONVERSACIÓN'))}</span>
           <strong dir="auto"><mark>${escapeHTML(item.word)}</mark></strong>
           <p>${escapeHTML(item.meaning)}</p>
           ${item.example ? `<small>${escapeHTML(item.example)}${item.exampleMeaning ? ` · ${escapeHTML(item.exampleMeaning)}` : ''}</small>` : ''}
         </div>
         <div class="saved-word-tools">
-          <button type="button" data-custom-action="listen"><span aria-hidden="true">▶</span> Escuchar</button>
-          <button type="button" data-custom-action="practice"><span aria-hidden="true">✦</span> Practicar</button>
-          <button type="button" class="saved-word-delete" data-custom-action="delete" aria-label="Eliminar ${escapeHTML(item.word)} de Mis palabras" title="Eliminar">×</button>
+          <button type="button" data-custom-action="listen"><span aria-hidden="true">▶</span> ${tUi('Escuchar')}</button>
+          <button type="button" data-custom-action="practice"><span aria-hidden="true">✦</span> ${tUi('Practicar')}</button>
+          <button type="button" class="saved-word-delete" data-custom-action="delete" aria-label="${tUi('Eliminar')} ${escapeHTML(item.word)} ${tUi('de Mis palabras')}" title="${tUi('Eliminar')}">×</button>
         </div>
       </article>`;
     }).join('');
@@ -427,25 +432,25 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     const progress = courseProgress(state, course);
     ui.levelPanel.classList.remove('is-hidden');
     if (ui.levelIcon) ui.levelIcon.innerHTML = courseIconImage(course.id, 'route-course-image');
-    if (ui.levelTitle) ui.levelTitle.textContent = course.title;
+    if (ui.levelTitle) ui.levelTitle.textContent = tUi(course.title);
     if (ui.levelMeta) ui.levelMeta.textContent = `${levels.length} niveles · ${levels.length * SESSIONS_PER_LEVEL} sesiones · ${course.words.length} palabras · ${levels.length * SESSIONS_PER_LEVEL * LESSON_SIZE} retos`;
     if (ui.levelProgress) ui.levelProgress.style.width = `${progress}%`;
     if (ui.levelGrid) ui.levelGrid.innerHTML = levels.map((level) => {
       const completed = completedSessions(state, course.id, level.id);
       const unlocked = isLevelUnlocked(state, course, level);
       const percent = levelProgress(state, course, level);
-      const status = completed >= SESSIONS_PER_LEVEL ? 'Completado' : unlocked ? `Sesión ${completed + 1} de ${SESSIONS_PER_LEVEL}` : 'Bloqueado';
-      const buttonLabel = completed >= SESSIONS_PER_LEVEL ? 'REPASAR NIVEL' : unlocked ? 'CONTINUAR NIVEL' : 'COMPLETA EL NIVEL ANTERIOR';
+      const status = completed >= SESSIONS_PER_LEVEL ? tUi('Completado') : unlocked ? `${tUi('Sesión')} ${completed + 1} ${tUi('de')} ${SESSIONS_PER_LEVEL}` : tUi('Bloqueado');
+      const buttonLabel = tUi(completed >= SESSIONS_PER_LEVEL ? 'REPASAR NIVEL' : unlocked ? 'CONTINUAR NIVEL' : 'COMPLETA EL NIVEL ANTERIOR');
       return `<article class="level-card ${unlocked ? '' : 'is-locked'} ${completed >= SESSIONS_PER_LEVEL ? 'is-complete' : ''}">
         <div class="level-card-top">
           <span class="level-number">NIVEL ${String(level.number).padStart(2,'0')}</span>
           <span class="level-status-icon">${iconSvg(completed >= SESSIONS_PER_LEVEL ? 'check' : unlocked ? level.icon : 'lock')}</span>
         </div>
         <div class="level-icon-box">${iconSvg(level.icon, 'sb-line-icon level-main-icon')}</div>
-        <h4>${escapeHTML(level.name)}</h4>
-        <strong class="level-focus">${escapeHTML(level.focus)}</strong>
-        <p>${escapeHTML(level.description)}</p>
-        <div class="level-metrics"><span><b>${level.words.length}</b> palabras</span><span><b>${SESSIONS_PER_LEVEL}</b> sesiones</span><span><b>${SESSIONS_PER_LEVEL * LESSON_SIZE}</b> retos</span></div>
+        <h4>${escapeHTML(tUi(level.name))}</h4>
+        <strong class="level-focus">${escapeHTML(tUi(level.focus))}</strong>
+        <p>${escapeHTML(tUi(level.description))}</p>
+        <div class="level-metrics"><span><b>${level.words.length}</b> ${tUi('palabras')}</span><span><b>${SESSIONS_PER_LEVEL}</b> ${tUi('sesiones')}</span><span><b>${SESSIONS_PER_LEVEL * LESSON_SIZE}</b> ${tUi('retos')}</span></div>
         <div class="level-word-preview">${level.words.slice(0,4).map((word) => `<span>${escapeHTML(word.word)}</span>`).join('')}<span>+${Math.max(0, level.words.length - 4)}</span></div>
         <div class="level-progress-row"><span>${status}</span><b>${percent}%</b></div>
         <div class="progress-track compact level-track"><i style="width:${percent}%"></i></div>
@@ -471,8 +476,8 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     const level = currentLevelFor(recent);
     const progress = courseProgress(state, recent);
     const done = completedSessions(state, recent.id, level.id);
-    if (ui.continueTitle) ui.continueTitle.textContent = `${recent.title} · Nivel ${level.number}`;
-    if (ui.continueMeta) ui.continueMeta.textContent = `${level.name} · ${done >= SESSIONS_PER_LEVEL ? 'repaso disponible' : `sesión ${done + 1}/${SESSIONS_PER_LEVEL}`}`;
+    if (ui.continueTitle) ui.continueTitle.textContent = `${tUi(recent.title)} · ${tUi('Nivel')} ${level.number}`;
+    if (ui.continueMeta) ui.continueMeta.textContent = `${tUi(level.name)} · ${done >= SESSIONS_PER_LEVEL ? tUi('repaso disponible') : `${tUi('sesión')} ${done + 1}/${SESSIONS_PER_LEVEL}`}`;
     if (ui.continueBar) ui.continueBar.style.width = `${progress}%`;
     if (ui.continueButton) { ui.continueButton.dataset.course = recent.id; ui.continueButton.dataset.level = level.id; }
 
@@ -489,10 +494,10 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
         return `<button class="course-card" type="button" data-course="${course.id}">
           <span class="course-index">${String(index + 1).padStart(2, '0')}</span>
           <span class="course-icon">${courseIconImage(course.id, 'course-icon-image')}</span>
-          <span class="course-copy"><strong>${course.title}</strong><small>${course.subtitle}</small></span>
-          <span class="course-meta-line"><b>${levels.length} niveles</b><span>${levels.length * SESSIONS_PER_LEVEL} sesiones</span><span>${course.words.length} palabras</span></span>
+          <span class="course-copy"><strong>${tUi(course.title)}</strong><small>${tUi(course.subtitle)}</small></span>
+          <span class="course-meta-line"><b>${levels.length} ${tUi('niveles')}</b><span>${levels.length * SESSIONS_PER_LEVEL} ${tUi('sesiones')}</span><span>${course.words.length} ${tUi('palabras')}</span></span>
           <span class="course-progress"><i style="width:${percent}%"></i></span>
-          <span class="course-footer"><b>${percent}%</b><span>${completedCount}/${levels.length} niveles · Nivel ${current.number} →</span></span>
+          <span class="course-footer"><b>${percent}%</b><span>${completedCount}/${levels.length} ${tUi('niveles')} · ${tUi('Nivel')} ${current.number} →</span></span>
         </button>`;
       }).join('');
     }
@@ -526,7 +531,19 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   function sentencePrompt(word) {
     const source = word.example || '';
     const regex = new RegExp(`\\b${String(word.word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    return source && regex.test(source) ? source.replace(regex, '________') : `Recuerda la palabra en inglés para “${word.meaning}”.`;
+    return source && regex.test(source) ? source.replace(regex, '________') : getUiLocale() === 'en'
+      ? `Recall the English word for “${word.meaning}”.`
+      : `Recuerda la palabra en inglés para “${word.meaning}”.`;
+  }
+
+  function exerciseTitleUi(exercise) {
+    if (getUiLocale() !== 'en') return exercise.title;
+    if (exercise.isRetry) return `Recall “${exercise.word.word}” without using your previous answer`;
+    if (exercise.type === 'meaning') return `What does “${exercise.word.word}” mean?`;
+    if (exercise.type === 'reverse') return `Which word means “${exercise.word.meaning}”?`;
+    if (exercise.type === 'listen') return 'Listen and select the word';
+    if (exercise.type === 'type') return `Write in English: “${exercise.word.meaning}”`;
+    return exercise.word.example ? 'Complete the sentence' : `Recall the word: “${exercise.word.meaning}”`;
   }
 
   function renderExercise() {
@@ -538,9 +555,9 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (ui.playerStep) ui.playerStep.textContent = `${session.index + 1} / ${session.exercises.length}`;
     if (ui.playerBar) ui.playerBar.style.width = `${(session.index / session.exercises.length) * 100}%`;
     if (ui.focus) ui.focus.textContent = session.focus;
-    if (ui.courseLabel) ui.courseLabel.textContent = `${session.course.title.toUpperCase()} · NIVEL ${session.level.number} · ${SESSION_PHASES[session.sessionNumber - 1]?.name?.toUpperCase() || 'REPASO'} ${session.sessionNumber}/${SESSIONS_PER_LEVEL}`;
+    if (ui.courseLabel) ui.courseLabel.textContent = `${tUi(session.course.title).toUpperCase()} · ${tUi('NIVEL')} ${session.level.number} · ${tUi(SESSION_PHASES[session.sessionNumber - 1]?.name || 'Repaso').toUpperCase()} ${session.sessionNumber}/${SESSIONS_PER_LEVEL}`;
     if (ui.badge) ui.badge.textContent = exercise.isRetry ? 'RECUPERA ESTA PALABRA' : ({ meaning: 'SIGNIFICADO', reverse: 'RECUERDO ACTIVO', listen: 'ESCUCHA', type: 'SIN PISTAS', example: 'CONTEXTO' }[exercise.type] || 'APRENDER');
-    if (ui.title) ui.title.textContent = exercise.title;
+    if (ui.title) ui.title.textContent = exerciseTitleUi(exercise);
     if (ui.prompt) {
       ui.prompt.textContent = exercise.type === 'example' ? sentencePrompt(exercise.word) : exercise.type === 'listen' ? 'Escucha una vez. Después elige lo que realmente oíste.' : '';
       ui.prompt.classList.toggle('is-hidden', !ui.prompt.textContent);
@@ -609,7 +626,9 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (ui.feedbackTitle) ui.feedbackTitle.textContent = isCorrect ? (exercise.isRetry ? 'Ahora sí. Esta palabra ya quedó más fuerte.' : 'Bien. Ya conectaste significado y uso.') : 'Todavía no. La reforzamos en unos pasos.';
     if (ui.feedbackCopy) ui.feedbackCopy.innerHTML = isCorrect
       ? `<strong>${escapeHTML(exercise.word.word)}</strong> · ${escapeHTML(exercise.word.meaning)}${exercise.word.example ? `<br><span>${escapeHTML(exercise.word.example)}</span>` : ''}`
-      : `La respuesta correcta es <strong>${escapeHTML(expected)}</strong>. Volverá más adelante para ayudarte a fijarla.`;
+      : getUiLocale() === 'en'
+        ? `The correct answer is <strong>${escapeHTML(expected)}</strong>. You’ll see it again later to help you remember.`
+        : `La respuesta correcta es <strong>${escapeHTML(expected)}</strong>. Volverá más adelante para ayudarte a fijarla.`;
     guidedScroll(ui.feedback, { block: 'end', delay: 60 });
     ui.continue?.focus({ preventScroll: true });
   }
@@ -690,10 +709,11 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
   }
 
   listen(ui.continueButton, 'click', () => { resetQuestionVisibility(); startLesson(ui.continueButton.dataset.course || state.recentCourse, null, ui.continueButton.dataset.level || state.recentLevel); });
-  listen(ui.reviewButton, 'click', () => {
+  function startDueReview() {
     const due = dueWords(state); if (!due.length) { notify?.('No tienes palabras pendientes por repasar.'); return; }
     const firstCourse = due[0].courseId; resetQuestionVisibility(); startLesson(firstCourse, due.filter((item) => item.courseId === firstCourse));
-  });
+  }
+  listen(ui.reviewButton, 'click', startDueReview);
   listen(ui.courseGrid, 'click', (event) => {
     const button = event.target.closest('[data-course]'); if (!button) return;
     selectedCourseId = button.dataset.course; renderLevelPanel(COURSES.find((item) => item.id === selectedCourseId));
@@ -720,7 +740,7 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     }
     if (action === 'practice') { practiceCustomWord(item); return; }
     if (action === 'delete') {
-      if (!window.confirm(`¿Eliminar “${item.word}” de Mis palabras?`)) return;
+      if (!window.confirm(getUiLocale() === 'en' ? `Delete “${item.word}” from My words?` : `¿Eliminar “${item.word}” de Mis palabras?`)) return;
       state.customWords = state.customWords.filter((word) => normalize(word.word) !== normalize(item.word));
       delete state.progress[wordKey('custom', item.word)];
       saveState(state);
@@ -742,6 +762,22 @@ export function initLearning({ notify, speakText, request, createAutoVoiceTurn, 
     if (['1','2','3'].includes(event.key) && !session.answered && !ui.options?.classList.contains('is-hidden')) ui.options.querySelectorAll('.lesson-option')[Number(event.key)-1]?.click();
   });
 
+  function getRecommendation() {
+    state = readState();
+    const dueCount = dueWords(state).length;
+    const course = COURSES.find((item) => item.id === state.recentCourse) || COURSES[0];
+    const level = currentLevelFor(course);
+    return { dueCount, courseTitle: course.title, levelNumber: level.number };
+  }
+
+  function startRecommended() {
+    state = readState();
+    if (dueWords(state).length) { startDueReview(); return; }
+    const course = COURSES.find((item) => item.id === state.recentCourse) || COURSES[0];
+    resetQuestionVisibility();
+    startLesson(course.id, null, currentLevelFor(course).id);
+  }
+
   render();
-  return { render, startLesson, importFromEnglishText, recordImageAnswer, imageProgress };
+  return { render, startLesson, importFromEnglishText, recordImageAnswer, imageProgress, getRecommendation, startRecommended };
 }

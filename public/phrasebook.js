@@ -1,6 +1,7 @@
-import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.23';
-import { getOrCreateTts } from './tts-cache.js?v=1.7.23';
-import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.23';
+import { playBase64Audio, unlockAudioPlayback } from './audio-playback.js?v=1.7.25';
+import { getOrCreateTts } from './tts-cache.js?v=1.7.25';
+import { withLearningAudioWave, setLearningAudioWave, hideLearningAudioWave } from './learning-audio-wave.js?v=1.7.25';
+import { getUiLocale, tUi } from './ui-i18n.js?v=1.7.25';
 
 const KEY = 'sinBarreras.phrasebook.v1';
 const AUDIO_CACHE = 'sin-barreras-phrase-audio-v1';
@@ -83,21 +84,21 @@ export function initPhrasebook({ notify, request, onPractice } = {}) {
   function render() {
     const all = read();
     const items = filteredItems();
-    if (count) count.textContent = `${all.length} ${all.length === 1 ? 'frase' : 'frases'}`;
+    if (count) count.textContent = `${all.length} ${tUi(all.length === 1 ? 'frase' : 'frases')}`;
     if (empty) empty.hidden = items.length > 0;
     if (!list) return;
     list.innerHTML = items.map((item) => `
       <article class="phrase-card" data-phrase-id="${escapeHtml(item.id)}">
-        <div class="phrase-card-top"><span>${PHRASE_CATEGORIES[item.category] || 'General'}</span><small>${item.createdAt ? new Date(item.createdAt).toLocaleDateString('es-US', { month: 'short', day: 'numeric' }) : ''}</small></div>
+        <div class="phrase-card-top"><span>${tUi(PHRASE_CATEGORIES[item.category] || 'General')}</span><small>${item.createdAt ? new Date(item.createdAt).toLocaleDateString(getUiLocale() === 'en' ? 'en-US' : 'es-US', { month: 'short', day: 'numeric' }) : ''}</small></div>
         <p class="phrase-source">${escapeHtml(item.sourceText)}</p>
         <p class="phrase-translation" dir="auto"><mark>${escapeHtml(item.translatedText)}</mark></p>
-        ${item.practiceCount ? `<span class="phrase-card-progress">✓ ${item.practiceCount} ${item.practiceCount === 1 ? 'práctica' : 'prácticas'}${item.bestScore ? ` · mejor ${item.bestScore}%` : ''}</span>` : ''}
+        ${item.practiceCount ? `<span class="phrase-card-progress">✓ ${item.practiceCount} ${tUi(item.practiceCount === 1 ? 'práctica' : 'prácticas')}${item.bestScore ? ` · ${tUi('mejor')} ${item.bestScore}%` : ''}</span>` : ''}
         <div class="phrase-actions">
-          <button type="button" data-action="listen"><span aria-hidden="true">▶</span> Escuchar</button>
-          <button type="button" data-action="practice" title="Practicar por partes" aria-label="Practicar por partes"><span aria-hidden="true">✦</span> Practicar</button>
-          <button type="button" data-action="copy" title="Copiar frase" aria-label="Copiar frase">⧉</button>
-          <button type="button" data-action="share" title="Compartir frase" aria-label="Compartir frase">↗</button>
-          <button type="button" data-action="delete" class="danger" title="Eliminar frase" aria-label="Eliminar frase">×</button>
+          <button type="button" data-action="listen"><span aria-hidden="true">▶</span> ${tUi('Escuchar')}</button>
+          <button type="button" data-action="practice" title="${tUi('Practicar por partes')}" aria-label="${tUi('Practicar por partes')}"><span aria-hidden="true">✦</span> ${tUi('Practicar')}</button>
+          <button type="button" data-action="copy" title="${tUi('Copiar frase')}" aria-label="${tUi('Copiar frase')}">⧉</button>
+          <button type="button" data-action="share" title="${tUi('Compartir frase')}" aria-label="${tUi('Compartir frase')}">↗</button>
+          <button type="button" data-action="delete" class="danger" title="${tUi('Eliminar frase')}" aria-label="${tUi('Eliminar frase')}">×</button>
         </div>
       </article>`).join('');
   }

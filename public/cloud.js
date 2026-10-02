@@ -18,6 +18,7 @@ function readJson(key, fallback) {
 
 function clearAccountKeys() {
   Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
+  localStorage.removeItem('sinBarreras.uiLocale.v1');
 }
 
 function sanitizedSettings(value) {

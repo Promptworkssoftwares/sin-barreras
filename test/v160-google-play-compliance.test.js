@@ -73,8 +73,8 @@ test('Play Console submission and Data Safety guides ship with the release', () 
 });
 
 test('v1.7.8 release metadata is aligned across Node, PWA and Android', () => {
-  assert.match(text('package.json'), /"version": "1\.7\.23"/);
-  assert.match(text('public/sw.js'), /sin-barreras-v1\.7\.23/);
-  assert.match(text('android/app/build.gradle'), /versionCode = 1723/);
-  assert.match(text('android/app/build.gradle'), /versionName = '1\.7\.23'/);
+  assert.match(text('package.json'), /"version": "1\.7\.25"/);
+  assert.match(text('public/sw.js'), /sin-barreras-v1\.7\.25/);
+  assert.match(text('android/app/build.gradle'), /versionCode = 1725/);
+  assert.match(text('android/app/build.gradle'), /versionName = '1\.7\.25'/);
 });

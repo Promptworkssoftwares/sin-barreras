@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles.css?v=1.7.23" />
+    <link rel="stylesheet" href="/styles.css?v=1.7.25" />
   </head>
   <body>
     <main class="app-shell">
@@ -212,8 +212,21 @@
             <span><b class="learn-stat-icon" data-learn-icon="spark"></b><strong id="learn-xp">0</strong><small>XP</small></span>
           </div>
 
+          <div class="learn-language-profile" aria-label="Idiomas de aprendizaje">
+            <label for="learn-native-language">Mi idioma para aprender<select id="learn-native-language" aria-label="Mi idioma para aprender"></select></label>
+            <span aria-hidden="true">→</span>
+            <label for="learn-target-language">Idioma que quiero aprender<select id="learn-target-language" aria-label="Idioma que quiero aprender"></select></label>
+          </div>
+
+          <article class="learn-today-card" aria-labelledby="learn-today-title">
+            <div class="learn-today-orb" aria-hidden="true">✦</div>
+            <div class="learn-today-copy"><span id="learn-today-eyebrow">TU SIGUIENTE PASO</span><h3 id="learn-today-title">Continuar mi aprendizaje</h3><p id="learn-today-description">Preparando tu siguiente paso…</p></div>
+            <button id="learn-today-button" type="button">CONTINUAR MI APRENDIZAJE →</button>
+          </article>
+          <p id="learn-english-note" class="learn-language-note" hidden>Las rutas, los sonidos y Mis palabras enseñan inglés desde el español. Con esta pareja de idiomas puedes aprender mediante imágenes, frases y conversaciones.</p>
+
           <div class="learn-path-grid">
-            <button class="learn-path-card learn-path-routes" type="button" data-learn-path="routes">
+            <button class="learn-path-card learn-path-routes" type="button" data-learn-path="routes" data-english-track>
               <span class="learn-path-visual route-visual" aria-hidden="true">
                 <i></i><i></i><i></i>
               </span>
@@ -226,7 +239,7 @@
               <span class="learn-path-arrow">→</span>
             </button>
 
-            <button class="learn-path-card learn-path-sounds" type="button" data-learn-path="sounds">
+            <button class="learn-path-card learn-path-sounds" type="button" data-learn-path="sounds" data-english-track>
               <span class="learn-path-visual" aria-hidden="true">
                 <i></i><i></i><i></i><i></i><i></i>
               </span>
@@ -283,7 +296,7 @@
               <span class="learn-path-arrow">→</span>
             </button>
 
-            <button class="learn-path-card learn-path-words" type="button" data-learn-path="words">
+            <button class="learn-path-card learn-path-words" type="button" data-learn-path="words" data-english-track>
               <span class="learn-path-visual words-visual" aria-hidden="true">★</span>
               <span class="learn-path-copy">
                 <small>VOCABULARIO PERSONAL</small>
@@ -982,6 +995,14 @@
 
           <div class="settings-divider"></div>
 
+          <label class="modern-setting-row text-size-setting app-language-setting" for="app-language-select">
+            <span class="settings-feature-icon" aria-hidden="true">🌐</span>
+            <div class="modern-setting-copy"><strong>Idioma de la app</strong><small>Cambia los menús y controles. Tus traducciones y la IA siguen igual.</small></div>
+            <select id="app-language-select" data-ui-locale aria-label="Idioma de la interfaz"><option value="es">Español</option><option value="en">English</option></select>
+          </label>
+
+          <div class="settings-divider"></div>
+
           <div class="modern-setting-row voice-setting">
             <span class="settings-feature-icon" aria-hidden="true">◖</span>
             <div class="modern-setting-copy"><strong>Voz del traductor</strong><small>Se usa para leer tus traducciones, práctica y contenido hablado.</small></div>
@@ -1150,7 +1171,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
-    <script src="/play-billing.js?v=1.7.23"></script>
-    <script type="module" src="/app-bootstrap.js?v=1.7.23"></script>
+    <script src="/play-billing.js?v=1.7.25"></script>
+    <script type="module" src="/app-bootstrap.js?v=1.7.25"></script>
   </body>
 </html>

@@ -1,4 +1,21 @@
-# Sin Barreras v1.7.23
+# Sin Barreras v1.7.25
+
+## 1.7.25 · Continuidad y flujo de aprendizaje
+
+- Coach conserva la conversación activa al cambiar de pestaña. Un error al preparar el resumen deja la sesión disponible y ofrece reintento.
+- Aprender guarda por cuenta el idioma desde el que estudias y el idioma objetivo, separados del idioma de la interfaz y de la detección de Hablar.
+- El historial muestra conversaciones de la pareja elegida en ambas direcciones; escuchar, guardar y practicar en Coach usan el idioma objetivo real.
+- La pantalla inicial de Aprender recomienda un paso concreto: retomar Coach, repasar palabras pendientes, continuar la ruta español → inglés, practicar una conversación o empezar una frase.
+- Las rutas y sonidos existentes se muestran solo para español → inglés, la pareja para la que se escribió su contenido. Imágenes y frases siguen disponibles en los demás idiomas.
+- Android versionCode 1725 / versionName 1.7.25; se renueva la caché de la PWA.
+
+## 1.7.24 · Interfaz en español e inglés
+
+- Selector persistente «Idioma de la app» en Preferencias, sincronizado con la cuenta.
+- Menús, pestañas, estados, botones, lecciones, categorías, Coach, Cámara y Mi cuenta en español o inglés; se detecta el idioma del dispositivo al entrar por primera vez.
+- Frases, traducciones, lecturas, texto del usuario y respuestas de IA conservan sus idiomas originales.
+- La confirmación de eliminación acepta DELETE en la interfaz inglesa y ELIMINAR en español sin cambiar el contrato del servidor.
+- Android versionCode 1724 / versionName 1.7.24.
 
 ## 1.7.23 · Cabeceras consistentes con Hablar
 

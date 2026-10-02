@@ -1,4 +1,9 @@
-# Sin Barreras v1.7.23
+# Sin Barreras v1.7.25
+
+### Nuevo en 1.7.25
+
+- La interfaz de Hablar, Aprender, Coach, Cámara, Preferencias y Mi cuenta está disponible en español e inglés. Se cambia en Preferencias → Idioma de la app, y la elección queda guardada en la cuenta.
+- El idioma de la interfaz no altera los idiomas de traducción, el material de aprendizaje ni las respuestas de la IA.
 
 ### Nuevo en 1.7.23
 
